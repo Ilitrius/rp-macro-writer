@@ -142,6 +142,56 @@ function ns.DeleteSaved(name)
 end
 
 -- ---------------------------------------------------------------------------
+-- Eigene Makros im Spiel wiedererkennen (an der Kennung ns.MARKER im Makrotext)
+-- ---------------------------------------------------------------------------
+-- Liefert eine Tabelle Name -> Makro-Index fuer alle Makros mit Kennung (Account + Charakter)
+function ns.ScanMacros()
+    local found = {}
+    local numAccount, numChar = GetNumMacros()
+    local base = MAX_ACCOUNT_MACROS or 120
+    local function check(index)
+        local name, _, body = GetMacroInfo(index)
+        if name and ns.IsOurMacro(body) then found[name] = index end
+    end
+    for i = 1, (numAccount or 0) do check(i) end
+    for i = base + 1, base + (numChar or 0) do check(i) end
+    return found
+end
+
+-- Liste aufbereiten: gespeicherte Kombinationen plus erkannte Makros ohne Vorlage
+function ns.ListEntries()
+    local inGame = ns.ScanMacros()
+    local entries, seen = {}, {}
+    for name in pairs(ns.db.saved) do
+        entries[#entries + 1] = { name = name, hasTemplate = true, inGame = inGame[name] ~= nil }
+        seen[name] = true
+    end
+    for name in pairs(inGame) do
+        if not seen[name] then
+            entries[#entries + 1] = { name = name, hasTemplate = false, inGame = true }
+        end
+    end
+    table.sort(entries, function(a, b) return a.name < b.name end)
+    return entries
+end
+
+function ns.PickupMacroByName(name)
+    if InCombatLockdown() then
+        ns.Print("Im Kampf nicht möglich.")
+        return
+    end
+    local index = GetMacroIndexByName(name)
+    if index and index > 0 then PickupMacro(index) end
+end
+
+-- Liste aktuell halten, wenn Makros im Spiel angelegt, geaendert oder geloescht werden
+local macroWatcher = CreateFrame("Frame")
+macroWatcher:RegisterEvent("UPDATE_MACROS")
+macroWatcher:SetScript("OnEvent", function()
+    if ns.state then ns.Refresh() end
+end)
+
+-- ---------------------------------------------------------------------------
 -- Makro im Spiel anlegen / aktualisieren
 -- ---------------------------------------------------------------------------
 function ns.WriteMacro()
@@ -168,6 +218,12 @@ function ns.WriteMacro()
     local index = GetMacroIndexByName(name)
     local ok, err
     if index and index > 0 then
+        -- Nur eigene Makros ueberschreiben: fremde Makros gleichen Namens bleiben unangetastet
+        local _, _, oldBody = GetMacroInfo(index)
+        if not ns.IsOurMacro(oldBody) then
+            ns.Print("Es gibt schon ein Makro namens \"" .. name .. "\", das nicht von rp-macro-writer stammt. Bitte einen anderen Namen wählen.")
+            return
+        end
         ok, err = pcall(EditMacro, index, name, nil, body)
     else
         local numAccount, numChar = GetNumMacros()

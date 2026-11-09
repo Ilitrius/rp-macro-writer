@@ -28,6 +28,7 @@ local function case(title, steps, patch, expected, expectedWarnings)
   local opts = ns.NewOpts()
   for k, v in pairs(patch) do opts[k] = v end
   local body, warnings = ns.BuildMacro(steps, opts)
+  if expected ~= "" then expected = expected .. "\\n" .. ns.MARKER end
   local ok = body == expected and (expectedWarnings == nil or #warnings == expectedWarnings)
   if not ok then
     fails = fails + 1
@@ -112,6 +113,10 @@ local long = {}
 for i = 1, 10 do long[i] = { kind = "spell", name = "Ein ziemlich langer Zaubername " .. i } end
 local body, w = ns.BuildMacro(long, ns.NewOpts())
 if #body <= 255 or #w ~= 1 then fails = fails + 1; print("FAIL Laengenwarnung") else print("OK   Laengenwarnung bei " .. #body .. " Zeichen") end
+
+local marked = ns.IsOurMacro("#showtooltip\\n/cast X\\n#rpmw") and not ns.IsOurMacro("/cast X\\n#rpmwx")
+  and not ns.IsOurMacro("/say #rpmw") and not ns.IsOurMacro(nil)
+if marked then print("OK   Kennung wird erkannt, Aehnliches nicht") else fails = fails + 1; print("FAIL Kennung") end
 return fails
 `;
 lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Generator.lua'), 'utf8')));

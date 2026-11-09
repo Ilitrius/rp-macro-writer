@@ -7,6 +7,18 @@ ns.MAX_MACRO_LEN = 255
 ns.MAX_NAME_LEN = 16
 ns.MAX_STEPS = 10
 
+-- Kennung als letzte Zeile jedes erzeugten Makros. WoW ignoriert Zeilen, die mit "#" beginnen
+-- (ausser #show/#showtooltip), das Add-on erkennt daran seine eigenen Makros wieder.
+ns.MARKER = "#rpmw"
+
+function ns.IsOurMacro(body)
+    if type(body) ~= "string" then return false end
+    for line in body:gmatch("[^\r\n]+") do
+        if line == ns.MARKER then return true end
+    end
+    return false
+end
+
 function ns.NewOpts()
     return {
         mode = "auto",          -- auto | modifier | lines | random
@@ -162,6 +174,8 @@ function ns.BuildMacro(steps, opts)
         if opts.hostility ~= "help" then cond = ConditionsWith(opts, { noChannel = false }) end
         lines[#lines + 1] = (("/startattack " .. cond):gsub("%s+$", ""))
     end
+
+    lines[#lines + 1] = ns.MARKER
 
     local body = table.concat(lines, "\n")
     if #body > ns.MAX_MACRO_LEN then

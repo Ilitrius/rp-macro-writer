@@ -150,12 +150,6 @@ end
 -- ---------------------------------------------------------------------------
 -- Gespeicherte Kombinationen
 -- ---------------------------------------------------------------------------
-local function SortedSavedNames()
-    local names = {}
-    for name in pairs(ns.db.saved) do names[#names + 1] = name end
-    table.sort(names)
-    return names
-end
 
 local function CreateSavedRow(parent, i)
     local row = CreateFrame("Button", nil, parent)
@@ -170,7 +164,13 @@ local function CreateSavedRow(parent, i)
     row.text:SetWordWrap(false)
 
     row:SetScript("OnClick", function(self)
-        if self.savedName then ns.LoadSaved(self.savedName) end
+        if not self.savedName then return end
+        if self.hasTemplate then
+            ns.LoadSaved(self.savedName)
+        else
+            -- Makro mit Kennung, aber ohne Vorlage: direkt auf den Mauszeiger nehmen
+            ns.PickupMacroByName(self.savedName)
+        end
     end)
 
     row.delete = IconButton(row, "Interface\\Buttons\\UI-StopButton", 14)
@@ -334,7 +334,7 @@ local function CreateUI()
         ui.savedOffset = ui.savedOffset - delta
         ns.Refresh()
     end)
-    local hint = Label(f, "Klick lädt die Kombination, das rote Symbol löscht die Vorlage.", RIGHT_X, -478 + BOTTOM, "GameFontDisableSmall")
+    local hint = Label(f, "Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage, Klick nimmt es auf.", RIGHT_X, -478 + BOTTOM, "GameFontDisableSmall")
     hint:SetWidth(RIGHT_W)
     hint:SetJustifyH("LEFT")
 
@@ -399,20 +399,28 @@ function ns.Refresh()
     end
     ui.warning:SetText(table.concat(warnings, "\n"))
 
-    local names = SortedSavedNames()
-    local maxOffset = math.max(0, #names - SAVED_ROWS)
+    local entries = ns.ListEntries()
+    local maxOffset = math.max(0, #entries - SAVED_ROWS)
     ui.savedOffset = math.min(math.max(ui.savedOffset, 0), maxOffset)
     for i = 1, SAVED_ROWS do
-        local row, savedName = ui.savedRows[i], names[i + ui.savedOffset]
-        row.savedName = savedName
-        if savedName then
-            row.text:SetText(savedName)
+        local row, entry = ui.savedRows[i], entries[i + ui.savedOffset]
+        row.savedName = entry and entry.name
+        row.hasTemplate = entry and entry.hasTemplate
+        if entry then
+            if not entry.hasTemplate then
+                row.text:SetText("|cffaaaaaa" .. entry.name .. " (nur Makro)|r")
+            elseif entry.inGame then
+                row.text:SetText(entry.name .. " |cff40ff40(im Spiel)|r")
+            else
+                row.text:SetText(entry.name)
+            end
+            row.delete:SetShown(entry.hasTemplate)
             row:Show()
         else
             row:Hide()
         end
     end
-    ui.savedEmpty:SetShown(#names == 0)
+    ui.savedEmpty:SetShown(#entries == 0)
 end
 
 function ns.Toggle()
