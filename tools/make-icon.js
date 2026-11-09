@@ -23,6 +23,17 @@ function segDist(px, py, ax, ay, bx, by) {
 const M = [[0.25, 0.70], [0.25, 0.24], [0.50, 0.52], [0.75, 0.24], [0.75, 0.70]];
 const DOTS = [[0.36, 0.845], [0.50, 0.845], [0.64, 0.845]];
 
+// Kleines "RP" zwischen den Beinen des M: Buchstaben als Linienzuege
+function letter(x0, y0, w, h, withLeg) {
+  const bowl = [[x0, y0], [x0 + 0.62 * w, y0], [x0 + w, y0 + 0.13 * h], [x0 + w, y0 + 0.39 * h], [x0 + 0.62 * w, y0 + 0.52 * h], [x0, y0 + 0.52 * h]];
+  const segs = [[[x0, y0], [x0, y0 + h]]];
+  for (let i = 0; i < bowl.length - 1; i++) segs.push([bowl[i], bowl[i + 1]]);
+  if (withLeg) segs.push([[x0 + 0.45 * w, y0 + 0.52 * h], [x0 + w, y0 + h]]);
+  return segs;
+}
+const RP = [...letter(0.385, 0.605, 0.09, 0.125, true), ...letter(0.525, 0.605, 0.09, 0.125, false)];
+const RP_COLOR = hex('#ffe9a8'), RP_OUTLINE = hex('#2a1245');
+
 // Farbe + Deckkraft an Position (x, y) im Einheitsquadrat
 function sample(x, y) {
   const r = 0.17;
@@ -41,6 +52,11 @@ function sample(x, y) {
   if (d < half) c = mix(FEL, hex('#e4ffb0'), clamp(1 - d / half) * 0.5);      // Strich
 
   for (const [cx, cy] of DOTS) if (Math.hypot(x - cx, y - cy) < 0.032) c = GOLD; // Sequenz-Punkte
+
+  let rp = Infinity;
+  for (const [a, b] of RP) rp = Math.min(rp, segDist(x, y, ...a, ...b));
+  if (rp < 0.03) c = mix(c, RP_OUTLINE, 0.85);
+  if (rp < 0.016) c = RP_COLOR;
 
   if (edge > -0.04) c = mix(GOLD, hex('#7a5a1c'), clamp((edge + 0.04) / 0.04) * 0.6); // Rahmen
   return [...c, 1];
