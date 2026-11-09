@@ -1,0 +1,15 @@
+# Paketbeschreibung fuer den BigWigs-Packager / CurseForge.
+# Das Repo-Wurzelverzeichnis ist das Addon; im Paket heisst der Ordner "MakroWriter".
+package-as: MakroWriter
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - tests
+  - tools
+  - docs
+  - media
+  - CLAUDE.md
+  - README.md
