@@ -1,6 +1,6 @@
 # MakroWriter – Projektwissen
 
-WoW-Addon: Zauber per Drag & Drop aus dem Zauberbuch in ein Fenster ziehen, Optionen daneben wählen, daraus ein Makro erzeugen. Schwerpunkt zunächst Hexenmeister (DoTs, Flüche, Begleiter). Der Nutzer schreibt Deutsch; alle UI-Texte, Doku und Berichte sind deutsch.
+WoW-Addon: Zauber per Drag & Drop aus dem Zauberbuch in ein Fenster ziehen, Optionen daneben wählen, daraus ein Makro erzeugen. Schwerpunkt zunächst Hexenmeister (DoTs, Flüche, Begleiter). Der Nutzer schreibt Deutsch; UI-Texte und Berichte sind deutsch, Changelog und Release Notes englisch (siehe „Sprache“).
 
 ## Aufbau
 Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Packager; `.pkgmeta` benennt den Ordner im Paket in `MakroWriter` um).
@@ -15,6 +15,10 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 | `tests/` | Generator-Tests + Syntaxprüfung in einer Lua-VM (`cd tests; npm install; npm test`) |
 | `CHANGELOG.md`, `docs/release-notes/` | Versionsverlauf und Release Notes |
 | `.claude/agents/` | `makro-generator` und `makro-ui` |
+
+## Sprache
+- Mit dem Nutzer, im Fenster des Addons und in dieser Datei: Deutsch.
+- **`CHANGELOG.md` und alle Release Notes immer auf Englisch.** Was der Nutzer dafür auf Deutsch vorgibt, wird ins Englische übersetzt.
 
 ## Arbeitsweise
 - Aufgaben am Makrotext gehen an den Agenten `makro-generator`, Aufgaben an Fenster/Bedienung an `makro-ui`. Kleinigkeiten dürfen direkt erledigt werden.

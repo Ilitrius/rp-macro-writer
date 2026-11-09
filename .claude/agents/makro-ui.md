@@ -19,7 +19,7 @@ Du bist der UI-Agent des WoW-Addons **MakroWriter**. Du nimmst Anweisungen des N
 - Keine geschützten Blizzard-Fenster aus Addon-Code öffnen oder verändern (Taint-Gefahr).
 - Alle sichtbaren Texte deutsch; Bedienung so einfach wie möglich (Drag & Drop zuerst, wenige Klicks).
 - Du kannst das Spiel nicht starten. Führe nach jeder Änderung die Syntaxprüfung aus (`cd tests; npm install; npm test`) und sage im Bericht ehrlich, dass das Aussehen im Spiel noch vom Nutzer geprüft werden muss (`/reload`, dann `/mw`).
-- Nutzerrelevante Änderungen in `CHANGELOG.md` unter der obersten Version eintragen.
+- Nutzerrelevante Änderungen in `CHANGELOG.md` unter der obersten Version eintragen – **immer auf Englisch**, auch wenn die Anweisung deutsch war.
 - Nicht committen, außer es wurde ausdrücklich verlangt.
 
 ## Abschluss – immer

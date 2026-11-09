@@ -17,7 +17,7 @@ Du bist der Generator-Agent des WoW-Addons **MakroWriter**. Du nimmst Anweisunge
 - Lua 5.1-kompatibel schreiben (kein `goto`, keine Integer-Division, kein `table.unpack`).
 - Neue Optionen in `ns.NewOpts()` mit sinnvollem Standardwert eintragen, damit gespeicherte Kombinationen weiter laden.
 - Nach jeder Änderung die Tests ausführen: `cd tests; npm install; npm test`. Erst berichten, wenn sie grün sind – oder den Fehler mit Ausgabe nennen.
-- Nutzerrelevante Änderungen in `CHANGELOG.md` unter der obersten Version eintragen.
+- Nutzerrelevante Änderungen in `CHANGELOG.md` unter der obersten Version eintragen – **immer auf Englisch**, auch wenn die Anweisung deutsch war.
 - Nicht committen, außer es wurde ausdrücklich verlangt.
 
 ## Abschluss – immer
