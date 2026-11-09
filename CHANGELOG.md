@@ -15,6 +15,8 @@ First version. Not yet tested in game.
 - Target conditions: enemy / friend / any, and alive / dead / any; optionally check mouseover or focus first, then the current target.
 - More macro types: modifier key (Shift / Ctrl / Alt per spell), separate lines, random (`/castrandom`).
 - Extras: `#showtooltip`, pet attack, auto-target an enemy, do not interrupt channeled spells, character-specific macro.
+- Set the unit under the mouse as focus (`/focus [@mouseover,…]`) and cast on the focus, so the target stays locked without changing your current target.
+- Start auto-attack at the end of the macro (`/startattack`), aimed at the same target as the spells.
 - Live preview of the macro text with a character counter (255 limit) and warnings.
 - Create or update the macro in game and pick it up with one click to place it on an action bar.
 - Saved combinations: every created combination can be loaded and edited again later.

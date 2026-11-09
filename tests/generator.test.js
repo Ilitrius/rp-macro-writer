@@ -62,6 +62,20 @@ case("Auto: Freund und tot", { { kind = "spell", name = "Wiederbelebung" } },
   { hostility = "help", life = "dead", showTooltip = false },
   "/cast [help,dead] Wiederbelebung", 0)
 
+-- Fokus auf Mouseover und Angriff starten
+case("Fokus: Mouseover als Fokus, Fokus als Ziel, Angriff am Ende", { dots[1] },
+  { focusMouseover = true, target = "focus", startAttack = true },
+  "#showtooltip\\n/focus [@mouseover,harm,nodead]\\n/cast [@focus,harm,nodead][harm,nodead] Verderbnis\\n/startattack [@focus,harm,nodead][harm,nodead]", 0)
+case("Fokus: ohne Bedingungen braucht exists", { dots[1] },
+  with(any, { focusMouseover = true, target = "focus", showTooltip = false }),
+  "/focus [@mouseover,exists]\\n/cast [@focus,exists][] Verderbnis", 0)
+case("Angriff: ohne Bedingungen bleibt schlicht", { dots[1] },
+  with(any, { startAttack = true, showTooltip = false, noChannel = true }),
+  "/cast [nochanneling] Verderbnis\\n/startattack", 0)
+case("Angriff: nach Sequenz, nochanneling gilt nicht fuer den Angriff", dots,
+  { startAttack = true, noChannel = true, showTooltip = false },
+  "/castsequence [harm,nodead,nochanneling] reset=target/combat " .. list .. "\\n/startattack [harm,nodead]", 0)
+
 -- Sequenz-Optionen
 case("Sequenz: Sekunden-Reset, Begleiter, Auto-Ziel", dots,
   { resetSeconds = 6, petAttack = true, autoTarget = true },

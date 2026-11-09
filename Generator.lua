@@ -20,6 +20,8 @@ function ns.NewOpts()
         petAttack = false,
         autoTarget = false,
         noChannel = false,
+        focusMouseover = false, -- /focus auf die Einheit unter der Maus setzen
+        startAttack = false,    -- /startattack am Ende
         perChar = true,
     }
 end
@@ -69,6 +71,20 @@ local function Conditions(opts, mod)
     return out .. " "
 end
 
+-- Wie Conditions, aber mit abweichenden Einstellungen (z.B. anderes Ziel, ohne nochanneling)
+local function ConditionsWith(opts, overrides)
+    local copy = {}
+    for k, v in pairs(opts) do copy[k] = v end
+    for k, v in pairs(overrides) do copy[k] = v end
+    return Conditions(copy)
+end
+
+-- Bedingung nur fuer die Einheit unter der Maus, z.B. "[@mouseover,harm,nodead]"
+local function MouseoverOnly(opts)
+    local both = ConditionsWith(opts, { target = "mouseover", noChannel = false })
+    return both:match("^(%b[])")
+end
+
 -- Automatik: ein Zauber = einfacher Cast, mehrere = Cast-Sequenz
 function ns.DetectKind(steps)
     if #steps <= 1 then return "cast" end
@@ -87,6 +103,7 @@ function ns.BuildMacro(steps, opts)
     if #steps == 0 then return "", warnings end
 
     if opts.showTooltip then lines[#lines + 1] = "#showtooltip" end
+    if opts.focusMouseover then lines[#lines + 1] = "/focus " .. MouseoverOnly(opts) end
     if opts.autoTarget then lines[#lines + 1] = "/targetenemy [noharm][dead]" end
     if opts.petAttack then lines[#lines + 1] = "/petattack" end
 
@@ -137,6 +154,13 @@ function ns.BuildMacro(steps, opts)
         if #steps > 1 then
             warnings[#warnings + 1] = "Hinweis: Pro Tastendruck löst WoW nur einen Zauber mit globaler Abklingzeit aus."
         end
+    end
+
+    if opts.startAttack then
+        -- Angriff auf dasselbe Ziel wie die Zauber; bei "Freund" ohne Bedingung auf das aktuelle Ziel
+        local cond = ""
+        if opts.hostility ~= "help" then cond = ConditionsWith(opts, { noChannel = false }) end
+        lines[#lines + 1] = (("/startattack " .. cond):gsub("%s+$", ""))
     end
 
     local body = table.concat(lines, "\n")

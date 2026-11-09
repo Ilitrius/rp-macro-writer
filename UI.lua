@@ -1,8 +1,8 @@
 -- UI.lua: Fenster mit Ablaufliste (Drop-Ziel), Optionen, Vorschau und gespeicherten Kombinationen.
 local ADDON, ns = ...
 
-local ROWS, ROW_H = ns.MAX_STEPS, 29
-local BOTTOM = -50 -- Versatz des unteren Bereichs (Name, Vorschau, gespeicherte Kombinationen)
+local ROWS, ROW_H = ns.MAX_STEPS, 31
+local BOTTOM = -72-- Versatz des unteren Bereichs (Name, Vorschau, gespeicherte Kombinationen)
 local SAVED_ROWS, SAVED_H = 6, 22
 local LEFT_X, LEFT_W = 14, 300
 local RIGHT_X, RIGHT_W = 328, 298
@@ -187,7 +187,7 @@ end
 local function CreateUI()
     local f = CreateFrame("Frame", "MakroWriterFrame", UIParent, "BasicFrameTemplate")
     ui.frame = f
-    f:SetSize(640, 576)
+    f:SetSize(640, 598)
     f:SetPoint("CENTER", UIParent, "CENTER", 250, 0)
     f:SetToplevel(true)
     f:SetClampedToScreen(true)
@@ -268,6 +268,14 @@ local function CreateUI()
     Toggle(f, "Automatisch Gegner wählen", c1, -304, "autoTarget")
     Toggle(f, "Nur dieser Charakter", c1 + 160, -304, "perChar")
     Toggle(f, "Kanalisierte Zauber nicht abbrechen", c1, -326, "noChannel")
+    -- Setzt den Fokus auf die Einheit unter der Maus und stellt das Ziel gleich auf "Fokus" um
+    Check(f, "Maus-Ziel als Fokus setzen", c1, -348,
+        function() return ns.state.opts.focusMouseover end,
+        function(checked)
+            ns.state.opts.focusMouseover = checked
+            if checked then ns.state.opts.target = "focus" end
+        end)
+    Toggle(f, "Am Ende angreifen", c1 + 160, -348, "startAttack")
 
     -- Unten links: Name, Vorschau, Knoepfe ------------------------------------
     Label(f, "Makroname", LEFT_X, -312 + BOTTOM)
