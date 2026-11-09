@@ -27,7 +27,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 - Im Spiel kann nur der Nutzer testen (`/reload`, dann `/mw`). Nie behaupten, etwas sei im Spiel geprüft.
 
 ## Technische Regeln
-- **Variantenneutral:** WoW liegt unter `D:\Games\Battle.net\World of Warcraft` mit `_retail_` (12.1.5), `_classic_`, `_classic_era_`, `_anniversary_`, `_forever_` (Interface 16001) und Betas. Getestet wird zuerst in **Classic Era** (Verknüpfung `_classic_era_\Interface\AddOns\MakroWriter` → Projektordner, Änderungen wirken nach `/reload`). Der Code soll trotzdem in allen Varianten laufen.
+- **Variantenneutral:** WoW liegt unter `D:\Games\Battle.net\World of Warcraft` mit `_retail_` (12.1.5), `_classic_`, `_classic_era_`, `_anniversary_`, `_forever_` (Interface 16001) und Betas. **Zielvariante ist WoW Forever** (`_forever_`, Interface 16001, Client 1.60.x) – dafür ist das Addon gedacht, dort wird getestet. Der Projektordner ist per Verknüpfung in `_forever_\Interface\AddOns\MakroWriter` und `_classic_era_\Interface\AddOns\MakroWriter` eingebunden (Änderungen wirken nach `/reload`). Andere Varianten sind Beifang: Kompatibilität behalten, solange sie nichts kostet. Forever hat `C_Spell`/`C_Item`; das globale `GetSpellInfo` ist dort laut Wiki nicht gelistet.
 - `C_Spell.GetSpellName` / `C_Spell.GetSpellTexture` / `C_Item.GetItemInfo` / `C_Item.GetItemIconByID` bevorzugen, auf globale Funktionen zurückfallen. `GetSpellInfo` ist in Retail seit 11.0.2 entfernt.
 - Keine `UIDropDownMenu`- oder Backdrop-Templates; nur `BasicFrameTemplate`, `UIPanelButtonTemplate`, `UICheckButtonTemplate`, `InputBoxTemplate`.
 - `CreateMacro`, `EditMacro`, `PickupMacro` sind im Kampf gesperrt → vorher `InCombatLockdown()` prüfen. Makrotext max. 255 Bytes, Name max. 16 Zeichen, 120 Account-Makros; Charakter-Makros je nach Variante 18 oder 30 (`MAX_CHARACTER_MACROS` nutzen).
@@ -50,6 +50,6 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 6. Interface-Nummern in der TOC bei jedem WoW-Patch gegen `TOC_format` im Wiki abgleichen.
 
 ## Offen
-- Erster Test im Spiel (Classic Era) durch den Nutzer steht aus.
+- Erster Test im Spiel (WoW Forever) durch den Nutzer steht aus.
 - Screenshots für CurseForge (erst nach dem Test im Spiel möglich).
 - Lizenz wählen, GitHub-Remote und CurseForge-Projekt anlegen.
