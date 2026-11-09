@@ -1,8 +1,8 @@
-# MakroWriter
+# rp-macro-writer
 
 **Build macros by drag and drop. No typing, no syntax, no guesswork.**
 
-MakroWriter turns macro writing into something you do with your mouse. Open the window, drag spells straight out of your spellbook, tick the options you want, and the finished macro appears in front of you – ready to be placed on your action bar.
+rp-macro-writer turns macro writing into something you do with your mouse. Open the window, drag spells straight out of your spellbook, tick the options you want, and the finished macro appears in front of you – ready to be placed on your action bar.
 
 It was built with warlocks in mind (DoTs, curses, pets), but it works with every class.
 
@@ -15,7 +15,7 @@ It was built with warlocks in mind (DoTs, curses, pets), but it works with every
 - **More macro types:** put different spells on Shift / Ctrl / Alt, cast a random spell from your list, or generate one line per spell.
 - **Useful extras:** `#showtooltip`, send your pet in, auto-target the nearest enemy, protect channeled spells from being clipped, account-wide or character-specific macro.
 - **Live preview:** the macro text updates as you click, with a character counter for the 255-character limit and plain warnings when something will not work.
-- **One-click creation:** MakroWriter creates or updates the macro in game and hands it to your cursor to drop on a bar.
+- **One-click creation:** rp-macro-writer creates or updates the macro in game and hands it to your cursor to drop on a bar.
 - **Saved combinations:** every combination you create is stored, so you can load it later, tweak it and save it again.
 
 ## Why you will like it

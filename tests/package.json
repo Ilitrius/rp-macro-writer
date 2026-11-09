@@ -1,5 +1,5 @@
 {
-  "name": "makrowriter-tests",
+  "name": "rp-macro-writer-tests",
   "private": true,
   "description": "Tests fuer den Makro-Generator (laufen ausserhalb von WoW in einer Lua-VM)",
   "scripts": {

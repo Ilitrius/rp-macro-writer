@@ -1,7 +1,7 @@
 -- Core.lua: Zustand, gespeicherte Daten, Drag & Drop-Annahme, Makro schreiben.
 local ADDON, ns = ...
 
-local PREFIX = "|cff9482c9MakroWriter|r: "
+local PREFIX = "|cff9482c9rp-macro-writer|r: "
 local QUESTION_MARK_ICON = 134400 -- Fragezeichen: WoW zeigt dann automatisch das Symbol des Zaubers
 
 function ns.Print(msg)
@@ -55,8 +55,8 @@ local function CopyOpts(opts)
 end
 
 local function InitDB()
-    MakroWriterDB = MakroWriterDB or {}
-    local db = MakroWriterDB
+    RPMacroWriterDB = RPMacroWriterDB or {}
+    local db = RPMacroWriterDB
     db.saved = db.saved or {}
     db.current = db.current or {}
     db.current.name = db.current.name or ""
@@ -217,9 +217,9 @@ loader:SetScript("OnEvent", function(self, _, addon)
     InitDB()
 end)
 
-SLASH_MAKROWRITER1 = "/mw"
-SLASH_MAKROWRITER2 = "/makrowriter"
-SLASH_MAKROWRITER3 = "/macrowriter"
-SlashCmdList["MAKROWRITER"] = function()
+SLASH_RPMACROWRITER1 = "/mw"
+SLASH_RPMACROWRITER2 = "/rpmw"
+SLASH_RPMACROWRITER3 = "/macrowriter"
+SlashCmdList["RPMACROWRITER"] = function()
     if ns.Toggle then ns.Toggle() end
 end

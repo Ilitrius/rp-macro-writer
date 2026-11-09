@@ -22,7 +22,7 @@ for (const file of ['Generator.lua', 'Core.lua', 'UI.lua']) {
 
 const harness = `
 local chunk = assert(load(GEN, "@Generator.lua"))
-local ns = chunk("MakroWriter", {})
+local ns = chunk("rp-macro-writer", {})
 local fails = 0
 local function case(title, steps, patch, expected, expectedWarnings)
   local opts = ns.NewOpts()

@@ -1,15 +1,15 @@
-# MakroWriter – Projektwissen
+# rp-macro-writer – Projektwissen
 
 WoW-Addon: Zauber per Drag & Drop aus dem Zauberbuch in ein Fenster ziehen, Optionen daneben wählen, daraus ein Makro erzeugen. Schwerpunkt zunächst Hexenmeister (DoTs, Flüche, Begleiter). Der Nutzer schreibt Deutsch; UI-Texte und Berichte sind deutsch, Changelog und Release Notes englisch (siehe „Sprache“).
 
 ## Aufbau
-Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Packager; `.pkgmeta` benennt den Ordner im Paket in `MakroWriter` um).
+Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Packager; `.pkgmeta` benennt den Ordner im Paket in `rp-macro-writer` um).
 
 | Datei | Inhalt |
 |---|---|
-| `MakroWriter.toc` | Metadaten, Interface-Nummern, Ladereihenfolge |
+| `rp-macro-writer.toc` | Metadaten, Interface-Nummern, Ladereihenfolge |
 | `Generator.lua` | Makrotext aus Schritten + Optionen. **Keine WoW-API**, damit testbar |
-| `Core.lua` | Zustand, `MakroWriterDB`, Drag-&-Drop-Annahme, Makro anlegen, Slash-Befehle |
+| `Core.lua` | Zustand, `RPMacroWriterDB`, Drag-&-Drop-Annahme, Makro anlegen, Slash-Befehle |
 | `UI.lua` | Fenster, Ablaufliste, Optionen, Vorschau, gespeicherte Kombinationen |
 | `icon.tga` | Addon-Icon im Spiel, erzeugt von `tools/make-icon.js` (auch `media/icon.png` für CurseForge) |
 | `tests/` | Generator-Tests + Syntaxprüfung in einer Lua-VM (`cd tests; npm install; npm test`) |
@@ -27,7 +27,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 - Im Spiel kann nur der Nutzer testen (`/reload`, dann `/mw`). Nie behaupten, etwas sei im Spiel geprüft.
 
 ## Technische Regeln
-- **Variantenneutral:** WoW liegt unter `D:\Games\Battle.net\World of Warcraft` mit `_retail_` (12.1.5), `_classic_`, `_classic_era_`, `_anniversary_`, `_forever_` (Interface 16001) und Betas. **Zielvariante ist WoW Forever** (`_forever_`, Interface 16001, Client 1.60.x) – dafür ist das Addon gedacht, dort wird getestet. Der Projektordner ist per Verknüpfung in `_forever_\Interface\AddOns\MakroWriter` und `_classic_era_\Interface\AddOns\MakroWriter` eingebunden (Änderungen wirken nach `/reload`). Andere Varianten sind Beifang: Kompatibilität behalten, solange sie nichts kostet. Forever hat `C_Spell`/`C_Item`; das globale `GetSpellInfo` ist dort laut Wiki nicht gelistet.
+- **Variantenneutral:** WoW liegt unter `D:\Games\Battle.net\World of Warcraft` mit `_retail_` (12.1.5), `_classic_`, `_classic_era_`, `_anniversary_`, `_forever_` (Interface 16001) und Betas. **Zielvariante ist WoW Forever** (`_forever_`, Interface 16001, Client 1.60.x) – dafür ist das Addon gedacht, dort wird getestet. Der Projektordner ist per Verknüpfung in `_forever_\Interface\AddOns\rp-macro-writer` und `_classic_era_\Interface\AddOns\rp-macro-writer` eingebunden (Änderungen wirken nach `/reload`). Andere Varianten sind Beifang: Kompatibilität behalten, solange sie nichts kostet. Forever hat `C_Spell`/`C_Item`; das globale `GetSpellInfo` ist dort laut Wiki nicht gelistet.
 - `C_Spell.GetSpellName` / `C_Spell.GetSpellTexture` / `C_Item.GetItemInfo` / `C_Item.GetItemIconByID` bevorzugen, auf globale Funktionen zurückfallen. `GetSpellInfo` ist in Retail seit 11.0.2 entfernt.
 - Keine `UIDropDownMenu`- oder Backdrop-Templates; nur `BasicFrameTemplate`, `UIPanelButtonTemplate`, `UICheckButtonTemplate`, `InputBoxTemplate`.
 - `CreateMacro`, `EditMacro`, `PickupMacro` sind im Kampf gesperrt → vorher `InCombatLockdown()` prüfen. Makrotext max. 255 Bytes, Name max. 16 Zeichen, 120 Account-Makros; Charakter-Makros je nach Variante 18 oder 30 (`MAX_CHARACTER_MACROS` nutzen).
@@ -42,7 +42,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 - https://www.wowhead.com/guide/comprehensive-beginners-guide-for-wow-addon-coding-in-lua-5338 – Einsteiger-Guide
 
 ## Release-Ablauf (CurseForge)
-1. Version in `MakroWriter.toc` (`## Version`) erhöhen.
+1. Version in `rp-macro-writer.toc` (`## Version`) erhöhen.
 2. `CHANGELOG.md`: Abschnitt der Version mit Datum versehen; neue Einträge immer oben.
 3. `docs/release-notes/vX.Y.Z.md` schreiben (nutzerfreundliche Fassung für die CurseForge-Seite).
 4. Tests grün, im Spiel geprüft, dann committen und `git tag vX.Y.Z`.

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to MakroWriter are documented in this file.
+All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [0.1.0] – unreleased
@@ -8,7 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 First version. Not yet tested in game.
 
 ### Added
-- Window opened with `/mw` (also `/makrowriter`, `/macrowriter`); ESC closes it.
+- Window opened with `/mw` (also `/rpmw`, `/macrowriter`); ESC closes it.
 - Drag and drop spells, pet abilities and items from the spellbook and bags into the step list; reorder with arrows, remove single entries.
 - **Automatic detection:** one spell becomes a simple cast (`/cast`), several become a cast sequence (`/castsequence`).
 - Sequence reset on target change, on leaving combat and/or after a configurable number of seconds.

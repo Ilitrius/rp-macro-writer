@@ -185,7 +185,7 @@ end
 -- Fenster
 -- ---------------------------------------------------------------------------
 local function CreateUI()
-    local f = CreateFrame("Frame", "MakroWriterFrame", UIParent, "BasicFrameTemplate")
+    local f = CreateFrame("Frame", "RPMacroWriterFrame", UIParent, "BasicFrameTemplate")
     ui.frame = f
     f:SetSize(640, 598)
     f:SetPoint("CENTER", UIParent, "CENTER", 250, 0)
@@ -196,14 +196,14 @@ local function CreateUI()
     f:SetScript("OnDragStart", f.StartMoving)
     f:SetScript("OnDragStop", f.StopMovingOrSizing)
     AcceptDrop(f)
-    tinsert(UISpecialFrames, "MakroWriterFrame") -- ESC schliesst das Fenster
+    tinsert(UISpecialFrames, "RPMacroWriterFrame") -- ESC schliesst das Fenster
 
     if f.TitleText then
-        f.TitleText:SetText("MakroWriter")
+        f.TitleText:SetText("rp-macro-writer")
     else
         local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         title:SetPoint("TOP", f, "TOP", 0, -6)
-        title:SetText("MakroWriter")
+        title:SetText("rp-macro-writer")
     end
 
     -- Links: Ablauf ----------------------------------------------------------

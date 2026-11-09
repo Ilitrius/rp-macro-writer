@@ -1,4 +1,4 @@
-# MakroWriter
+# rp-macro-writer
 
 World-of-Warcraft-Addon: Zauber per Drag & Drop zu Makros kombinieren. Schwerpunkt zunächst Hexenmeister (DoTs, Flüche, Begleiter), funktioniert aber mit jeder Klasse.
 
@@ -11,10 +11,10 @@ World-of-Warcraft-Addon: Zauber per Drag & Drop zu Makros kombinieren. Schwerpun
 Bei „Automatisch erkennen“ wird aus einem Zauber ein einfacher Cast und aus mehreren eine Cast-Sequenz.
 
 ## Installation zum Testen
-Den Projektordner als `MakroWriter` in den AddOns-Ordner der gewünschten Spielvariante verknüpfen (PowerShell, einmalig):
+Den Projektordner als `rp-macro-writer` in den AddOns-Ordner der gewünschten Spielvariante verknüpfen (PowerShell, einmalig):
 
 ```powershell
-New-Item -ItemType Junction -Path "D:\Games\Battle.net\World of Warcraft\_retail_\Interface\AddOns\MakroWriter" -Target "D:\AI_KI\wow-macro-writer"
+New-Item -ItemType Junction -Path "D:\Games\Battle.net\World of Warcraft\_retail_\Interface\AddOns\rp-macro-writer" -Target "D:\AI_KI\rp-macro-writer"
 ```
 
 Danach im Spiel `/reload`.
