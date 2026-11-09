@@ -19,5 +19,5 @@ First version. Not yet tested in game.
 - Start auto-attack at the end of the macro (`/startattack`), aimed at the same target as the spells.
 - Live preview of the macro text with a character counter (255 limit) and warnings.
 - Create or update the macro in game and pick it up with one click to place it on an action bar.
-- Saved combinations: every created combination can be loaded and edited again later.
+- Saved combinations: every created combination is stored account-wide, so it can be loaded and edited again later on any character. Macros are created account-wide by default; a checkbox makes them character-specific.
 - Supported game flavors according to the TOC: Retail 12.1.x, Mists Classic, Wrath (Titan Reforged), TBC Classic, Forever, Classic Era.

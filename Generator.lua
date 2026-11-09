@@ -22,7 +22,7 @@ function ns.NewOpts()
         noChannel = false,
         focusMouseover = false, -- /focus auf die Einheit unter der Maus setzen
         startAttack = false,    -- /startattack am Ende
-        perChar = true,
+        perChar = false,        -- false = Makro gilt fuer alle Charaktere (Account)
     }
 end
 

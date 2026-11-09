@@ -16,7 +16,7 @@ It was built with warlocks in mind (DoTs, curses, pets), but it works with every
 - **Useful extras:** `#showtooltip`, send your pet in, auto-target the nearest enemy, protect channeled spells from being clipped, account-wide or character-specific macro.
 - **Live preview:** the macro text updates as you click, with a character counter for the 255-character limit and plain warnings when something will not work.
 - **One-click creation:** rp-macro-writer creates or updates the macro in game and hands it to your cursor to drop on a bar.
-- **Saved combinations:** every combination you create is stored, so you can load it later, tweak it and save it again.
+- **Saved combinations, shared across characters:** every combination you create is stored account-wide, so you can load it on any character, tweak it and save it again.
 
 ## Why you will like it
 
