@@ -3,9 +3,9 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] – unreleased
+## [0.1.0] – 2026-11-09
 
-First version. Not yet tested in game.
+First release.
 
 ### Added
 - Window opened with `/mw` (also `/rpmw`, `/macrowriter`); ESC closes it.
@@ -21,4 +21,12 @@ First version. Not yet tested in game.
 - Create or update the macro in game and pick it up with one click to place it on an action bar.
 - Saved combinations: every created combination is stored account-wide, so it can be loaded and edited again later on any character. Macros are created account-wide by default; a checkbox makes them character-specific.
 - Every generated macro ends with the marker line `#rpmw`. The addon uses it to recognise its own macros in game, shows them in the list, and never overwrites a macro of the same name that it did not create.
-- Supported game flavors according to the TOC: Retail 12.1.x, Mists Classic, Wrath (Titan Reforged), TBC Classic, Forever, Classic Era.
+
+### Known limitations
+- WoW allows only one spell on the global cooldown per key press; a cast sequence casts the next spell with each press.
+- Macros cannot be created or changed while in combat.
+- A macro holds at most 255 characters; the marker line uses 6 of them.
+- The addon's interface is currently German only.
+
+### Supported game versions
+Developed for WoW Forever. Also flagged for Retail 12.1.x, Mists Classic, Wrath (Titan Reforged), TBC Classic and Classic Era.
