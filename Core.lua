@@ -199,7 +199,7 @@ function ns.PickupMacro()
     if index and index > 0 then
         PickupMacro(index)
     else
-        ns.Print("Dieses Makro gibt es noch nicht – zuerst \"Makro erstellen\" klicken.")
+        ns.Print("Dieses Makro gibt es noch nicht – zuerst \"Makro erstellen/speichern\" klicken.")
     end
 end
 

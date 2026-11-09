@@ -309,15 +309,15 @@ local function CreateUI()
     ui.warning:SetJustifyH("LEFT")
     ui.warning:SetJustifyV("TOP")
 
-    local create = TextButton(f, "Makro erstellen", 120)
+    local create = TextButton(f, "Makro erstellen/speichern", 172)
     create:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", LEFT_X, 12)
     create:SetScript("OnClick", function() ns.WriteMacro() end)
 
-    local pickup = TextButton(f, "Auf Leiste", 100)
+    local pickup = TextButton(f, "Auf Leiste", 74)
     pickup:SetPoint("LEFT", create, "RIGHT", 4, 0)
     pickup:SetScript("OnClick", function() ns.PickupMacro() end)
 
-    local clear = TextButton(f, "Leeren", 70)
+    local clear = TextButton(f, "Leeren", 50)
     clear:SetPoint("LEFT", pickup, "RIGHT", 4, 0)
     clear:SetScript("OnClick", function() ns.ClearSteps() end)
 

@@ -6,7 +6,7 @@ World-of-Warcraft-Addon: Zauber per Drag & Drop zu Makros kombinieren. Schwerpun
 1. `/mw` öffnet das Fenster.
 2. Zauber aus dem Zauberbuch (oder Gegenstände aus den Taschen) in die Liste „Ablauf“ ziehen.
 3. Rechts Art, Reset, Ziel und Extras wählen – die Vorschau unten zeigt den Makrotext sofort.
-4. Namen eingeben, **Makro erstellen**, dann mit **Auf Leiste** auf eine Aktionsleiste ziehen.
+4. Namen eingeben, **Makro erstellen/speichern**, dann mit **Auf Leiste** auf eine Aktionsleiste ziehen.
 
 Bei „Automatisch erkennen“ wird aus einem Zauber ein einfacher Cast und aus mehreren eine Cast-Sequenz.
 
