@@ -45,7 +45,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 1. Version in `rp-macro-writer.toc` (`## Version`) erhöhen.
 2. `CHANGELOG.md`: Abschnitt der Version mit Datum versehen; neue Einträge immer oben.
 3. `docs/release-notes/vX.Y.Z.md` schreiben (nutzerfreundliche Fassung für die CurseForge-Seite).
-4. Tests grün, im Spiel geprüft, dann committen und `git tag vX.Y.Z`.
+4. Tests grün, im Spiel geprüft, dann committen und ZIP bauen (`pwsh tools/build-release.ps1`). GitHub-Release samt ZIP: `gh release create vX.Y.Z .release/rp-macro-writer-X.Y.Z.zip --target main --title ... --notes-file ...` (Notizen = Changelog-Abschnitt der Version; bis zum Spieltest mit `--prerelease`).
 5. Paket bauen: BigWigs-Packager liest `.pkgmeta`. Sobald das CurseForge-Projekt existiert, `## X-Curse-Project-ID: <id>` in die TOC eintragen.
 6. Interface-Nummern in der TOC bei jedem WoW-Patch gegen `TOC_format` im Wiki abgleichen.
 
