@@ -1,30 +1,33 @@
 # rp-macro-writer
 
-World-of-Warcraft-Addon: Zauber per Drag & Drop zu Makros kombinieren. Schwerpunkt zunächst Hexenmeister (DoTs, Flüche, Begleiter), funktioniert aber mit jeder Klasse.
+World of Warcraft addon: combine spells into macros by drag and drop. Initially focused on warlocks (DoTs, curses, pets), but it works with any class. Targets WoW Forever and WoW Retail. The addon's interface is currently German only.
 
-## Benutzung
-1. `/mw` öffnet das Fenster.
-2. Zauber aus dem Zauberbuch (oder Gegenstände aus den Taschen) in die Liste „Ablauf“ ziehen.
-3. Rechts Art, Reset, Ziel und Extras wählen – die Vorschau unten zeigt den Makrotext sofort.
-4. Namen eingeben, **Makro erstellen/speichern**, dann mit **Auf Leiste** auf eine Aktionsleiste ziehen.
+## Usage
+1. `/mw` opens the window.
+2. Drag spells from the spellbook (or items from your bags) into the "Ablauf" (sequence) list.
+3. Choose type, reset, target and extras on the right – the preview at the bottom shows the macro text immediately.
+4. Enter a name, click **Makro erstellen/speichern** (create/save macro), then drag it onto an action bar with **Auf Leiste** (to bar).
 
-Bei „Automatisch erkennen“ wird aus einem Zauber ein einfacher Cast und aus mehreren eine Cast-Sequenz.
+With "Automatisch erkennen" (detect automatically), one spell becomes a simple cast and several become a cast sequence.
 
-## Installation zum Testen
-Den Projektordner (Name beliebig, hier `wow-macro-writer`) als `rp-macro-writer` in den AddOns-Ordner der gewünschten Spielvariante verknüpfen (PowerShell, einmalig):
+## Installing for testing
+Link the project folder (any name, here `wow-macro-writer`) as `rp-macro-writer` into the AddOns folder of the game flavor you want (PowerShell, once):
 
 ```powershell
 New-Item -ItemType Junction -Path "D:\Games\Battle.net\World of Warcraft\_retail_\Interface\AddOns\rp-macro-writer" -Target "D:\AI_KI\wow-macro-writer"
 ```
 
-Danach im Spiel `/reload`.
+Then type `/reload` in game.
 
-## Entwicklung
-- `Generator.lua` – Makrotext aus Schritten + Optionen (ohne WoW-API, testbar)
-- `Core.lua` – Zustand, Drag & Drop, Makros im Spiel anlegen
-- `UI.lua` – Fenster
+## Development
+- `Generator.lua` – macro text from steps + options (no WoW API, testable)
+- `Core.lua` – state, drag and drop, creating macros in game
+- `UI.lua` – window
 - Tests: `cd tests; npm install; npm test`
-- Icon neu erzeugen: `node tools/make-icon.js`
+- Regenerate the icon: `node tools/make-icon.js`
 
-## Veröffentlichen
-Versionsverlauf in [CHANGELOG.md](CHANGELOG.md), Release Notes je Version in [docs/release-notes](docs/release-notes). Ablauf siehe [CLAUDE.md](CLAUDE.md).
+## Releasing
+Version history in [CHANGELOG.md](CHANGELOG.md), release notes per version in [docs/release-notes](docs/release-notes). For the procedure see [CLAUDE.md](CLAUDE.md) (German).
+
+## License
+[MIT](LICENSE)
