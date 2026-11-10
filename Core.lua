@@ -58,6 +58,7 @@ local function InitDB()
     RPMacroWriterDB = RPMacroWriterDB or {}
     local db = RPMacroWriterDB
     db.saved = db.saved or {}
+    db.long = db.long or {}
     db.current = db.current or {}
     db.current.name = db.current.name or ""
     if type(db.current.manualBody) ~= "string" then db.current.manualBody = nil end
@@ -241,6 +242,9 @@ function ns.LoadMacro(index, foreign)
     ns.state.name = name
     ns.state.steps = {}
     ns.state.manualBody = body or ""
+    if not foreign and ns.db.long[name] then -- verlaengertes Makro: den vollen Text laden, nicht nur /click
+        ns.state.manualBody = ns.db.long[name] .. "\n" .. ns.MARKER
+    end
     ns.state.foreign = foreign and { name = name, index = index } or nil
     ns.state.opts.perChar = index > (MAX_ACCOUNT_MACROS or 120) -- Charakter-Makros haben die hohen Indizes
     ns.Refresh()
@@ -252,6 +256,66 @@ macroWatcher:RegisterEvent("UPDATE_MACROS")
 macroWatcher:SetScript("OnEvent", function()
     if ns.state then ns.Refresh() end
 end)
+
+-- ---------------------------------------------------------------------------
+-- Beste Rotation: Blizzards Rotationshilfe (C_AssistedCombat), sonst eigene Tabelle
+-- ---------------------------------------------------------------------------
+local function IsKnown(id)
+    if IsPlayerSpell and IsPlayerSpell(id) then return true end
+    if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then return false end
+    local name = SpellName(id)
+    if not name then return false end
+    if C_Spell and C_Spell.GetSpellInfo then return C_Spell.GetSpellInfo(name) ~= nil end
+    return GetSpellInfo and GetSpellInfo(name) ~= nil or false
+end
+
+function ns.BestRotation()
+    if InCombatLockdown() then
+        ns.Print("Im Kampf können keine Makros geändert werden.")
+        return
+    end
+    local ids, source
+    local ac = C_AssistedCombat
+    if ac and ac.GetRotationSpells and (not ac.IsAvailable or ac.IsAvailable()) then
+        local ok, list = pcall(ac.GetRotationSpells)
+        if ok and type(list) == "table" and #list > 0 then
+            ids, source = {}, "Blizzard-Rotationshilfe"
+            for _, id in ipairs(list) do
+                if IsKnown(id) then ids[#ids + 1] = id end
+            end
+        end
+    end
+    if not ids or #ids == 0 then
+        local _, class = UnitClass("player")
+        ids = ns.PickRotation(class, IsKnown)
+        source = "eigene Tabelle"
+        if not ids then
+            ns.Print("Für diese Klasse ist keine Rotation hinterlegt und die Rotationshilfe des Spiels liefert nichts.")
+            return
+        end
+    end
+    local steps, seen = {}, {}
+    for _, id in ipairs(ids) do
+        local name = SpellName(id)
+        if name and #steps < ns.MAX_STEPS and (not seen[id] or id == ids[#ids]) then
+            seen[id] = true
+            steps[#steps + 1] = { kind = "spell", id = id, name = name, icon = SpellIcon(id) }
+        end
+    end
+    if #steps == 0 then
+        ns.Print("Keine passenden Zauber für Level " .. UnitLevel("player") .. " gefunden.")
+        return
+    end
+    ns.state.steps = steps
+    ns.state.manualBody = nil
+    ns.state.foreign = nil
+    if Trim(ns.state.name) == "" then ns.state.name = "Rotation" end
+    local names = {}
+    for i, s in ipairs(steps) do names[i] = s.name end
+    ns.Print("Rotation (" .. source .. ", Level " .. UnitLevel("player") .. "): " .. table.concat(names, ", "))
+    ns.Refresh()
+    ns.WriteMacro()
+end
 
 -- ---------------------------------------------------------------------------
 -- Makro im Spiel anlegen / aktualisieren
@@ -309,9 +373,10 @@ function ns.WriteMacro()
         body = ns.BuildMacro(state.steps, state.opts)
     end
     if #body > ns.MAX_MACRO_LEN then
-        ns.Print("Makro ist zu lang (" .. #body .. "/" .. ns.MAX_MACRO_LEN .. " Zeichen).")
+        ns.Print("Makro ist zu lang (" .. #body .. "/" .. ns.MAX_MACRO_LEN .. " Zeichen). Bitte Zauber oder Optionen entfernen.")
         return
     end
+    ns.db.long[name] = nil -- Rest der frueheren /click-Verlaengerung
 
     local index = GetMacroIndexByName(name)
     local ok, err
@@ -375,6 +440,6 @@ end)
 SLASH_RPMACROWRITER1 = "/mw"
 SLASH_RPMACROWRITER2 = "/rpmw"
 SLASH_RPMACROWRITER3 = "/macrowriter"
-SlashCmdList["RPMACROWRITER"] = function()
+SlashCmdList["RPMACROWRITER"] = function(msg)
     if ns.Toggle then ns.Toggle() end
 end

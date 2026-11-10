@@ -10,6 +10,9 @@ World of Warcraft addon: combine spells into macros by drag and drop. Initially 
 
 With "Automatisch erkennen" (detect automatically), one spell becomes a simple cast and several become a cast sequence.
 
+### Best rotation
+The **Beste Rotation** (best rotation) button fills the list with a rotation for your level and the spells you currently know, and creates the macro. **Not every class has a best rotation available.** The addon asks the game's own rotation helper first; where the game offers none for your class, specialization or game flavor, only warlocks get the addon's built-in fallback. For all other classes the button then reports that no rotation is available.
+
 ## Installing for testing
 Link the project folder (any name, here `wow-macro-writer`) as `rp-macro-writer` into the AddOns folder of the game flavor you want (PowerShell, once):
 
@@ -21,8 +24,10 @@ Then type `/reload` in game.
 
 ## Development
 - `Generator.lua` – macro text from steps + options (no WoW API, testable)
+- `Rotations.lua` – built-in rotation table (fallback for "Beste Rotation")
 - `Core.lua` – state, drag and drop, creating macros in game
 - `UI.lua` – window
+- `Minimap.lua` – minimap button
 - Tests: `cd tests; npm install; npm test`
 - Regenerate the icon: `node tools/make-icon.js`
 

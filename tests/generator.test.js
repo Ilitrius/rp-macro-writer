@@ -8,7 +8,7 @@ const root = path.join(__dirname, '..');
 const L = lauxlib.luaL_newstate();
 lualib.luaL_openlibs(L);
 
-for (const file of ['Generator.lua', 'Core.lua', 'UI.lua']) {
+for (const file of ['Generator.lua', 'Rotations.lua', 'Core.lua', 'UI.lua', 'Minimap.lua']) {
   const src = fs.readFileSync(path.join(root, file));
   const status = lauxlib.luaL_loadbuffer(L, src, src.length, to_luastring('@' + file));
   if (status !== lua.LUA_OK) {
@@ -144,6 +144,19 @@ local o = ns.NewOpts()
 local _, w1 = ns.BuildMacro({ { kind = "spell", name = "A,B" }, { kind = "spell", name = "C" } }, o)
 local _, w2 = ns.BuildMacro({ { kind = "spell", name = "A,B" } }, o)
 if #w1 == 1 and #w2 == 0 then print("OK   Namenswarnung in der Vorschau") else fails = fails + 1; print("FAIL Namenswarnung " .. #w1 .. "/" .. #w2) end
+do
+  local c = ns.Compact("#showtooltip\\n/castsequence [harm,nodead] reset=target/combat A, B, C\\n/cast [mod:shift] X; [harm] Y\\n#rpmw")
+  local ok = c == "#showtooltip\\n/castsequence [harm,nodead] reset=target/combat A,B,C\\n/cast [mod:shift] X;[harm] Y\\n#rpmw"
+  if ok then print("OK   Kuerzen") else fails = fails + 1; print("FAIL Kuerzen: " .. c) end
+end
+do
+  local steps = { dots[1], dots[3] }
+  for i = 1, 3 do steps[#steps + 1] = { kind = "spell", name = "Schattenblitz" } end
+  local o2 = ns.NewOpts()
+  o2.focusMouseover = true; o2.targetFocus = true; o2.petAttack = true; o2.startAttack = true; o2.target = "focus"
+  local b, w = ns.BuildMacro(steps, o2)
+  if #b <= 255 and #w == 0 and b:find("\\n/tar focus\\n", 1, true) then print("OK   Gekuerzt auf " .. #b .. " Zeichen") else fails = fails + 1; print("FAIL Gekuerzt (" .. #b .. "):\\n" .. b) end
+end
 return fails
 `;
 lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Generator.lua'), 'utf8')));

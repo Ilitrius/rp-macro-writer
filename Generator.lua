@@ -11,6 +11,23 @@ ns.MAX_STEPS = 10
 -- (ausser #show/#showtooltip), das Add-on erkennt daran seine eigenen Makros wieder.
 ns.MARKER = "#rpmw"
 
+-- Kuerzt einen Makrotext ohne Wirkungsaenderung: Leerzeichen nach Komma/Semikolon in den
+-- Zauberlisten weglassen (nur Zeilen mit /cast, /castsequence, /castrandom, /use).
+function ns.Compact(body)
+    local lines = {}
+    for line in (body .. "\n"):gmatch("(.-)\n") do
+        if line:match("^/cast") or line:match("^/use") then
+            local head, rest = line:match("^(/%S+ ?%b[]%s*)(.*)$")
+            if not head then head, rest = line:match("^(/%S+%s*)(.*)$") end
+            -- Bedingungen "][" und "] " bleiben; nur in der Zauberliste kuerzen
+            line = head .. rest:gsub(",%s+", ","):gsub(";%s+", ";")
+        end
+        lines[#lines + 1] = line
+    end
+    if lines[#lines] == "" then lines[#lines] = nil end
+    return table.concat(lines, "\n")
+end
+
 function ns.IsOurMacro(body)
     if type(body) ~= "string" then return false end
     for line in body:gmatch("[^\r\n]+") do
@@ -280,8 +297,10 @@ function ns.BuildMacro(steps, opts)
     lines[#lines + 1] = ns.MARKER
 
     local body = table.concat(lines, "\n")
+    if #body > ns.MAX_MACRO_LEN then body = ns.Compact(body) end -- erst kuerzen, dann erst warnen
+    if #body > ns.MAX_MACRO_LEN then body = body:gsub("\n/target ", "\n/tar ") end -- /tar ist die Kurzform von /target
     if #body > ns.MAX_MACRO_LEN then
-        warnings[#warnings + 1] = "Makro ist zu lang (" .. #body .. "/" .. ns.MAX_MACRO_LEN .. " Zeichen)."
+        warnings[#warnings + 1] = "Makro ist zu lang (" .. #body .. "/" .. ns.MAX_MACRO_LEN .. " Zeichen). Bitte Zauber oder Optionen entfernen."
     end
     return body, warnings
 end

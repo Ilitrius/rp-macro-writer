@@ -3,6 +3,14 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
+## [0.1.3] – 2026-11-10
+
+### Added
+- Macros that would exceed the 255-character limit are shortened automatically without changing what they do: the spaces after commas and semicolons in spell lists are dropped and `/target` becomes `/tar`.
+- "Beste Rotation" button above the step list: replaces the steps with the best rotation for your level and the spells you currently know, and creates the macro. It uses the game's own rotation helper (`C_AssistedCombat.GetRotationSpells`) and falls back to a built-in Warlock table (DoTs, then the filler spell repeated). Not every class has a best rotation available: where the game offers none, only warlocks get the fallback.
+- Minimap button: click to open or close the window, drag to move it around the minimap edge (position is remembered).
+- The macro's icon (the first step's icon, as `#showtooltip` would show it) is displayed (40 px) at the top right of the options column, next to the macro type, and updates with the step list.
+
 ## [0.1.2] – 2026-11-10
 
 ### Added

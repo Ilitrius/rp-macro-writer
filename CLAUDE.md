@@ -11,6 +11,8 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 | `Generator.lua` | Makrotext aus Schritten + Optionen. **Keine WoW-API**, damit testbar |
 | `Core.lua` | Zustand, `RPMacroWriterDB`, Drag-&-Drop-Annahme, Makro anlegen, Slash-Befehle |
 | `UI.lua` | Fenster, Ablaufliste, Optionen, Vorschau, gespeicherte Kombinationen |
+| `Rotations.lua` | Eingebaute Rotationstabelle (Rückfall für „Beste Rotation“, bisher nur Hexenmeister). Keine WoW-API |
+| `Minimap.lua` | Minimap-Symbol (Klick öffnet das Fenster, Ziehen verschiebt es) |
 | `icon.tga` | Addon-Icon im Spiel, erzeugt von `tools/make-icon.js` (auch `media/icon.png` für CurseForge) |
 | `tests/` | Generator-Tests + Syntaxprüfung in einer Lua-VM (`cd tests; npm install; npm test`) |
 | `CHANGELOG.md`, `docs/release-notes/` | Versionsverlauf und Release Notes |
@@ -57,3 +59,8 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 ## Kennung und geplante Auswahl
 - Jedes erzeugte Makro endet mit der Zeile `#rpmw` (`ns.MARKER`, kostet 6 der 255 Zeichen). Daran erkennt das Add-on eigene Makros im Spiel (`ns.ListEntries`), zeigt sie in der Liste (Reiter „Global“ mit allen Account-Makros, „Dieser Charakter“ nur Charakter-Makros; fremde Makros grau) und überschreibt keine fremden Makros gleichen Namens. Die Kennung nie ändern, sonst werden alte Makros nicht mehr erkannt.
 - Erledigt 2026-11-10: Auswahl in der Liste nach „Global“ und „Dieser Charakter“ (zwei Reiter).
+
+## Makrolänge
+- Makros müssen in 255 Zeichen passen. Zu lange erzeugte Makros kürzt `ns.Compact` (Leerzeichen in Zauberlisten), danach `/target` → `/tar`.
+- Eine Verlängerung per `/click` auf sichere Zusatzschaltflächen (`macrotext`) lief beim Nutzer auf Forever nicht und wurde am 2026-11-10 auf seinen Wunsch wieder ausgebaut. Nicht erneut einbauen.
+- „Beste Rotation“ (`ns.BestRotation`): zuerst `C_AssistedCombat.GetRotationSpells`, sonst `Rotations.lua`. Nicht jede Klasse hat eine Rotation; das steht so in README und Release Notes.

@@ -228,8 +228,18 @@ local function CreateUI()
         title:SetText("rp-macro-writer")
     end
 
+    -- Makro-Symbol oben rechts (Symbol des ersten Schritts, wie bei #showtooltip)
     -- Links: Ablauf ----------------------------------------------------------
     Label(f, "Ablauf", LEFT_X, -32)
+    local best = TextButton(f, "Beste Rotation", 104, 18)
+    best:SetPoint("TOPLEFT", f, "TOPLEFT", LEFT_X + 56, -29)
+    best:SetScript("OnClick", function() ns.BestRotation() end)
+    best:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Beste Rotation für dein Level und deine verfügbaren Zauber\nersetzt den Ablauf und legt das Makro an", nil, nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    best:SetScript("OnLeave", function() GameTooltip:Hide() end)
     ui.detected = f:CreateFontString(nil, "OVERLAY", "GameFontGreenSmall")
     ui.detected:SetPoint("TOPRIGHT", f, "TOPRIGHT", -(RIGHT_W + 28), -33)
     local drop = Box(f, LEFT_X, -50, LEFT_W, ROWS * ROW_H + 8)
@@ -248,6 +258,11 @@ local function CreateUI()
     right:SetSize(RIGHT_W, 560)
     right:SetPoint("TOPRIGHT", f, "TOPRIGHT", -14, 0)
     local c1, c2, c3 = 0, 110, 210
+
+    -- Makro-Symbol (Symbol des ersten Schritts, wie bei #showtooltip), rechts neben der Makro-Art
+    ui.macroIcon = right:CreateTexture(nil, "ARTWORK")
+    ui.macroIcon:SetSize(40, 40)
+    ui.macroIcon:SetPoint("TOPRIGHT", right, "TOPRIGHT", 0, -34)
 
     Label(right, "Makro-Art", 0, -32)
     Radio(right, "Automatisch erkennen", c1, -48, "mode", "auto")
@@ -530,6 +545,7 @@ function ns.Refresh()
         end
     end
     ui.dropHint:SetShown(#steps == 0)
+    ui.macroIcon:SetTexture(steps[1] and steps[1].icon or 134400) -- 134400 = Fragezeichen
 
     for _, sync in ipairs(ui.syncs) do sync() end
     local autoMode = opts.mode == "auto"
