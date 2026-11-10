@@ -296,20 +296,72 @@ local function CreateUI()
     ui.counter = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     ui.counter:SetPoint("TOPRIGHT", f, "TOPLEFT", LEFT_X + LEFT_W, -313 + BOTTOM)
 
+    -- Makrotext: bearbeitbar; waechst mit der Fensterhoehe
     local previewBox = Box(f, LEFT_X, -334 + BOTTOM, LEFT_W, 112)
-    AcceptDrop(previewBox)
-    ui.preview = previewBox:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    ui.preview:SetPoint("TOPLEFT", previewBox, "TOPLEFT", 6, -6)
-    ui.preview:SetPoint("BOTTOMRIGHT", previewBox, "BOTTOMRIGHT", -6, 6)
-    ui.preview:SetJustifyH("LEFT")
-    ui.preview:SetJustifyV("TOP")
-    ui.preview:SetWordWrap(true)
+    previewBox:SetPoint("BOTTOMRIGHT", f, "BOTTOMLEFT", LEFT_X + LEFT_W, 76)
+    local scroll = CreateFrame("ScrollFrame", "RPMacroWriterPreviewScroll", previewBox, "UIPanelScrollFrameTemplate")
+    scroll:SetPoint("TOPLEFT", previewBox, "TOPLEFT", 4, -4)
+    scroll:SetPoint("BOTTOMRIGHT", previewBox, "BOTTOMRIGHT", -26, 4)
+    local edit = CreateFrame("EditBox", nil, scroll)
+    ui.preview = edit
+    edit:SetMultiLine(true)
+    edit:SetAutoFocus(false)
+    edit:SetFontObject("GameFontHighlightSmall")
+    edit:SetWidth(LEFT_W - 34)
+    edit:SetMaxLetters(0)
+    scroll:SetScrollChild(edit)
+    edit:SetScript("OnTextChanged", function(self, userInput)
+        if userInput then
+            ns.state.manualBody = self:GetText()
+            ns.Refresh()
+        end
+        scroll:UpdateScrollChildRect()
+    end)
+    edit:SetScript("OnEscapePressed", edit.ClearFocus)
+    edit:SetScript("OnCursorChanged", function(self, _, y, _, h)
+        -- Cursor im sichtbaren Bereich halten
+        local top, view = scroll:GetVerticalScroll(), scroll:GetHeight()
+        y = -y
+        if y < top then
+            scroll:SetVerticalScroll(y)
+        elseif y + h > top + view then
+            scroll:SetVerticalScroll(y + h - view)
+        end
+    end)
+    -- Klick irgendwo in den Kasten setzt den Cursor in den Text
+    previewBox:EnableMouse(true)
+    previewBox:SetScript("OnMouseDown", function() edit:SetFocus() end)
+
+    ui.regen = TextButton(previewBox, "Neu erzeugen", 90, 18)
+    ui.regen:SetPoint("BOTTOMRIGHT", previewBox, "BOTTOMRIGHT", -24, 4)
+    ui.regen:SetScript("OnClick", function()
+        ns.state.manualBody = nil
+        edit:ClearFocus()
+        ns.Refresh()
+    end)
 
     ui.warning = f:CreateFontString(nil, "OVERLAY", "GameFontRedSmall")
-    ui.warning:SetPoint("TOPLEFT", f, "TOPLEFT", LEFT_X, -450 + BOTTOM)
+    ui.warning:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", LEFT_X, 38)
     ui.warning:SetWidth(LEFT_W)
     ui.warning:SetJustifyH("LEFT")
-    ui.warning:SetJustifyV("TOP")
+    ui.warning:SetJustifyV("BOTTOM")
+
+    -- Fenstergroesse (nur Hoehe) ueber den Griff unten rechts aendern
+    f:SetResizable(true)
+    if f.SetResizeBounds then
+        f:SetResizeBounds(640, 620, 640, 900)
+    elseif f.SetMinResize then
+        f:SetMinResize(640, 620)
+        if f.SetMaxResize then f:SetMaxResize(640, 900) end
+    end
+    local grip = CreateFrame("Button", nil, f)
+    grip:SetSize(16, 16)
+    grip:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -4, 4)
+    grip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+    grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+    grip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+    grip:SetScript("OnMouseDown", function() f:StartSizing("BOTTOM") end)
+    grip:SetScript("OnMouseUp", function() f:StopMovingOrSizing() end)
 
     local create = TextButton(f, "Makro erstellen/speichern", 172)
     create:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", LEFT_X, 12)
@@ -391,7 +443,16 @@ function ns.Refresh()
     if ui.name:GetText() ~= state.name then ui.name:SetText(state.name) end
 
     local body, warnings = ns.BuildMacro(steps, opts)
-    ui.preview:SetText(body)
+    local manual = state.manualBody
+    if manual then
+        body = manual
+        warnings = { "Von Hand bearbeitet: Optionen ändern den Text nicht mehr. \"Neu erzeugen\" setzt ihn zurück." }
+        if not ns.IsOurMacro(body) then
+            warnings[2] = "Kennung " .. ns.MARKER .. " fehlt, wird beim Speichern angehängt."
+        end
+    end
+    ui.regen:SetShown(manual ~= nil)
+    if ui.preview:GetText() ~= body then ui.preview:SetText(body) end
     local len = #body
     ui.counter:SetText(len .. "/" .. ns.MAX_MACRO_LEN)
     if len > ns.MAX_MACRO_LEN then

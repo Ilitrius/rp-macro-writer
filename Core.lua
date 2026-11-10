@@ -60,6 +60,7 @@ local function InitDB()
     db.saved = db.saved or {}
     db.current = db.current or {}
     db.current.name = db.current.name or ""
+    if type(db.current.manualBody) ~= "string" then db.current.manualBody = nil end
     db.current.steps = CopySteps(db.current.steps)
     db.current.opts = CopyOpts(db.current.opts)
     ns.db = db
@@ -156,6 +157,7 @@ end
 
 function ns.ClearSteps()
     ns.state.steps = {}
+    ns.state.manualBody = nil
     ns.Refresh()
 end
 
@@ -168,6 +170,7 @@ function ns.LoadSaved(name)
     ns.state.name = name
     ns.state.steps = CopySteps(entry.steps)
     ns.state.opts = CopyOpts(entry.opts)
+    ns.state.manualBody = entry.manualBody
     ns.Refresh()
 end
 
@@ -240,11 +243,19 @@ function ns.WriteMacro()
         ns.Print("Bitte zuerst einen Makronamen eingeben.")
         return
     end
-    if #state.steps == 0 then
+    local manual = state.manualBody and state.manualBody ~= ""
+    if #state.steps == 0 and not manual then
         ns.Print("Bitte zuerst Zauber in das Fenster ziehen.")
         return
     end
-    local body = ns.BuildMacro(state.steps, state.opts)
+    local body
+    if manual then
+        -- Von Hand bearbeiteter Text; ohne Kennung koennte das Add-on das Makro nicht wiedererkennen
+        body = state.manualBody
+        if not ns.IsOurMacro(body) then body = body:gsub("%s+$", "") .. "\n" .. ns.MARKER end
+    else
+        body = ns.BuildMacro(state.steps, state.opts)
+    end
     if #body > ns.MAX_MACRO_LEN then
         ns.Print("Makro ist zu lang (" .. #body .. "/" .. ns.MAX_MACRO_LEN .. " Zeichen).")
         return
@@ -276,7 +287,7 @@ function ns.WriteMacro()
     end
 
     state.name = name
-    ns.db.saved[name] = { steps = CopySteps(state.steps), opts = CopyOpts(state.opts) }
+    ns.db.saved[name] = { steps = CopySteps(state.steps), opts = CopyOpts(state.opts), manualBody = manual and state.manualBody or nil }
     ns.Print("Makro \"" .. name .. "\" gespeichert. Mit \"Auf Leiste\" kannst du es auf eine Aktionsleiste ziehen.")
     ns.Refresh()
 end
