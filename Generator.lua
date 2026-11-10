@@ -107,6 +107,75 @@ local function MouseoverOnly(opts)
     return both:match("^(%b[])")
 end
 
+-- ---------------------------------------------------------------------------
+-- Syntaxfarben fuer den Makrotext (reine Textfunktion, ohne WoW-API)
+-- ---------------------------------------------------------------------------
+local COLOR = {
+    command = "ffffa040", -- /cast, /focus, ...
+    comment = "ff808080", -- #rpmw und andere Kommentarzeilen
+    show    = "ffffd100", -- #show, #showtooltip
+    unit    = "ff66ccff", -- @mouseover, @focus, ...
+    cond    = "ff7fe07f", -- harm, nodead, mod:shift, ...
+    reset   = "ffd19bff", -- reset=target/combat
+}
+
+local function Paint(color, s)
+    if s == "" then return "" end
+    return "|c" .. color .. s:gsub("|", "||") .. "|r"
+end
+
+local function Plain(s)
+    s = s:gsub("|", "||")
+    return (s:gsub("reset=%S+", function(r) return "|c" .. COLOR.reset .. r .. "|r" end))
+end
+
+local function Bracket(inner)
+    local parts = {}
+    for token in (inner .. ","):gmatch("([^,]*),") do
+        if token:sub(1, 1) == "@" then
+            parts[#parts + 1] = Paint(COLOR.unit, token)
+        else
+            parts[#parts + 1] = Paint(COLOR.cond, token)
+        end
+    end
+    return table.concat(parts, ",")
+end
+
+local function HighlightLine(line)
+    if line:sub(1, 1) == "#" then
+        return Paint(line:match("^#show") and COLOR.show or COLOR.comment, line)
+    end
+    local cmd, rest = line:match("^(/%S+)(.*)$")
+    if not cmd then return Plain(line) end
+    local out, pos = { Paint(COLOR.command, cmd) }, 1
+    while true do
+        local open = rest:find("[", pos, true)
+        local close = open and rest:find("]", open, true)
+        if not close then break end
+        out[#out + 1] = Plain(rest:sub(pos, open - 1))
+        out[#out + 1] = "[" .. Bracket(rest:sub(open + 1, close - 1)) .. "]"
+        pos = close + 1
+    end
+    out[#out + 1] = Plain(rest:sub(pos))
+    return table.concat(out)
+end
+
+-- Faerbt Makrotext mit |c..|r-Codes ein; ohne die Codes ist das Ergebnis der Originaltext
+function ns.Highlight(text)
+    text = tostring(text or "")
+    local out, pos = {}, 1
+    while true do
+        local nl = text:find("\n", pos, true)
+        if not nl then
+            out[#out + 1] = HighlightLine(text:sub(pos))
+            break
+        end
+        out[#out + 1] = HighlightLine(text:sub(pos, nl - 1))
+        pos = nl + 1
+    end
+    return table.concat(out, "\n")
+end
+
 -- Automatik: ein Zauber = einfacher Cast, mehrere = Cast-Sequenz
 function ns.DetectKind(steps)
     if #steps <= 1 then return "cast" end

@@ -132,6 +132,14 @@ local np = (not ns.NameProblem("Feuerball", "cast")) and ns.NameProblem("A[B]", 
   and ns.NameProblem("A;B", "modifier") and (not ns.NameProblem("A;B", "sequence"))
 if np then print("OK   Namen mit Sonderzeichen") else fails = fails + 1; print("FAIL Namen mit Sonderzeichen") end
 
+local function strip(s) return (s:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("||", "|")) end
+local sample = "#showtooltip\\n/castsequence [@mouseover,harm,nodead][mod:shift] reset=target/combat Verderbnis, Feuerbrand\\n\\n/startattack\\n#rpmw"
+local hl = ns.Highlight(sample)
+local hlOk = strip(hl) == sample and hl:find("|cff66ccff@mouseover|r", 1, true) and hl:find("|cff7fe07fharm|r", 1, true)
+  and hl:find("|cffd19bffreset=target/combat|r", 1, true) and hl:find("|cffffa040/castsequence|r", 1, true)
+  and ns.Highlight("") == "" and strip(ns.Highlight("/cast [x Foo|bar")) == "/cast [x Foo|bar"
+if hlOk then print("OK   Syntaxfarben") else fails = fails + 1; print("FAIL Syntaxfarben: " .. hl) end
+
 local o = ns.NewOpts()
 local _, w1 = ns.BuildMacro({ { kind = "spell", name = "A,B" }, { kind = "spell", name = "C" } }, o)
 local _, w2 = ns.BuildMacro({ { kind = "spell", name = "A,B" } }, o)
