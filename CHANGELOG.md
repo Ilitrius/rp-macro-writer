@@ -9,6 +9,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - The macro text box is now editable: type directly into the preview to fine-tune the macro by hand. While edited by hand, options no longer change the text; "Neu erzeugen" returns to the generated text. The marker line `#rpmw` is appended on saving if it was removed. Hand-edited text is saved with the combination.
 - The window can be resized (wider and taller) by dragging a grip in the bottom-right corner of the window or of the macro text box; the step list and the macro text box grow with it, the options stay at the right edge.
 - The list of saved macros now has two tabs: "Global" shows all account-wide macros (the addon's own with or without saved data, and macros made by others, greyed out) and "Dieser Charakter" shows only the macros of the current character. The addon's own macros are always listed first, macros made by others after them. Clicking a macro without saved data loads its text into the editable macro box; macros made by others are changed directly in game when saved (without the marker line and without saved data).
+- Fixed: the text cursor in the macro box was invisible because of the highlighting; it is now drawn separately.
 - The window remembers its position and size between sessions.
 - Syntax highlighting in the macro text box: commands, `@units`, conditions, `reset=` and comment lines get their own colors.
 

@@ -363,7 +363,28 @@ local function CreateUI()
         edit:SetHeight(math.max(self:GetHeight(), colored:GetStringHeight() + 8))
     end)
     edit:SetScript("OnEscapePressed", edit.ClearFocus)
-    edit:SetScript("OnCursorChanged", function(self, _, y, _, h)
+    -- Der echte Cursor hat die (unsichtbare) Textfarbe, deshalb einen eigenen blinkenden zeichnen
+    local caret = edit:CreateTexture(nil, "OVERLAY")
+    caret:SetColorTexture(1, 1, 1, 1)
+    caret:SetSize(1.5, 12)
+    caret:Hide()
+    local blink = 0
+    edit:SetScript("OnUpdate", function(self, elapsed)
+        if not self:HasFocus() then
+            caret:Hide()
+            return
+        end
+        blink = blink + elapsed
+        if blink >= 1 then blink = 0 end
+        caret:SetShown(blink < 0.55)
+    end)
+    edit:SetScript("OnEditFocusGained", function() blink = 0 end)
+    edit:SetScript("OnEditFocusLost", function() caret:Hide() end)
+    edit:SetScript("OnCursorChanged", function(self, x, y, _, h)
+        caret:ClearAllPoints()
+        caret:SetPoint("TOPLEFT", self, "TOPLEFT", x, y)
+        caret:SetHeight(math.max(h or 12, 8))
+        blink = 0 -- nach jeder Eingabe wieder sichtbar
         -- Cursor im sichtbaren Bereich halten
         local top, view = scroll:GetVerticalScroll(), scroll:GetHeight()
         y = -y
