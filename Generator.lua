@@ -32,7 +32,9 @@ function ns.NewOpts()
         petAttack = false,
         autoTarget = false,
         noChannel = false,
-        focusMouseover = false, -- /focus auf die Einheit unter der Maus setzen
+        focusMouseover = false, -- /focus auf die Einheit unter der Maus setzen (sonst auf das Ziel)
+        targetFocus = false,    -- /target focus: den Fokus anvisieren, Zauber gehen aufs Ziel
+        targetTarget = false,   -- Rueckfall auf das Ziel des Ziels, sonst Zauber trotzdem aufs Ziel
         startAttack = false,    -- /startattack am Ende
         perChar = false,        -- false = Makro gilt fuer alle Charaktere (Account)
     }
@@ -62,20 +64,28 @@ local function Conditions(opts, mod)
         units[#units + 1] = "@focus"
     end
     units[#units + 1] = ""
+    if opts.targetTarget then
+        units[#units + 1] = "@targettarget"
+        units[#units + 1] = "CATCHALL" -- immer wahr: Zauber geht im Zweifel aufs Ziel
+    end
 
     local out = ""
     local anyContent = false
     for _, unit in ipairs(units) do
         local parts = {}
         if mod and mod ~= "" then parts[#parts + 1] = "mod:" .. mod end
-        if unit ~= "" then
-            parts[#parts + 1] = unit
-            -- [@mouseover] allein ist immer wahr; harm/help pruefen die Existenz bereits mit
-            if opts.hostility ~= "harm" and opts.hostility ~= "help" then
-                parts[#parts + 1] = "exists"
+        if unit == "CATCHALL" then
+            parts[#parts + 1] = "@target"
+        else
+            if unit ~= "" then
+                parts[#parts + 1] = unit
+                -- [@mouseover] allein ist immer wahr; harm/help pruefen die Existenz bereits mit
+                if opts.hostility ~= "harm" and opts.hostility ~= "help" then
+                    parts[#parts + 1] = "exists"
+                end
             end
+            for _, p in ipairs(base) do parts[#parts + 1] = p end
         end
-        for _, p in ipairs(base) do parts[#parts + 1] = p end
         if #parts > 0 then anyContent = true end
         out = out .. "[" .. table.concat(parts, ",") .. "]"
     end
@@ -93,7 +103,7 @@ end
 
 -- Bedingung nur fuer die Einheit unter der Maus, z.B. "[@mouseover,harm,nodead]"
 local function MouseoverOnly(opts)
-    local both = ConditionsWith(opts, { target = "mouseover", noChannel = false })
+    local both = ConditionsWith(opts, { target = "mouseover", noChannel = false, targetTarget = false })
     return both:match("^(%b[])")
 end
 
@@ -125,7 +135,9 @@ function ns.BuildMacro(steps, opts)
     if #steps == 0 then return "", warnings end
 
     if opts.showTooltip then lines[#lines + 1] = "#showtooltip" end
-    if opts.focusMouseover then lines[#lines + 1] = "/focus " .. MouseoverOnly(opts) end
+    -- Fokus: Einheit unter der Maus, sonst (leere Bedingung) das aktuelle Ziel
+    if opts.focusMouseover then lines[#lines + 1] = "/focus " .. MouseoverOnly(opts) .. "[]" end
+    if opts.targetFocus then lines[#lines + 1] = "/target focus" end
     if opts.autoTarget then lines[#lines + 1] = "/targetenemy [noharm][dead]" end
     if opts.petAttack then lines[#lines + 1] = "/petattack" end
 
@@ -192,7 +204,7 @@ function ns.BuildMacro(steps, opts)
     if opts.startAttack then
         -- Angriff auf dasselbe Ziel wie die Zauber; bei "Freund" ohne Bedingung auf das aktuelle Ziel
         local cond = ""
-        if opts.hostility ~= "help" then cond = ConditionsWith(opts, { noChannel = false }) end
+        if opts.hostility ~= "help" then cond = ConditionsWith(opts, { noChannel = false, targetTarget = false }) end
         lines[#lines + 1] = (("/startattack " .. cond):gsub("%s+$", ""))
     end
 

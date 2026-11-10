@@ -66,10 +66,19 @@ case("Auto: Freund und tot", { { kind = "spell", name = "Wiederbelebung" } },
 -- Fokus auf Mouseover und Angriff starten
 case("Fokus: Mouseover als Fokus, Fokus als Ziel, Angriff am Ende", { dots[1] },
   { focusMouseover = true, target = "focus", startAttack = true },
-  "#showtooltip\\n/focus [@mouseover,harm,nodead]\\n/cast [@focus,harm,nodead][harm,nodead] Verderbnis\\n/startattack [@focus,harm,nodead][harm,nodead]", 0)
+  "#showtooltip\\n/focus [@mouseover,harm,nodead][]\\n/cast [@focus,harm,nodead][harm,nodead] Verderbnis\\n/startattack [@focus,harm,nodead][harm,nodead]", 0)
+-- Beispiel des Nutzers: Fokus setzen und anvisieren, Begleiter, Ziel des Ziels als Rueckfall
+case("Beispiel: Fokus, anvisieren, Begleiter, Ziel des Ziels, Angriff",
+  { dots[1], dots[3] },
+  { focusMouseover = true, targetFocus = true, petAttack = true, targetTarget = true,
+    startAttack = true, resetTarget = false, resetCombat = false, showTooltip = false },
+  "/focus [@mouseover,harm,nodead][]\\n/target focus\\n/petattack\\n/castsequence [harm,nodead][@targettarget,harm,nodead][@target] Verderbnis, Feuerbrand\\n/startattack [harm,nodead]", 0)
+case("Ziel des Ziels: einfacher Cast, Freund ohne Bedingung braucht exists", { dots[1] },
+  with(any, { targetTarget = true, showTooltip = false }),
+  "/cast [][@targettarget,exists][@target] Verderbnis", 0)
 case("Fokus: ohne Bedingungen braucht exists", { dots[1] },
   with(any, { focusMouseover = true, target = "focus", showTooltip = false }),
-  "/focus [@mouseover,exists]\\n/cast [@focus,exists][] Verderbnis", 0)
+  "/focus [@mouseover,exists][]\\n/cast [@focus,exists][] Verderbnis", 0)
 case("Angriff: ohne Bedingungen bleibt schlicht", { dots[1] },
   with(any, { startAttack = true, showTooltip = false, noChannel = true }),
   "/cast [nochanneling] Verderbnis\\n/startattack", 0)

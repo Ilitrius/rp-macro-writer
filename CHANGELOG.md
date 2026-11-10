@@ -9,6 +9,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Warning in the preview when a spell name contains characters that can break the macro (line breaks and square brackets always; commas in sequences and random macros; commas and semicolons in modifier macros).
 - Items that are not yet in the client cache are now requested and added automatically once their data arrives, instead of failing with "name could not be determined".
 - MIT license.
+- New options "Fokus anvisieren" (`/target focus`) and "Ziel des Ziels (Rückfall)": the spell goes to the current target if it is a valid enemy, otherwise to the target's target (`@targettarget`), otherwise to the target anyway (`[@target]`).
+
+### Changed
+- "Maus-Ziel als Fokus setzen" now sets the focus to the unit under the mouse and falls back to the current target when nothing is under the mouse (`/focus [@mouseover,…][]`). It also ticks "Fokus anvisieren", and the spells then go to the current target (the focus) instead of `@focus`. The old behaviour is still available through the target choice "Fokus".
+- Window is 22 pixels taller to fit the new options.
 
 ## [0.1.0] – 2026-11-09
 
