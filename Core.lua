@@ -61,6 +61,7 @@ local function InitDB()
     db.current = db.current or {}
     db.current.name = db.current.name or ""
     if type(db.current.manualBody) ~= "string" then db.current.manualBody = nil end
+    db.current.foreign = nil -- Makro-Indizes gelten nur fuer die laufende Sitzung
     db.current.steps = CopySteps(db.current.steps)
     db.current.opts = CopyOpts(db.current.opts)
     ns.db = db
@@ -158,6 +159,7 @@ end
 function ns.ClearSteps()
     ns.state.steps = {}
     ns.state.manualBody = nil
+    ns.state.foreign = nil
     ns.Refresh()
 end
 
@@ -171,6 +173,7 @@ function ns.LoadSaved(name)
     ns.state.steps = CopySteps(entry.steps)
     ns.state.opts = CopyOpts(entry.opts)
     ns.state.manualBody = entry.manualBody
+    ns.state.foreign = nil
     ns.Refresh()
 end
 
@@ -220,7 +223,9 @@ function ns.ListEntries(scope)
             entries[#entries + 1] = { name = name, hasTemplate = false, inGame = true, index = m.index, foreign = not m.ours }
         end
     end
+    -- Eigene Makros (mit Vorlage oder Kennung) zuerst, fremde danach; jeweils alphabetisch
     table.sort(entries, function(a, b)
+        if (a.foreign and 1 or 0) ~= (b.foreign and 1 or 0) then return not a.foreign end
         local x, y = a.name:lower(), b.name:lower()
         if x ~= y then return x < y end
         return a.name < b.name
@@ -228,12 +233,17 @@ function ns.ListEntries(scope)
     return entries
 end
 
-function ns.PickupMacroAt(index)
-    if InCombatLockdown() then
-        ns.Print("Im Kampf nicht möglich.")
-        return
-    end
-    if index and index > 0 then PickupMacro(index) end
+-- Makro aus dem Spiel zum Bearbeiten laden (Text von Hand, ohne Zauberliste).
+-- foreign = Makro stammt nicht vom Add-on: wird beim Speichern direkt geaendert, ohne Kennung
+function ns.LoadMacro(index, foreign)
+    local name, _, body = GetMacroInfo(index or 0)
+    if not name then return end
+    ns.state.name = name
+    ns.state.steps = {}
+    ns.state.manualBody = body or ""
+    ns.state.foreign = foreign and { name = name, index = index } or nil
+    ns.state.opts.perChar = index > (MAX_ACCOUNT_MACROS or 120) -- Charakter-Makros haben die hohen Indizes
+    ns.Refresh()
 end
 
 -- Liste aktuell halten, wenn Makros im Spiel angelegt, geaendert oder geloescht werden
@@ -257,6 +267,34 @@ function ns.WriteMacro()
         ns.Print("Bitte zuerst einen Makronamen eingeben.")
         return
     end
+    -- Fremdes Makro bearbeiten: direkt im Spiel aendern, ohne Kennung und ohne Vorlage
+    if state.foreign then
+        local body = state.manualBody or ""
+        if #body > ns.MAX_MACRO_LEN then
+            ns.Print("Makro ist zu lang (" .. #body .. "/" .. ns.MAX_MACRO_LEN .. " Zeichen).")
+            return
+        end
+        local index = state.foreign.index
+        local cur = GetMacroInfo(index or 0)
+        if cur ~= state.foreign.name then -- Reihenfolge hat sich geaendert: nach altem Namen suchen
+            index = GetMacroIndexByName(state.foreign.name)
+        end
+        if not index or index == 0 then
+            ns.Print("Das Makro \"" .. state.foreign.name .. "\" gibt es nicht mehr.")
+            return
+        end
+        local ok, err = pcall(EditMacro, index, name, nil, body)
+        if not ok then
+            ns.Print("Makro konnte nicht gespeichert werden: " .. tostring(err))
+            return
+        end
+        state.name = name
+        state.foreign = { name = name, index = GetMacroIndexByName(name) }
+        ns.Print("Fremdes Makro \"" .. name .. "\" geändert.")
+        ns.Refresh()
+        return
+    end
+
     local manual = state.manualBody and state.manualBody ~= ""
     if #state.steps == 0 and not manual then
         ns.Print("Bitte zuerst Zauber in das Fenster ziehen.")

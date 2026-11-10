@@ -172,8 +172,8 @@ local function CreateSavedRow(parent, i)
         if self.hasTemplate then
             ns.LoadSaved(self.savedName)
         else
-            -- Makro ohne Vorlage (eigenes ohne Daten oder fremdes): direkt auf den Mauszeiger nehmen
-            ns.PickupMacroAt(self.macroIndex)
+            -- Makro ohne Vorlage (eigenes ohne Daten oder fremdes): Text zum Bearbeiten laden
+            ns.LoadMacro(self.macroIndex, self.foreign)
         end
     end)
 
@@ -475,7 +475,7 @@ local function CreateUI()
         ui.savedOffset = ui.savedOffset - delta
         ns.Refresh()
     end)
-    local hint = Label(right, "Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage oder fremdes Makro, Klick nimmt es auf den Mauszeiger.", 0, -478 + BOTTOM, "GameFontDisableSmall")
+    local hint = Label(right, "Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage, Klick lädt den Text zum Bearbeiten. Dunkelgrau = fremdes Makro, wird beim Speichern direkt geändert.", 0, -478 + BOTTOM, "GameFontDisableSmall")
     hint:SetWidth(RIGHT_W)
     hint:SetJustifyH("LEFT")
 
@@ -534,11 +534,13 @@ function ns.Refresh()
     if manual then
         body = manual
         warnings = { "Von Hand bearbeitet: Optionen ändern den Text nicht mehr. \"Neu erzeugen\" setzt ihn zurück." }
-        if not ns.IsOurMacro(body) then
+        if state.foreign then
+            warnings = { "Fremdes Makro: Speichern ändert es direkt im Spiel (ohne Kennung)." }
+        elseif not ns.IsOurMacro(body) then
             warnings[2] = "Kennung " .. ns.MARKER .. " fehlt, wird beim Speichern angehängt."
         end
     end
-    ui.regen:SetShown(manual ~= nil)
+    ui.regen:SetShown(manual ~= nil and not state.foreign)
     if ui.preview:GetText() ~= body then ui.preview:SetText(body) end
     local len = #body
     ui.counter:SetText(len .. "/" .. ns.MAX_MACRO_LEN)
@@ -569,6 +571,7 @@ function ns.Refresh()
         row.savedName = entry and entry.name
         row.hasTemplate = entry and entry.hasTemplate
         row.macroIndex = entry and entry.index
+        row.foreign = entry and entry.foreign
         if entry then
             if entry.foreign then
                 row.text:SetText("|cff888888" .. entry.name .. " (fremd)|r")
