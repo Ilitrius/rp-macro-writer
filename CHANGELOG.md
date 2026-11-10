@@ -3,11 +3,14 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] – 2026-11-09
+## \[0.1.0\] – 2026-11-09
 
 First release.
 
 ### Added
+
+- Warning in the preview when a spell name contains characters that can break the macro (line breaks and square brackets always; commas in sequences and random macros; commas and semicolons in modifier macros).
+- Items that are not yet in the client cache are now requested and added automatically once their data arrives, instead of failing with "name could not be determined".
 - Window opened with `/mw` (also `/rpmw`, `/macrowriter`); ESC closes it.
 - Drag and drop spells, pet abilities and items from the spellbook and bags into the step list; reorder with arrows, remove single entries.
 - **Automatic detection:** one spell becomes a simple cast (`/cast`), several become a cast sequence (`/castsequence`).
@@ -23,10 +26,12 @@ First release.
 - Every generated macro ends with the marker line `#rpmw`. The addon uses it to recognise its own macros in game, shows them in the list, and never overwrites a macro of the same name that it did not create.
 
 ### Known limitations
+
 - WoW allows only one spell on the global cooldown per key press; a cast sequence casts the next spell with each press.
 - Macros cannot be created or changed while in combat.
 - A macro holds at most 255 characters; the marker line uses 6 of them.
 - The addon's interface is currently German only.
 
 ### Supported game versions
+
 Developed for WoW Forever. Also flagged for Retail 12.1.x, Mists Classic, Wrath (Titan Reforged), TBC Classic and Classic Era.
