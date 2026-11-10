@@ -3,7 +3,7 @@
 ## Notes: Zauber per Drag & Drop zu Makros kombinieren – erkennt Cast oder Cast-Sequenz automatisch.
 ## IconTexture: Interface\AddOns\rp-macro-writer\icon
 ## Author: Rene
-## Version: 0.1.1
+## Version: 0.1.2
 ## SavedVariables: RPMacroWriterDB
 
 Generator.lua
