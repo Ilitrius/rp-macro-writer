@@ -182,43 +182,57 @@ end
 -- ---------------------------------------------------------------------------
 -- Eigene Makros im Spiel wiedererkennen (an der Kennung ns.MARKER im Makrotext)
 -- ---------------------------------------------------------------------------
--- Liefert eine Tabelle Name -> Makro-Index fuer alle Makros mit Kennung (Account + Charakter)
-function ns.ScanMacros()
-    local found = {}
+-- Alle Makros im Spiel eines Bereichs: scope "global" (Account) oder "char" (dieser Charakter).
+-- Liefert Liste { name, index, ours } (ours = hat die Kennung ns.MARKER)
+local function ScanScope(scope)
+    local list = {}
     local numAccount, numChar = GetNumMacros()
     local base = MAX_ACCOUNT_MACROS or 120
-    local function check(index)
-        local name, _, body = GetMacroInfo(index)
-        if name and ns.IsOurMacro(body) then found[name] = index end
+    local first, last
+    if scope == "global" then
+        first, last = 1, numAccount or 0
+    else
+        first, last = base + 1, base + (numChar or 0)
     end
-    for i = 1, (numAccount or 0) do check(i) end
-    for i = base + 1, base + (numChar or 0) do check(i) end
-    return found
+    for index = first, last do
+        local name, _, body = GetMacroInfo(index)
+        if name then list[#list + 1] = { name = name, index = index, ours = ns.IsOurMacro(body) } end
+    end
+    return list
 end
 
--- Liste aufbereiten: gespeicherte Kombinationen plus erkannte Makros ohne Vorlage
-function ns.ListEntries()
-    local inGame = ns.ScanMacros()
-    local entries, seen = {}, {}
-    for name in pairs(ns.db.saved) do
-        entries[#entries + 1] = { name = name, hasTemplate = true, inGame = inGame[name] ~= nil }
-        seen[name] = true
-    end
-    for name in pairs(inGame) do
-        if not seen[name] then
-            entries[#entries + 1] = { name = name, hasTemplate = false, inGame = true }
+-- Liste eines Reiters aufbereiten: gespeicherte Kombinationen dieses Bereichs plus alle Makros
+-- im Spiel dieses Bereichs (eigene ohne Vorlage, fremde)
+function ns.ListEntries(scope)
+    local wantChar = scope == "char"
+    local inGame, entries, seen = {}, {}, {}
+    for _, m in ipairs(ScanScope(scope)) do inGame[m.name] = m end
+    for name, saved in pairs(ns.db.saved) do
+        local isChar = saved.opts and saved.opts.perChar and true or false
+        if isChar == wantChar then
+            local m = inGame[name]
+            entries[#entries + 1] = { name = name, hasTemplate = true, inGame = m ~= nil, index = m and m.index }
+            seen[name] = true
         end
     end
-    table.sort(entries, function(a, b) return a.name < b.name end)
+    for name, m in pairs(inGame) do
+        if not seen[name] then
+            entries[#entries + 1] = { name = name, hasTemplate = false, inGame = true, index = m.index, foreign = not m.ours }
+        end
+    end
+    table.sort(entries, function(a, b)
+        local x, y = a.name:lower(), b.name:lower()
+        if x ~= y then return x < y end
+        return a.name < b.name
+    end)
     return entries
 end
 
-function ns.PickupMacroByName(name)
+function ns.PickupMacroAt(index)
     if InCombatLockdown() then
         ns.Print("Im Kampf nicht möglich.")
         return
     end
-    local index = GetMacroIndexByName(name)
     if index and index > 0 then PickupMacro(index) end
 end
 
@@ -287,6 +301,7 @@ function ns.WriteMacro()
     end
 
     state.name = name
+    ns.db.savedTab = state.opts.perChar and "char" or "global" -- Liste zeigt gleich den passenden Reiter
     ns.db.saved[name] = { steps = CopySteps(state.steps), opts = CopyOpts(state.opts), manualBody = manual and state.manualBody or nil }
     ns.Print("Makro \"" .. name .. "\" gespeichert. Mit \"Auf Leiste\" kannst du es auf eine Aktionsleiste ziehen.")
     ns.Refresh()

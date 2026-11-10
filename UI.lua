@@ -172,8 +172,8 @@ local function CreateSavedRow(parent, i)
         if self.hasTemplate then
             ns.LoadSaved(self.savedName)
         else
-            -- Makro mit Kennung, aber ohne Vorlage: direkt auf den Mauszeiger nehmen
-            ns.PickupMacroByName(self.savedName)
+            -- Makro ohne Vorlage (eigenes ohne Daten oder fremdes): direkt auf den Mauszeiger nehmen
+            ns.PickupMacroAt(self.macroIndex)
         end
     end)
 
@@ -449,11 +449,25 @@ local function CreateUI()
     clear:SetScript("OnClick", function() ns.ClearSteps() end)
 
     -- Unten rechts: gespeicherte Kombinationen --------------------------------
-    Label(right, "Gespeicherte Kombinationen", 0, -312 + BOTTOM)
+    Label(right, "Gespeichert", 0, -312 + BOTTOM)
+    -- Reiter: alle globalen Makros / nur Makros dieses Charakters
+    ui.tabs = {}
+    local function MakeTab(scope, w, x)
+        local b = TextButton(right, scope, w, 20)
+        b:SetPoint("TOPLEFT", right, "TOPLEFT", x, -308 + BOTTOM)
+        b:SetScript("OnClick", function()
+            ui.savedOffset = 0
+            ns.db.savedTab = scope
+            ns.Refresh()
+        end)
+        ui.tabs[scope] = b
+    end
+    MakeTab("global", 100, 90)
+    MakeTab("char", 104, 194)
     local saved = Box(right, 0, -334 + BOTTOM, RIGHT_W, SAVED_ROWS * SAVED_H + 6)
     ui.savedEmpty = saved:CreateFontString(nil, "OVERLAY", "GameFontDisable")
     ui.savedEmpty:SetPoint("CENTER")
-    ui.savedEmpty:SetText("Noch nichts gespeichert")
+    ui.savedEmpty:SetText("Keine Makros")
     ui.savedRows = {}
     for i = 1, SAVED_ROWS do ui.savedRows[i] = CreateSavedRow(saved, i) end
     saved:EnableMouseWheel(true)
@@ -461,7 +475,7 @@ local function CreateUI()
         ui.savedOffset = ui.savedOffset - delta
         ns.Refresh()
     end)
-    local hint = Label(right, "Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage, Klick nimmt es auf.", 0, -478 + BOTTOM, "GameFontDisableSmall")
+    local hint = Label(right, "Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage oder fremdes Makro, Klick nimmt es auf den Mauszeiger.", 0, -478 + BOTTOM, "GameFontDisableSmall")
     hint:SetWidth(RIGHT_W)
     hint:SetJustifyH("LEFT")
 
@@ -535,15 +549,30 @@ function ns.Refresh()
     end
     ui.warning:SetText(table.concat(warnings, "\n"))
 
-    local entries = ns.ListEntries()
+    local tab = (ns.db.savedTab == "char") and "char" or "global"
+    local lists = { global = ns.ListEntries("global"), char = ns.ListEntries("char") }
+    local entries = lists[tab]
+    for scope, button in pairs(ui.tabs) do
+        local label = (scope == "global" and "Global" or "Dieser Charakter") .. " (" .. #lists[scope] .. ")"
+        if scope == tab then
+            button:SetText("|cffffd100" .. label .. "|r")
+            button:Disable()
+        else
+            button:SetText(label)
+            button:Enable()
+        end
+    end
     local maxOffset = math.max(0, #entries - SAVED_ROWS)
     ui.savedOffset = math.min(math.max(ui.savedOffset, 0), maxOffset)
     for i = 1, SAVED_ROWS do
         local row, entry = ui.savedRows[i], entries[i + ui.savedOffset]
         row.savedName = entry and entry.name
         row.hasTemplate = entry and entry.hasTemplate
+        row.macroIndex = entry and entry.index
         if entry then
-            if not entry.hasTemplate then
+            if entry.foreign then
+                row.text:SetText("|cff888888" .. entry.name .. " (fremd)|r")
+            elseif not entry.hasTemplate then
                 row.text:SetText("|cffaaaaaa" .. entry.name .. " (nur Makro)|r")
             elseif entry.inGame then
                 row.text:SetText(entry.name .. " |cff40ff40(im Spiel)|r")
