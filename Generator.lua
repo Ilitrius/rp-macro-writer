@@ -109,6 +109,16 @@ local function Names(steps)
     return table.concat(names, ", ")
 end
 
+-- Zeichen, die im Namen den Makrotext durcheinanderbringen wuerden:
+--   Zeilenumbruch und [ ] immer, "," in Sequenz/Zufall, ";" und "," im Modus Zusatztaste
+function ns.NameProblem(name, mode)
+    name = tostring(name or "")
+    if name:find("[\r\n%[%]]") then return true end
+    if mode == "sequence" or mode == "random" then return name:find(",", 1, true) ~= nil end
+    if mode == "modifier" then return name:find("[,;]") ~= nil end
+    return false
+end
+
 -- Liefert: Makrotext, Liste von Warnungen
 function ns.BuildMacro(steps, opts)
     local lines, warnings = {}, {}
@@ -165,6 +175,17 @@ function ns.BuildMacro(steps, opts)
         end
         if #steps > 1 then
             warnings[#warnings + 1] = "Hinweis: Pro Tastendruck löst WoW nur einen Zauber mit globaler Abklingzeit aus."
+        end
+    end
+
+    -- Namen mit Sonderzeichen melden (die Syntax kann dann brechen)
+    local kindForNames = opts.mode
+    if kindForNames == "auto" then
+        kindForNames = (ns.DetectKind(steps) == "sequence") and "sequence" or "cast"
+    end
+    for _, step in ipairs(steps) do
+        if ns.NameProblem(step.name, kindForNames) then
+            warnings[#warnings + 1] = step.name .. ": enthält Sonderzeichen, das Makro funktioniert evtl. nicht."
         end
     end
 
