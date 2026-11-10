@@ -85,25 +85,60 @@ local function StepFromCursor()
     elseif kind == "item" then
         local name = a and ItemName(a)
         if name then return { kind = "item", id = a, name = name, icon = ItemIcon(a) } end
+        -- Gegenstand noch nicht im Client-Cache: nachladen lassen, Schritt folgt per Ereignis
+        if a then return nil, nil, a end
     elseif kind then
         return nil, "Das kann nicht in ein Makro übernommen werden (nur Zauber, Begleiterfähigkeiten und Gegenstände)."
     end
     return nil, kind and "Name konnte nicht ermittelt werden." or nil
 end
 
-function ns.TryDrop()
-    local step, err = StepFromCursor()
-    if not step then
-        if err then ns.Print(err) end
-        return
-    end
-    ClearCursor()
+local function AddStep(step)
     if #ns.state.steps >= ns.MAX_STEPS then
         ns.Print("Maximal " .. ns.MAX_STEPS .. " Zauber pro Makro.")
         return
     end
     table.insert(ns.state.steps, step)
     ns.Refresh()
+end
+
+-- Gegenstaende, deren Daten noch nachgeladen werden: itemID -> Anzahl wartender Ablagen
+local pendingItems = {}
+local itemWatcher = CreateFrame("Frame")
+itemWatcher:SetScript("OnEvent", function(_, _, itemID, success)
+    local count = pendingItems[itemID]
+    if not count then return end
+    pendingItems[itemID] = nil
+    if not next(pendingItems) then itemWatcher:UnregisterEvent("GET_ITEM_INFO_RECEIVED") end
+    local name = success ~= false and ItemName(itemID)
+    if not name then
+        ns.Print("Name des Gegenstands konnte nicht ermittelt werden.")
+        return
+    end
+    for _ = 1, count do
+        AddStep({ kind = "item", id = itemID, name = name, icon = ItemIcon(itemID) })
+    end
+end)
+
+local function RequestItem(itemID)
+    if C_Item and C_Item.RequestLoadItemDataByID then C_Item.RequestLoadItemDataByID(itemID) end
+    pendingItems[itemID] = (pendingItems[itemID] or 0) + 1
+    itemWatcher:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+end
+
+function ns.TryDrop()
+    local step, err, pendingItem = StepFromCursor()
+    if not step then
+        if pendingItem then
+            ClearCursor()
+            RequestItem(pendingItem)
+        elseif err then
+            ns.Print(err)
+        end
+        return
+    end
+    ClearCursor()
+    AddStep(step)
 end
 
 function ns.MoveStep(index, delta)

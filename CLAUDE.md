@@ -52,7 +52,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 ## Offen
 - Erster Test im Spiel (WoW Forever **und** Retail) durch den Nutzer steht aus.
 - Screenshots für CurseForge (erst nach dem Test im Spiel möglich).
-- Lizenz wählen, GitHub-Remote und CurseForge-Projekt anlegen.
+- CurseForge-Projekt anlegen (Lizenz MIT seit 2026-11-10, GitHub-Remote steht).
 
 ## Kennung und geplante Auswahl
 - Jedes erzeugte Makro endet mit der Zeile `#rpmw` (`ns.MARKER`, kostet 6 der 255 Zeichen). Daran erkennt das Add-on eigene Makros im Spiel (`ns.ScanMacros`), zeigt sie in der Liste und überschreibt keine fremden Makros gleichen Namens. Die Kennung nie ändern, sonst werden alte Makros nicht mehr erkannt.

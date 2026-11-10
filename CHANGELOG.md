@@ -7,6 +7,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 - Warning in the preview when a spell name contains characters that can break the macro (line breaks and square brackets always; commas in sequences and random macros; commas and semicolons in modifier macros).
+- Items that are not yet in the client cache are now requested and added automatically once their data arrives, instead of failing with "name could not be determined".
+- MIT license.
 
 ## [0.1.0] – 2026-11-09
 
