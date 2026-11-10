@@ -193,12 +193,30 @@ local function CreateUI()
     ui.frame = f
     f:SetSize(640, 620)
     f:SetPoint("CENTER", UIParent, "CENTER", 250, 0)
+    -- Position und Groesse aus der letzten Sitzung wiederherstellen
+    local w = ns.db and ns.db.window
+    if type(w) == "table" and w.point and tonumber(w.x) and tonumber(w.y) then
+        f:SetSize(math.min(math.max(tonumber(w.w) or 640, MIN_W), MAX_W),
+                  math.min(math.max(tonumber(w.h) or 620, MIN_H), MAX_H))
+        f:ClearAllPoints()
+        f:SetPoint(w.point, UIParent, w.relPoint or w.point, w.x, w.y)
+    end
+    ui.saveWindow = function()
+        local point, _, relPoint, x, y = f:GetPoint(1)
+        if point and ns.db then
+            ns.db.window = { point = point, relPoint = relPoint, x = x, y = y,
+                             w = f:GetWidth(), h = f:GetHeight() }
+        end
+    end
     f:SetToplevel(true)
     f:SetClampedToScreen(true)
     f:SetMovable(true)
     f:RegisterForDrag("LeftButton")
     f:SetScript("OnDragStart", f.StartMoving)
-    f:SetScript("OnDragStop", f.StopMovingOrSizing)
+    f:SetScript("OnDragStop", function(self)
+        self:StopMovingOrSizing()
+        ui.saveWindow()
+    end)
     AcceptDrop(f)
     tinsert(UISpecialFrames, "RPMacroWriterFrame") -- ESC schliesst das Fenster
 
@@ -404,6 +422,7 @@ local function CreateUI()
         end)
         grip:SetScript("OnMouseUp", function()
             f:SetScript("OnUpdate", nil)
+            ui.saveWindow()
             ns.Refresh()
         end)
         grip:SetScript("OnEnter", function(self)
