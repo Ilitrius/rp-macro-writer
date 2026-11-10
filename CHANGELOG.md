@@ -36,4 +36,4 @@ First release.
 
 ### Supported game versions
 
-Developed for WoW Forever. Also flagged for Retail 12.1.x, Mists Classic, Wrath (Titan Reforged), TBC Classic and Classic Era.
+Developed for WoW Forever and WoW Retail (12.1.x). Also flagged for Mists Classic, Wrath (Titan Reforged), TBC Classic and Classic Era.

@@ -47,7 +47,7 @@ Honest limits, so you know what to expect:
 
 ## Supported game versions
 
-Developed for **WoW Forever**. The addon is also flagged for Retail, Mists Classic, Wrath (Titan Reforged), TBC Classic and Classic Era.
+Developed for **WoW Forever** and **WoW Retail**. The addon is also flagged for Mists Classic, Wrath (Titan Reforged), TBC Classic and Classic Era.
 
 ## Feedback
 
