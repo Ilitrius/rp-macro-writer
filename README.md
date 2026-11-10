@@ -11,10 +11,10 @@ World-of-Warcraft-Addon: Zauber per Drag & Drop zu Makros kombinieren. Schwerpun
 Bei „Automatisch erkennen“ wird aus einem Zauber ein einfacher Cast und aus mehreren eine Cast-Sequenz.
 
 ## Installation zum Testen
-Den Projektordner als `rp-macro-writer` in den AddOns-Ordner der gewünschten Spielvariante verknüpfen (PowerShell, einmalig):
+Den Projektordner (Name beliebig, hier `wow-macro-writer`) als `rp-macro-writer` in den AddOns-Ordner der gewünschten Spielvariante verknüpfen (PowerShell, einmalig):
 
 ```powershell
-New-Item -ItemType Junction -Path "D:\Games\Battle.net\World of Warcraft\_retail_\Interface\AddOns\rp-macro-writer" -Target "D:\AI_KI\rp-macro-writer"
+New-Item -ItemType Junction -Path "D:\Games\Battle.net\World of Warcraft\_retail_\Interface\AddOns\rp-macro-writer" -Target "D:\AI_KI\wow-macro-writer"
 ```
 
 Danach im Spiel `/reload`.
