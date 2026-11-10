@@ -10,7 +10,8 @@ local RIGHT_X, RIGHT_W = 328, 298
 local MOD_LABEL = { [""] = "-", shift = "Shift", ctrl = "Strg", alt = "Alt" }
 local MOD_NEXT = { [""] = "shift", shift = "ctrl", ctrl = "alt", alt = "" }
 
-local MIN_H, MAX_H = 620, 900 -- Fensterhoehe
+local MIN_W, MAX_W = 640, 1100 -- Fensterbreite
+local MIN_H, MAX_H = 620, 900  -- Fensterhoehe
 
 local ui = { syncs = {}, savedOffset = 0 }
 
@@ -97,8 +98,9 @@ end
 -- ---------------------------------------------------------------------------
 local function CreateStepRow(parent, i)
     local row = CreateFrame("Frame", nil, parent)
-    row:SetSize(LEFT_W - 8, ROW_H)
+    row:SetHeight(ROW_H)
     row:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, -4 - (i - 1) * ROW_H)
+    row:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -4, -4 - (i - 1) * ROW_H)
     AcceptDrop(row)
 
     row.index = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -211,8 +213,9 @@ local function CreateUI()
     -- Links: Ablauf ----------------------------------------------------------
     Label(f, "Ablauf", LEFT_X, -32)
     ui.detected = f:CreateFontString(nil, "OVERLAY", "GameFontGreenSmall")
-    ui.detected:SetPoint("TOPRIGHT", f, "TOPLEFT", LEFT_X + LEFT_W, -33)
+    ui.detected:SetPoint("TOPRIGHT", f, "TOPRIGHT", -(RIGHT_W + 28), -33)
     local drop = Box(f, LEFT_X, -50, LEFT_W, ROWS * ROW_H + 8)
+    drop:SetPoint("TOPRIGHT", f, "TOPRIGHT", -(RIGHT_W + 28), -50)
     AcceptDrop(drop)
     ui.dropHint = drop:CreateFontString(nil, "OVERLAY", "GameFontDisable")
     ui.dropHint:SetPoint("CENTER")
@@ -222,23 +225,26 @@ local function CreateUI()
     ui.rows = {}
     for i = 1, ROWS do ui.rows[i] = CreateStepRow(drop, i) end
 
-    -- Rechts: Optionen -------------------------------------------------------
-    local c1, c2, c3 = RIGHT_X, RIGHT_X + 110, RIGHT_X + 210
+    -- Rechts: Optionen (Container haengt am rechten Fensterrand, wandert beim Verbreitern mit) --
+    local right = CreateFrame("Frame", nil, f)
+    right:SetSize(RIGHT_W, 560)
+    right:SetPoint("TOPRIGHT", f, "TOPRIGHT", -14, 0)
+    local c1, c2, c3 = 0, 110, 210
 
-    Label(f, "Makro-Art", RIGHT_X, -32)
-    Radio(f, "Automatisch erkennen", c1, -48, "mode", "auto")
-    Radio(f, "Zusatztaste", c1 + 160, -48, "mode", "modifier")
-    Radio(f, "Einzelne Zeilen", c1, -70, "mode", "lines")
-    Radio(f, "Zufall", c1 + 160, -70, "mode", "random")
+    Label(right, "Makro-Art", 0, -32)
+    Radio(right, "Automatisch erkennen", c1, -48, "mode", "auto")
+    Radio(right, "Zusatztaste", c1 + 160, -48, "mode", "modifier")
+    Radio(right, "Einzelne Zeilen", c1, -70, "mode", "lines")
+    Radio(right, "Zufall", c1 + 160, -70, "mode", "random")
 
-    Label(f, "Sequenz zurücksetzen (Reset) bei", RIGHT_X, -100)
-    ui.resetTarget = Toggle(f, "Zielwechsel", c1, -116, "resetTarget")
-    ui.resetCombat = Toggle(f, "Kampfende", c2, -116, "resetCombat")
-    ui.secsLabel = Label(f, "Sek.:", c3, -121, "GameFontHighlightSmall")
-    local secs = CreateFrame("EditBox", nil, f, "InputBoxTemplate")
+    Label(right, "Sequenz zurücksetzen (Reset) bei", 0, -100)
+    ui.resetTarget = Toggle(right, "Zielwechsel", c1, -116, "resetTarget")
+    ui.resetCombat = Toggle(right, "Kampfende", c2, -116, "resetCombat")
+    ui.secsLabel = Label(right, "Sek.:", c3, -121, "GameFontHighlightSmall")
+    local secs = CreateFrame("EditBox", nil, right, "InputBoxTemplate")
     ui.secs = secs
     secs:SetSize(36, 20)
-    secs:SetPoint("TOPLEFT", f, "TOPLEFT", c3 + 40, -117)
+    secs:SetPoint("TOPLEFT", right, "TOPLEFT", c3 + 40, -117)
     secs:SetAutoFocus(false)
     secs:SetNumeric(true)
     secs:SetMaxLetters(3)
@@ -251,35 +257,35 @@ local function CreateUI()
     secs:SetScript("OnEnterPressed", secs.ClearFocus)
     secs:SetScript("OnEscapePressed", secs.ClearFocus)
 
-    Label(f, "Ziel", RIGHT_X, -148)
-    Radio(f, "Aktuelles Ziel", c1, -164, "target", "target")
-    Radio(f, "Mouseover", c2, -164, "target", "mouseover")
-    Radio(f, "Fokus", c3, -164, "target", "focus")
+    Label(right, "Ziel", 0, -148)
+    Radio(right, "Aktuelles Ziel", c1, -164, "target", "target")
+    Radio(right, "Mouseover", c2, -164, "target", "mouseover")
+    Radio(right, "Fokus", c3, -164, "target", "focus")
 
-    Label(f, "Ziel muss sein", RIGHT_X, -196)
-    Radio(f, "Feind", c1, -212, "hostility", "harm")
-    Radio(f, "Freund", c2, -212, "hostility", "help")
-    Radio(f, "Egal", c3, -212, "hostility", "any")
-    Radio(f, "Am Leben", c1, -234, "life", "alive")
-    Radio(f, "Tot", c2, -234, "life", "dead")
-    Radio(f, "Egal", c3, -234, "life", "any")
+    Label(right, "Ziel muss sein", 0, -196)
+    Radio(right, "Feind", c1, -212, "hostility", "harm")
+    Radio(right, "Freund", c2, -212, "hostility", "help")
+    Radio(right, "Egal", c3, -212, "hostility", "any")
+    Radio(right, "Am Leben", c1, -234, "life", "alive")
+    Radio(right, "Tot", c2, -234, "life", "dead")
+    Radio(right, "Egal", c3, -234, "life", "any")
 
-    Label(f, "Extras", RIGHT_X, -266)
-    Toggle(f, "Symbol/Tooltip anzeigen", c1, -282, "showTooltip")
-    Toggle(f, "Begleiter greift an", c1 + 160, -282, "petAttack")
-    Toggle(f, "Automatisch Gegner wählen", c1, -304, "autoTarget")
-    Toggle(f, "Nur dieser Charakter", c1 + 160, -304, "perChar")
-    Toggle(f, "Kanalisierte Zauber nicht abbrechen", c1, -326, "noChannel")
+    Label(right, "Extras", 0, -266)
+    Toggle(right, "Symbol/Tooltip anzeigen", c1, -282, "showTooltip")
+    Toggle(right, "Begleiter greift an", c1 + 160, -282, "petAttack")
+    Toggle(right, "Automatisch Gegner wählen", c1, -304, "autoTarget")
+    Toggle(right, "Nur dieser Charakter", c1 + 160, -304, "perChar")
+    Toggle(right, "Kanalisierte Zauber nicht abbrechen", c1, -326, "noChannel")
     -- Fokus auf die Einheit unter der Maus (sonst aufs Ziel) setzen; gleich anvisieren, abwaehlbar
-    Check(f, "Maus-Ziel als Fokus setzen", c1, -348,
+    Check(right, "Maus-Ziel als Fokus setzen", c1, -348,
         function() return ns.state.opts.focusMouseover end,
         function(checked)
             ns.state.opts.focusMouseover = checked
             ns.state.opts.targetFocus = checked
         end)
-    Toggle(f, "Am Ende angreifen", c1 + 160, -348, "startAttack")
-    Toggle(f, "Fokus anvisieren", c1, -370, "targetFocus")
-    Toggle(f, "Ziel des Ziels (Rückfall)", c1 + 160, -370, "targetTarget")
+    Toggle(right, "Am Ende angreifen", c1 + 160, -348, "startAttack")
+    Toggle(right, "Fokus anvisieren", c1, -370, "targetFocus")
+    Toggle(right, "Ziel des Ziels (Rückfall)", c1 + 160, -370, "targetTarget")
 
     -- Unten links: Name, Vorschau, Knoepfe ------------------------------------
     Label(f, "Makroname", LEFT_X, -312 + BOTTOM)
@@ -296,14 +302,15 @@ local function CreateUI()
     name:SetScript("OnEscapePressed", name.ClearFocus)
 
     ui.counter = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    ui.counter:SetPoint("TOPRIGHT", f, "TOPLEFT", LEFT_X + LEFT_W, -313 + BOTTOM)
+    ui.counter:SetPoint("TOPRIGHT", f, "TOPRIGHT", -(RIGHT_W + 28), -313 + BOTTOM)
 
     -- Makrotext: bearbeitbar; waechst mit der Fensterhoehe
     local previewBox = Box(f, LEFT_X, -334 + BOTTOM, LEFT_W, 112)
-    previewBox:SetPoint("BOTTOMRIGHT", f, "BOTTOMLEFT", LEFT_X + LEFT_W, 76)
+    previewBox:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -(RIGHT_W + 28), 76)
     local scroll = CreateFrame("ScrollFrame", "RPMacroWriterPreviewScroll", previewBox, "UIPanelScrollFrameTemplate")
     scroll:SetPoint("TOPLEFT", previewBox, "TOPLEFT", 4, -4)
-    scroll:SetPoint("BOTTOMRIGHT", previewBox, "BOTTOMRIGHT", -26, 4)
+    -- unten Platz fuer den Griff lassen, damit der Scroll-Pfeil ihn nicht verdeckt
+    scroll:SetPoint("BOTTOMRIGHT", previewBox, "BOTTOMRIGHT", -26, 24)
     local edit = CreateFrame("EditBox", nil, scroll)
     ui.preview = edit
     edit:SetMultiLine(true)
@@ -332,6 +339,9 @@ local function CreateUI()
         scroll:UpdateScrollChildRect()
     end)
     scroll:SetScript("OnSizeChanged", function(self)
+        local w = math.max(self:GetWidth(), 50)
+        edit:SetWidth(w)
+        colored:SetWidth(w)
         edit:SetHeight(math.max(self:GetHeight(), colored:GetStringHeight() + 8))
     end)
     edit:SetScript("OnEscapePressed", edit.ClearFocus)
@@ -350,7 +360,7 @@ local function CreateUI()
     previewBox:SetScript("OnMouseDown", function() edit:SetFocus() end)
 
     ui.regen = TextButton(previewBox, "Neu erzeugen", 90, 18)
-    ui.regen:SetPoint("BOTTOMRIGHT", previewBox, "BOTTOMRIGHT", -24, 4)
+    ui.regen:SetPoint("BOTTOMRIGHT", previewBox, "BOTTOMRIGHT", -26, 3)
     ui.regen:SetScript("OnClick", function()
         ns.state.manualBody = nil
         edit:ClearFocus()
@@ -359,11 +369,11 @@ local function CreateUI()
 
     ui.warning = f:CreateFontString(nil, "OVERLAY", "GameFontRedSmall")
     ui.warning:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", LEFT_X, 38)
-    ui.warning:SetWidth(LEFT_W)
+    ui.warning:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -(RIGHT_W + 28), 38)
     ui.warning:SetJustifyH("LEFT")
     ui.warning:SetJustifyV("BOTTOM")
 
-    -- Fenstergroesse (nur Hoehe) ueber den Griff unten rechts aendern
+    -- Fenstergroesse (Breite und Hoehe) ueber die Griffe aendern
     -- Zwei Griffe: einer an der Ecke des Textkastens, einer unten rechts im Fenster
     local function MakeGrip(parent, anchorTo, x, y)
         local grip = CreateFrame("Button", nil, parent)
@@ -383,12 +393,13 @@ local function CreateUI()
                 f:ClearAllPoints()
                 f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
             end
-            local _, startY = GetCursorPosition()
-            local startH, scale = f:GetHeight(), f:GetEffectiveScale()
+            local startX, startY = GetCursorPosition()
+            local startW, startH, scale = f:GetWidth(), f:GetHeight(), f:GetEffectiveScale()
             f:SetScript("OnUpdate", function()
-                local _, y = GetCursorPosition()
+                local x, y = GetCursorPosition()
+                local w = startW + (x - startX) / scale
                 local h = startH + (startY - y) / scale
-                f:SetHeight(math.min(math.max(h, MIN_H), MAX_H))
+                f:SetSize(math.min(math.max(w, MIN_W), MAX_W), math.min(math.max(h, MIN_H), MAX_H))
             end)
         end)
         grip:SetScript("OnMouseUp", function()
@@ -397,7 +408,7 @@ local function CreateUI()
         end)
         grip:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetText("Ziehen: Fenster und Makrotext höher/niedriger machen")
+            GameTooltip:SetText("Ziehen: Fenster und Makrotext größer/kleiner machen")
             GameTooltip:Show()
         end)
         grip:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -419,8 +430,8 @@ local function CreateUI()
     clear:SetScript("OnClick", function() ns.ClearSteps() end)
 
     -- Unten rechts: gespeicherte Kombinationen --------------------------------
-    Label(f, "Gespeicherte Kombinationen", RIGHT_X, -312 + BOTTOM)
-    local saved = Box(f, RIGHT_X, -334 + BOTTOM, RIGHT_W, SAVED_ROWS * SAVED_H + 6)
+    Label(right, "Gespeicherte Kombinationen", 0, -312 + BOTTOM)
+    local saved = Box(right, 0, -334 + BOTTOM, RIGHT_W, SAVED_ROWS * SAVED_H + 6)
     ui.savedEmpty = saved:CreateFontString(nil, "OVERLAY", "GameFontDisable")
     ui.savedEmpty:SetPoint("CENTER")
     ui.savedEmpty:SetText("Noch nichts gespeichert")
@@ -431,7 +442,7 @@ local function CreateUI()
         ui.savedOffset = ui.savedOffset - delta
         ns.Refresh()
     end)
-    local hint = Label(f, "Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage, Klick nimmt es auf.", RIGHT_X, -478 + BOTTOM, "GameFontDisableSmall")
+    local hint = Label(right, "Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage, Klick nimmt es auf.", 0, -478 + BOTTOM, "GameFontDisableSmall")
     hint:SetWidth(RIGHT_W)
     hint:SetJustifyH("LEFT")
 

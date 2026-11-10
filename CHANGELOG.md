@@ -7,7 +7,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 - The macro text box is now editable: type directly into the preview to fine-tune the macro by hand. While edited by hand, options no longer change the text; "Neu erzeugen" returns to the generated text. The marker line `#rpmw` is appended on saving if it was removed. Hand-edited text is saved with the combination.
-- The window can be made taller by dragging a grip (bottom-right corner of the window or of the macro text box); the macro text box grows with it.
+- The window can be resized (wider and taller) by dragging a grip in the bottom-right corner of the window or of the macro text box; the step list and the macro text box grow with it, the options stay at the right edge.
 - Syntax highlighting in the macro text box: commands, `@units`, conditions, `reset=` and comment lines get their own colors.
 
 ## [0.1.1] – 2026-11-10
