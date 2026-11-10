@@ -3,14 +3,16 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
-## \[0.1.0\] – 2026-11-09
+## [Unreleased]
+
+### Added
+- Warning in the preview when a spell name contains characters that can break the macro (line breaks and square brackets always; commas in sequences and random macros; commas and semicolons in modifier macros).
+
+## [0.1.0] – 2026-11-09
 
 First release.
 
 ### Added
-
-- Warning in the preview when a spell name contains characters that can break the macro (line breaks and square brackets always; commas in sequences and random macros; commas and semicolons in modifier macros).
-- Items that are not yet in the client cache are now requested and added automatically once their data arrives, instead of failing with "name could not be determined".
 - Window opened with `/mw` (also `/rpmw`, `/macrowriter`); ESC closes it.
 - Drag and drop spells, pet abilities and items from the spellbook and bags into the step list; reorder with arrows, remove single entries.
 - **Automatic detection:** one spell becomes a simple cast (`/cast`), several become a cast sequence (`/castsequence`).

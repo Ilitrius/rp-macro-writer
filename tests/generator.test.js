@@ -117,6 +117,16 @@ if #body <= 255 or #w ~= 1 then fails = fails + 1; print("FAIL Laengenwarnung") 
 local marked = ns.IsOurMacro("#showtooltip\\n/cast X\\n#rpmw") and not ns.IsOurMacro("/cast X\\n#rpmwx")
   and not ns.IsOurMacro("/say #rpmw") and not ns.IsOurMacro(nil)
 if marked then print("OK   Kennung wird erkannt, Aehnliches nicht") else fails = fails + 1; print("FAIL Kennung") end
+local np = (not ns.NameProblem("Feuerball", "cast")) and ns.NameProblem("A[B]", "cast")
+  and ns.NameProblem("A\\nB", "cast") and (not ns.NameProblem("A,B", "cast"))
+  and ns.NameProblem("A,B", "sequence") and ns.NameProblem("A,B", "random")
+  and ns.NameProblem("A;B", "modifier") and (not ns.NameProblem("A;B", "sequence"))
+if np then print("OK   Namen mit Sonderzeichen") else fails = fails + 1; print("FAIL Namen mit Sonderzeichen") end
+
+local o = ns.NewOpts()
+local _, w1 = ns.BuildMacro({ { kind = "spell", name = "A,B" }, { kind = "spell", name = "C" } }, o)
+local _, w2 = ns.BuildMacro({ { kind = "spell", name = "A,B" } }, o)
+if #w1 == 1 and #w2 == 0 then print("OK   Namenswarnung in der Vorschau") else fails = fails + 1; print("FAIL Namenswarnung " .. #w1 .. "/" .. #w2) end
 return fails
 `;
 lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Generator.lua'), 'utf8')));
