@@ -10,6 +10,8 @@ local RIGHT_X, RIGHT_W = 328, 298
 local MOD_LABEL = { [""] = "-", shift = "Shift", ctrl = "Strg", alt = "Alt" }
 local MOD_NEXT = { [""] = "shift", shift = "ctrl", ctrl = "alt", alt = "" }
 
+local MIN_H, MAX_H = 620, 900 -- Fensterhoehe
+
 local ui = { syncs = {}, savedOffset = 0 }
 
 -- ---------------------------------------------------------------------------
@@ -362,13 +364,6 @@ local function CreateUI()
     ui.warning:SetJustifyV("BOTTOM")
 
     -- Fenstergroesse (nur Hoehe) ueber den Griff unten rechts aendern
-    f:SetResizable(true)
-    if f.SetResizeBounds then
-        f:SetResizeBounds(640, 620, 640, 900)
-    elseif f.SetMinResize then
-        f:SetMinResize(640, 620)
-        if f.SetMaxResize then f:SetMaxResize(640, 900) end
-    end
     -- Zwei Griffe: einer an der Ecke des Textkastens, einer unten rechts im Fenster
     local function MakeGrip(parent, anchorTo, x, y)
         local grip = CreateFrame("Button", nil, parent)
@@ -381,9 +376,23 @@ local function CreateUI()
         grip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
         grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
         grip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
-        grip:SetScript("OnMouseDown", function() f:StartSizing("BOTTOM") end)
+        -- Eigene Groessenaenderung per Mausposition (StartSizing war unzuverlaessig)
+        grip:SetScript("OnMouseDown", function()
+            local left, top = f:GetLeft(), f:GetTop()
+            if left and top then -- Oberkante festhalten, nur die Unterkante wandert
+                f:ClearAllPoints()
+                f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
+            end
+            local _, startY = GetCursorPosition()
+            local startH, scale = f:GetHeight(), f:GetEffectiveScale()
+            f:SetScript("OnUpdate", function()
+                local _, y = GetCursorPosition()
+                local h = startH + (startY - y) / scale
+                f:SetHeight(math.min(math.max(h, MIN_H), MAX_H))
+            end)
+        end)
         grip:SetScript("OnMouseUp", function()
-            f:StopMovingOrSizing()
+            f:SetScript("OnUpdate", nil)
             ns.Refresh()
         end)
         grip:SetScript("OnEnter", function(self)
