@@ -64,7 +64,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 - Erledigt 2026-11-10: Auswahl in der Liste nach „Global“ und „Dieser Charakter“ (zwei Reiter).
 
 ## Makrolänge
-- Makros müssen in 255 Zeichen passen. Zu lange erzeugte Makros kürzt `ns.Compact` (Leerzeichen in Zauberlisten), danach `/target` → `/tar`.
+- Makros müssen in 255 Zeichen passen. Zu lange erzeugte Makros kürzt `ns.Compact` (Leerzeichen in Zauberlisten).
 - Eine Verlängerung per `/click` auf sichere Zusatzschaltflächen (`macrotext`) lief beim Nutzer auf Forever nicht und wurde am 2026-11-10 auf seinen Wunsch wieder ausgebaut. Nicht erneut einbauen.
-- Ziel Fokus/Mouseover: nur eine Klammer `[@focus,…]`; zweite Klammer (Rückfall aufs aktuelle Ziel) nur mit Option `fallbackTarget`.
+- Ziele: nur aktuelles Ziel, Mouseover und Ziel des Ziels. Den Fokus gibt es nicht mehr (Nutzer, 2026-11-11: „Lass das mit dem Fokus weg“). Bei Mouseover steht nur eine Klammer `[@mouseover,…]`; die zweite (Rückfall aufs aktuelle Ziel) nur mit Option `fallbackTarget`. „Ziel des Ziels“: jede Klammer prüft `exists`.
 - „Beste Rotation“ (`ns.BestRotation`): zuerst `C_AssistedCombat.GetRotationSpells`, sonst `Rotations.lua`. Alle Klassen sind abgedeckt (Quelle 1 gilt für alle, Tabelle als Rückfall); Rassen spielen keine Rolle. Die Zauber-IDs der Tabelle sind ungeprüft.

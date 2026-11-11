@@ -44,17 +44,15 @@ function ns.NewOpts()
         resetTarget = true,     -- /castsequence reset=target
         resetCombat = true,     -- /castsequence reset=combat
         resetSeconds = 0,       -- /castsequence reset=<n>
-        target = "target",      -- target | mouseover | focus
+        target = "target",      -- target | mouseover
         hostility = "harm",     -- harm (Feind) | help (Freund) | any
         life = "alive",         -- alive (nodead) | dead | any
         showTooltip = true,
         petAttack = false,
         autoTarget = false,
         noChannel = false,
-        focusMouseover = false, -- /focus auf die Einheit unter der Maus setzen (sonst auf das Ziel)
-        targetFocus = false,    -- /target focus: den Fokus anvisieren, Zauber gehen aufs Ziel
         targetTarget = false,   -- Rueckfall auf das Ziel des Ziels, sonst Zauber trotzdem aufs Ziel
-        fallbackTarget = false, -- bei Mouseover/Fokus als Rueckfall das aktuelle Ziel pruefen ("[@focus,harm][harm]")
+        fallbackTarget = false, -- bei Mouseover als Rueckfall das aktuelle Ziel pruefen ("[@mouseover,harm][harm]")
         startAttack = false,    -- /startattack am Ende
         perChar = false,        -- false = Makro gilt fuer alle Charaktere (Account)
     }
@@ -76,14 +74,10 @@ local function Conditions(opts, mod)
     end
     if opts.noChannel then base[#base + 1] = "nochanneling" end
 
-    -- Erst Mouseover/Fokus pruefen, dann als Rueckfall das aktuelle Ziel
+    -- Erst Mouseover pruefen, dann als Rueckfall das aktuelle Ziel
     local units = {}
-    if opts.target == "mouseover" then
-        units[#units + 1] = "@mouseover"
-    elseif opts.target == "focus" then
-        units[#units + 1] = "@focus"
-    end
-    if opts.target == "target" or opts.fallbackTarget then units[#units + 1] = "" end
+    if opts.target == "mouseover" then units[#units + 1] = "@mouseover" end
+    if opts.target ~= "mouseover" or opts.fallbackTarget then units[#units + 1] = "" end
     if opts.targetTarget then
         units[#units + 1] = "@targettarget"
         units[#units + 1] = "CATCHALL" -- immer wahr: Zauber geht im Zweifel aufs Ziel
@@ -127,20 +121,14 @@ local function ConditionsWith(opts, overrides)
     return Conditions(copy)
 end
 
--- Bedingung nur fuer die Einheit unter der Maus, z.B. "[@mouseover,harm,nodead]"
-local function MouseoverOnly(opts)
-    local both = ConditionsWith(opts, { target = "mouseover", noChannel = false, targetTarget = false })
-    return both:match("^(%b[])")
-end
-
 -- ---------------------------------------------------------------------------
 -- Syntaxfarben fuer den Makrotext (reine Textfunktion, ohne WoW-API)
 -- ---------------------------------------------------------------------------
 local COLOR = {
-    command = "ffffa040", -- /cast, /focus, ...
+    command = "ffffa040", -- /cast, /castsequence, ...
     comment = "ff808080", -- #rpmw und andere Kommentarzeilen
     show    = "ffffd100", -- #show, #showtooltip
-    unit    = "ff66ccff", -- @mouseover, @focus, ...
+    unit    = "ff66ccff", -- @mouseover, @targettarget, ...
     cond    = "ff7fe07f", -- harm, nodead, mod:shift, ...
     reset   = "ffd19bff", -- reset=target/combat
 }
@@ -230,9 +218,6 @@ function ns.BuildMacro(steps, opts)
     if #steps == 0 then return "", warnings end
 
     if opts.showTooltip then lines[#lines + 1] = "#showtooltip" end
-    -- Fokus: Einheit unter der Maus, sonst (leere Bedingung) das aktuelle Ziel
-    if opts.focusMouseover then lines[#lines + 1] = "/focus " .. MouseoverOnly(opts) .. "[]" end
-    if opts.targetFocus then lines[#lines + 1] = "/target focus" end
     if opts.autoTarget then lines[#lines + 1] = "/targetenemy [noharm][dead]" end
     if opts.petAttack then lines[#lines + 1] = "/petattack" end
 
@@ -307,7 +292,6 @@ function ns.BuildMacro(steps, opts)
 
     local body = table.concat(lines, "\n")
     if #body > ns.MAX_MACRO_LEN then body = ns.Compact(body) end -- erst kuerzen, dann erst warnen
-    if #body > ns.MAX_MACRO_LEN then body = body:gsub("\n/target ", "\n/tar ") end -- /tar ist die Kurzform von /target
     if #body > ns.MAX_MACRO_LEN then
         warnings[#warnings + 1] = L["Makro ist zu lang ("] .. #body .. "/" .. ns.MAX_MACRO_LEN .. L[" Zeichen). Bitte Zauber oder Optionen entfernen."]
     end
