@@ -3,7 +3,7 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.5] – 2026-11-11
 
 ### Changed
 - A cast sequence now always ends with `[@target]` as its last bracket (for example `/castsequence [@focus,harm,nodead][@target] reset=target/combat …`; without any condition just `[@target]`), so the spell goes to the current target when no earlier bracket matches.
