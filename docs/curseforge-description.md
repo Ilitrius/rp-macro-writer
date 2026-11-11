@@ -11,7 +11,7 @@ It works with every class and race.
 - **Drag and drop:** pull spells, pet abilities and items from your spellbook or bags into the step list. Reorder or remove them with one click.
 - **Detects what you need:** one spell becomes a simple `/cast`, several spells become a `/castsequence` – automatically.
 - **Sequence reset:** reset on target change, on leaving combat, after a number of seconds, or any combination.
-- **Target conditions with one click:** enemy or friend, alive or dead, and optionally mouseover first with your current target as fallback.
+- **Target conditions with one click:** enemy or any target, alive or dead, and optionally mouseover first with your current target as fallback.
 - **More macro types:** put different spells on Shift / Ctrl / Alt, cast a random spell from your list, or generate one line per spell.
 - **Useful extras:** `#showtooltip`, send your pet in, auto-target the nearest enemy, protect channeled spells from being clipped, account-wide or character-specific macro.
 - **Live preview:** the macro text updates as you click, with a character counter for the 255-character limit and plain warnings when something will not work.

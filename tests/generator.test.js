@@ -59,16 +59,16 @@ case("Auto: mehrere Zauber = Cast-Sequenz mit Reset", dots, {},
   "#showtooltip\\n/castsequence [harm,nodead] reset=target/combat " .. list, 0)
 case("Auto: ein Gegenstand = /use", { { kind = "item", name = "Gesundheitsstein" } }, any,
   "#showtooltip\\n/use Gesundheitsstein", 0)
-case("Auto: Freund und tot", { { kind = "spell", name = "Wiederbelebung" } },
-  { hostility = "help", life = "dead", showTooltip = false },
-  "/cast [help,dead] Wiederbelebung", 0)
+case("Auto: egal und tot", { { kind = "spell", name = "Wiederbelebung" } },
+  { hostility = "any", life = "dead", showTooltip = false },
+  "/cast [dead] Wiederbelebung", 0)
 
 -- Beispiel des Nutzers: Begleiter, Ziel des Ziels als Rueckfall, Angriff am Ende
 case("Beispiel: Begleiter, Ziel des Ziels, Angriff",
   { dots[1], dots[3] },
   { petAttack = true, targetTarget = true, startAttack = true, resetTarget = false, resetCombat = false, showTooltip = false },
   "/petattack\\n/castsequence [harm,nodead,exists][@targettarget,harm,nodead,exists][@target] Verderbnis, Feuerbrand\\n/startattack [harm,nodead]", 0)
-case("Ziel des Ziels: einfacher Cast, Freund ohne Bedingung braucht exists", { dots[1] },
+case("Ziel des Ziels: einfacher Cast, ohne Bedingung braucht exists", { dots[1] },
   with(any, { targetTarget = true, showTooltip = false }),
   "/cast [][@targettarget,exists][@target] Verderbnis", 0)
 case("Angriff: ohne Bedingungen bleibt schlicht", { dots[1] },

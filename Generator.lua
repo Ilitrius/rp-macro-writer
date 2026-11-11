@@ -45,7 +45,7 @@ function ns.NewOpts()
         resetCombat = true,     -- /castsequence reset=combat
         resetSeconds = 0,       -- /castsequence reset=<n>
         target = "target",      -- target | mouseover
-        hostility = "harm",     -- harm (Feind) | help (Freund) | any
+        hostility = "harm",     -- harm (Feind) | any (egal)
         life = "alive",         -- alive (nodead) | dead | any
         showTooltip = true,
         petAttack = false,
@@ -64,8 +64,6 @@ local function Conditions(opts, mod)
     local base = {}
     if opts.hostility == "harm" then
         base[#base + 1] = "harm"
-    elseif opts.hostility == "help" then
-        base[#base + 1] = "help"
     end
     if opts.life == "alive" then
         base[#base + 1] = "nodead"
@@ -93,8 +91,8 @@ local function Conditions(opts, mod)
         else
             if unit ~= "" then
                 parts[#parts + 1] = unit
-                -- [@mouseover] allein ist immer wahr; harm/help pruefen die Existenz bereits mit
-                if opts.hostility ~= "harm" and opts.hostility ~= "help" then
+                -- [@mouseover] allein ist immer wahr; harm prueft die Existenz bereits mit
+                if opts.hostility ~= "harm" then
                     parts[#parts + 1] = "exists"
                 end
             end
@@ -282,9 +280,8 @@ function ns.BuildMacro(steps, opts)
     end
 
     if opts.startAttack then
-        -- Angriff auf dasselbe Ziel wie die Zauber; bei "Freund" ohne Bedingung auf das aktuelle Ziel
-        local cond = ""
-        if opts.hostility ~= "help" then cond = ConditionsWith(opts, { noChannel = false, targetTarget = false }) end
+        -- Angriff auf dasselbe Ziel wie die Zauber
+        local cond = ConditionsWith(opts, { noChannel = false, targetTarget = false })
         lines[#lines + 1] = (("/startattack " .. cond):gsub("%s+$", ""))
     end
 

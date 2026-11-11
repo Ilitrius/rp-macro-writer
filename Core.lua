@@ -53,6 +53,7 @@ local function CopyOpts(opts)
         if opts and opts[k] ~= nil then out[k] = opts[k] end
     end
     if out.target == "focus" then out.target = "target" end -- Fokus gibt es nicht mehr
+    if out.hostility == "help" then out.hostility = "any" end -- "Freund" gibt es nicht mehr
     return out
 end
 
