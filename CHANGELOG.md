@@ -3,9 +3,10 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.6] – 2026-11-11
 
 ### Added
+- WoW Forever: all nine Classic classes now have a rotation for each of their three talent trees (Warrior, Paladin, Hunter, Rogue, Priest, Shaman, Mage, Warlock, Druid), researched from Warcraft Tavern, wowtbc.gg and others and listed with sources and reasoning in `Rotations/<Class>.lua`. Healer trees without a sensible damage macro are left empty and fall back to the class default (Shaman Restoration). No level bands: the known-spell filter already skips spells your character has not learned yet. The order of the trees (1 to 3) is assumed to follow the talent tabs and is not yet confirmed in game.
 - Forever/Classic rotations can now differ per talent tree (1-3) and, where sources support it, per level band. The addon detects the tree through `C_SpecializationInfo.GetSpecialization` or, failing that, the tree with the most points; `/mw rotation` records which way worked.
 - Warlock rotation rebuilt per game version from Method and Maxroll (Retail 12.1.5: Agony, Corruption, Haunt, Unstable Affliction, filler Drain Soul/Shadow Bolt) and Warcraft Tavern (Classic/Forever: Immolate, Corruption, Curse of Agony, Siphon Life, filler Shadow Bolt). Still unverified: no helper dump yet, not checked in game.
 - Rotation research for the other 12 classes (one spec each, per game version, from Method, Maxroll, Warcraft Tavern and others; see the `sources` and `comparison` in every `Rotations/<Class>.lua`): Mage, Priest, Hunter, Druid, Rogue, Warrior, Paladin, Shaman, Death Knight, Monk, Demon Hunter and Evoker. Death Knight, Monk, Demon Hunter and Evoker have a Retail variant only, because WoW Forever has only the nine Classic classes. All files are still `unverified`: no helper dump yet, not checked in game, and several versions rest on a single readable source.

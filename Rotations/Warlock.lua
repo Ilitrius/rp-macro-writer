@@ -16,6 +16,7 @@
 --
 -- AENDERUNGSVERLAUF
 --   2026-11-11  Ausgangsstand aus der Sammeltabelle uebernommen (unverified).
+--   2026-11-11  classic: trees (Affliction/Demonology/Destruction) aus wowtbc.gg + Warcraft Tavern (Forever), unverified.
 --   2026-11-11  Neu aufgebaut aus Quellen, getrennt nach retail und classic (unverified, kein Dump vorhanden).
 local ADDON, ns = ...
 
@@ -66,6 +67,67 @@ ns.RegisterRotation("WARLOCK", {
         },
         fillers = {
             { 686, "Shadow Bolt" },
+        },
+        -- Index = Reihenfolge der Registerkarten: Affliction, Demonology, Destruction
+        -- (belegt durch wowtbc.gg-Buildlisten Forever). Rang-1-IDs, Forever benennt 980 "Bane of Agony".
+        -- Wrack und Incinerate (neu in Forever) fehlen: Zauber-ID nicht belegbar (Wowhead-Classic kennt sie nicht).
+        trees = {
+            [1] = {
+                name = "Affliction",
+                sources = {
+                    { "https://wowtbc.gg/warcraftforever/class-guides/affliction-warlock/", "WoW Forever, ohne Datum (2026), Affliction" },
+                    { "https://www.warcrafttavern.com/forever/guides/affliction-warlock/", "WoW Forever, Stand 2026-11-11, Affliction (SM Ruin und Wrack)" },
+                },
+                comparison = "Beide: Bane of Agony, Corruption, Siphon Life halten, Shadow Bolt bei Nightfall; Wrack (Talent) ist Filler im Raid-Build. "
+                    .. "Wrack-ID nicht belegt, deshalb Shadow Bolt als Filler und Immolate (SM-Ruin-Variante) als letzter Aufbau. Fluch/Life Tap/Pet per Makro weggelassen. "
+                    .. "Keine Staffelung: Quellen nennen Wrack-Stufe widerspruechlich (30/40/51), ID fehlt. Kein Dump.",
+                dots = {
+                    { 980, "Bane of Agony" },
+                    { 172, "Corruption" },
+                    { 18265, "Siphon Life" },
+                    { 348, "Immolate" },
+                },
+                fillers = {
+                    { 686, "Shadow Bolt" },
+                },
+            },
+            [2] = {
+                name = "Demonology",
+                sources = {
+                    { "https://wowtbc.gg/warcraftforever/class-guides/demonology-warlock/", "WoW Forever, ohne Datum (2026), Demonology" },
+                    { "https://www.warcrafttavern.com/forever/guides/demonology-warlock/", "WoW Forever, Stand 2026-11-01, Demonology (Fire/Shadow)" },
+                },
+                comparison = "Beide: Bane (Agony/Doom), Immolate, Corruption, Fuellzauber Searing Pain (Fire-Build; Shadow-Build nutzt Shadow Bolt). "
+                    .. "Soul Fire nur bei Decimation (bedingt, weggelassen). Bane of Doom (603) nur bei Kaempfen ueber 1 Minute, daher Agony. Kein Dump.",
+                dots = {
+                    { 980, "Bane of Agony" },
+                    { 348, "Immolate" },
+                    { 172, "Corruption" },
+                },
+                fillers = {
+                    { 5676, "Searing Pain" },
+                    { 686, "Shadow Bolt" },
+                },
+            },
+            [3] = {
+                name = "Destruction",
+                sources = {
+                    { "https://wowtbc.gg/warcraftforever/class-guides/destruction-warlock/", "WoW Forever, ohne Datum (2026), Destruction" },
+                    { "https://www.warcrafttavern.com/forever/guides/destruction-warlock/", "WoW Forever, Stand 2026-11-03, Destruction" },
+                },
+                comparison = "Beide: Bane, Immolate, Corruption, Conflagrate, Shadowburn, Filler Incinerate (ID nicht belegt, Rang 1 ab Stufe 40 laut metabot.gg), "
+                    .. "ersatzweise Shadow Bolt. Conflagrate 17962 und Shadowburn 17877 per Wowhead Classic belegt. Keine Staffelung belegt. Kein Dump.",
+                dots = {
+                    { 980, "Bane of Agony" },
+                    { 348, "Immolate" },
+                    { 172, "Corruption" },
+                    { 17962, "Conflagrate" },
+                    { 17877, "Shadowburn" },
+                },
+                fillers = {
+                    { 686, "Shadow Bolt" },
+                },
+            },
         },
     },
 })

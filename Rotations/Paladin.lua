@@ -17,6 +17,7 @@
 -- AENDERUNGSVERLAUF
 --   2026-11-11  Ausgangsstand aus der Sammeltabelle uebernommen (unverified).
 --   2026-11-11  Neu aufgebaut aus Quellen, getrennt nach retail und classic (unverified, kein Dump vorhanden).
+--   2026-11-11  classic: Rotation je Talentbaum (trees: Holy, Protection, Retribution), unverified, keine Stufenbaender.
 local ADDON, ns = ...
 
 ns.RegisterRotation("PALADIN", {
@@ -62,6 +63,59 @@ ns.RegisterRotation("PALADIN", {
         fillers = {
             { 26573, "Consecration" },
             { 24275, "Hammer of Wrath" },
+        },
+        -- Reihenfolge der Registerkarten: Holy, Protection, Retribution (Wowhead-Guides nennen Holy-Builds als 35/11/5, Holy zuerst).
+        -- Keine Stufenbaender: die Quellen nennen keine stufenabhaengigen Aenderungen; der Bekannt-Filter erledigt das.
+        trees = {
+            [1] = {
+                name = "Holy",
+                sources = {
+                    { "https://www.icy-veins.com/wow-classic/holy-paladin-healer-pve-spec-builds-talents", "Classic, Stand Nov 2024 (Heiler)" },
+                    { "https://cn.classic.wowhead.com/guides/paladin-healing-talents-builds-classic-wow", "Classic, ohne Datum (Heiler; Reihenfolge Holy/Prot/Ret)" },
+                },
+                comparison = "Holy ist ein Heilbaum; es gibt keine Schaden-Rotation per Makro. Sinnvoller Aufbau fuer Schaden/Solo: Seal of Righteousness, Judgement, Holy Shock als Fueller (beide Quellen nennen Holy Shock als Kernzauber). "
+                    .. "Heilen selbst laeuft ueber Zielwahl und ist nicht Teil der Makro-Rotation. IDs Rang 1: Seal of Righteousness 21084, Holy Shock 20473 (Wowhead belegt, Rang nicht angezeigt). Unsicher, ob Nutzer dafuer ueberhaupt eine Rotation wuenschen.",
+                dots = {
+                    { 21084, "Seal of Righteousness" },
+                    { 20271, "Judgement" },
+                },
+                fillers = {
+                    { 20473, "Holy Shock" },
+                },
+            },
+            [2] = {
+                name = "Protection",
+                sources = {
+                    { "https://www.icy-veins.com/wow-classic/protection-paladin-tank-pve-rotation-cooldowns-abilities", "Classic, Stand Nov 2024" },
+                    { "https://www.warcrafttavern.com/wow-classic/guides/tankadin-guide-playing-as-a-protection-paladin/", "Classic, ohne Datum" },
+                },
+                comparison = "Beide: Prioritaetssystem statt fester Rotation; Holy Shield aufrecht halten (wichtigster Zauber), Righteous Fury (Buff, per Makro unnoetig), Consecration fuer AoE/Mana erlaubt, Judgement als Aufbau. "
+                    .. "Seal of Righteousness als Tank-Siegel. Holy Shield 20925, Seal of Righteousness 21084 (Wowhead belegt). Heiliges Schild-Charges und Mana lassen sich per Makro nicht abfragen.",
+                dots = {
+                    { 21084, "Seal of Righteousness" },
+                    { 20925, "Holy Shield" },
+                    { 20271, "Judgement" },
+                },
+                fillers = {
+                    { 26573, "Consecration" },
+                },
+            },
+            [3] = {
+                name = "Retribution",
+                sources = {
+                    { "https://www.warcrafttavern.com/wow-classic/guides/pve-retribution-paladin-rotations-amp-cooldowns/", "Classic, ohne Datum" },
+                    { "https://wowtbc.gg/classic/class-guides/retribution-paladin", "Classic, ohne Datum" },
+                },
+                comparison = "Siehe Vergleich oben: Seal of Command halten, Judgement, Consecration (Vengeance/Mana), Hammer of Wrath unter 20 %. Seal-Twisting per Makro nicht sinnvoll.",
+                dots = {
+                    { 20920, "Seal of Command" },
+                    { 20271, "Judgement" },
+                },
+                fillers = {
+                    { 26573, "Consecration" },
+                    { 24275, "Hammer of Wrath" },
+                },
+            },
         },
     },
 })

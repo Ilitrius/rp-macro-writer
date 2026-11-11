@@ -31,6 +31,8 @@
 -- AENDERUNGSVERLAUF
 --   2026-11-11  Ausgangsstand aus der Sammeltabelle uebernommen (unverified).
 --   2026-11-11  Neu recherchiert: Varianten retail und classic, Quellen und Vergleich eingetragen (unverified).
+--   2026-11-11  classic: trees (Arms/Fury/Protection) aus je zwei Forever-Quellen; keine Stufenbaender (Quellen nennen keine stufenabhaengige Aenderung). Unverified.
+--   IDs Classic (Wowhead): Bloodthirst 23881, Whirlwind 1680, Shield Slam 23922, Revenge 6572, Thunder Clap 6343, Sunder Armor 7386, Execute 5308 (Rang 1 ungeprueft).
 local ADDON, ns = ...
 
 ns.RegisterRotation("WARRIOR", {
@@ -63,6 +65,31 @@ ns.RegisterRotation("WARRIOR", {
         fillers = {
             { 7384, "Overpower" },
             { 78, "Heroic Strike" },
+        },
+        -- Reihenfolge der Baeume: Arms, Fury, Protection (Warcraft Tavern nennt die Talentrechner-Bilder als
+        -- 26/0/0, 0/26/0, 0/0/26; Standardreihenfolge der Krieger-Registerkarten, im Spiel ungeprueft).
+        trees = {
+            [1] = {
+                name = "Arms",
+                dots = { { 772, "Rend" } },
+                fillers = { { 7384, "Overpower" }, { 12294, "Mortal Strike" }, { 1464, "Slam" } },
+                sources = "Warcraft Tavern Forever Arms https://www.warcrafttavern.com/forever/guides/arms-warrior/ (ohne Patchangabe, Beta/Stufe 30); wowtbc.gg Forever Arms https://wowtbc.gg/warcraftforever/class-guides/arms-warrior/ (ohne Patchangabe)",
+                comparison = "Beide: Overpower, Rend, Mortal Strike, Slam (Spearing Strike nur gegen Riesen/Drachkin, ausgelassen; Execute nur unter 20%, Zustandsabhaengig, ausgelassen). Heroic Strike/Sunder/Battle Shout ausgelassen (Rage-Dump bzw. Makrolaenge). Overpower braucht Kampfhaltung, Mortal Strike/Slam sind Filler; unbekannte Zauber filtert das Addon.",
+            },
+            [2] = {
+                name = "Fury",
+                dots = {},
+                fillers = { { 23881, "Bloodthirst" }, { 1680, "Whirlwind" }, { 78, "Heroic Strike" } },
+                sources = "Warcraft Tavern Forever Fury https://www.warcrafttavern.com/forever/guides/fury-warrior/ (ohne Patchangabe); wowtbc.gg Forever Fury https://wowtbc.gg/warcraftforever/class-guides/fury-warrior/ (ohne Patchangabe)",
+                comparison = "Beide: Bloodthirst vor Whirlwind. Execute (unter 20%) ausgelassen. Rend nur kleiner Zugewinn und braucht Kampfhaltung -> kein Aufbau. Leveling-Guide Tavern nennt fuer Fury dagegen Overpower/Rend/Heroic Strike (niedrige Stufen, Bloodthirst erst spaeter); Bekannt-Filter deckt das ab, Bloodthirst-ID (Classic) per Wowhead belegt, Stufe nicht.",
+            },
+            [3] = {
+                name = "Protection",
+                dots = { { 6343, "Thunder Clap" }, { 7386, "Sunder Armor" } },
+                fillers = { { 23922, "Shield Slam" }, { 6572, "Revenge" }, { 78, "Heroic Strike" } },
+                sources = "Warcraft Tavern Forever Protection https://www.warcrafttavern.com/forever/guides/protection-warrior/ (ohne Patchangabe); wowtbc.gg Forever Protection https://wowtbc.gg/warcraftforever/class-guides/protection-warrior/ (ohne Patchangabe)",
+                comparison = "Beide: Thunder Clap und Sunder Armor halten, dann Shield Slam, Revenge, Heroic Strike mit Rest-Rage. Rend/Demoralizing Shout/Battle Shout ausgelassen (Haltung, Makrolaenge). Leveling-Guide stellt Revenge vor Rend; Revenge/Shield Slam sind reaktiv bzw. talentabhaengig.",
+            },
         },
     },
 })

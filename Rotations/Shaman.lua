@@ -17,6 +17,7 @@
 -- AENDERUNGSVERLAUF
 --   2026-11-11  Ausgangsstand aus der Sammeltabelle uebernommen (unverified).
 --   2026-11-11  Neu aufgebaut aus Quellen, getrennt nach retail und classic (unverified, kein Dump vorhanden).
+--   2026-11-11  classic: trees fuer Elemental, Enhancement, Restoration (leer) ergaenzt (unverified).
 local ADDON, ns = ...
 
 ns.RegisterRotation("SHAMAN", {
@@ -52,6 +53,51 @@ ns.RegisterRotation("SHAMAN", {
         },
     },
     classic = {
+        trees = {
+            [1] = {
+                name = "Elemental",
+                dots = {
+                    { 8050, "Flame Shock" },
+                },
+                fillers = {
+                    { 403, "Lightning Bolt" },
+                },
+                sources = {
+                    { "https://www.icy-veins.com/wow-forever/elemental-shaman-leveling", "WoW Forever, nur Suchausschnitt (Seite 403): Lightning Bolt Einzelziel, Flame Shock halten, Lava Burst ab Stufe 30, Chain Lightning/Fire Nova ab 3 Zielen" },
+                    { "https://mobalytics.gg/wow-forever/classes/elemental-shaman-leveling-guide", "WoW Forever, nur Suchausschnitt (Seite 403): Flame Shock halten, Lava Burst auf Abklingzeit, Lightning Bolt als Filler" },
+                    { "https://guildorder.com/games/wow_forever/tools/talents/shaman", "Forever-Talentrechner: Reihenfolge Elemental, Enhancement, Restoration (Listenreihenfolge, nicht ausdruecklich als Registerkarte bezeichnet)" },
+                },
+                comparison = "Beide Quellen: Flame Shock + Lightning Bolt. Lava Burst (ab 30 laut Icy Veins) weggelassen: Zauber-ID fuer Forever nicht belegt (Wowhead Classic spell=51505 liefert 404). "
+                    .. "Chain Lightning (421, belegt) und Fire Nova sind Mehrzielzauber und fehlen. Keine Stufenbaender (Lava Burst-Aenderung ab 30 ohne belegte ID). Rotationshilfe-Dump fehlt.",
+            },
+            [2] = {
+                name = "Enhancement",
+                dots = {
+                    { 8050, "Flame Shock" },
+                    { 17364, "Stormstrike" },
+                },
+                fillers = {
+                    { 8042, "Earth Shock" },
+                    { 403, "Lightning Bolt" },
+                },
+                sources = {
+                    { "https://www.warcrafttavern.com/forever/guides/enhancement-shaman/", "WoW Forever, Beta-Stufe 30, ohne Datum; Einzelziel: Flame Shock, Stormstrike, Lightning Bolt bei Maelstrom Weapon, Earth Shock Filler" },
+                    { "https://wow.gg/guides/shaman-enhancement-forever-overview", "WoW Forever, Stand 2026-09-19, keine ausdrueckliche Prioritaet" },
+                    { "https://guildorder.com/games/wow_forever/tools/talents/shaman", "Baumreihenfolge, siehe Elemental" },
+                },
+                comparison = "Unveraendert gegenueber der bisherigen classic-Rotation. Lightning Bolt bei Maelstrom Weapon nur sinnvoll mit Procs; als zweiter Filler nur Rueckfall, falls Earth Shock fehlt. Totems/Schilde/Waffen sind keine Makro-Ziele. Keine Stufenbaender belegt (Guide: Stufe-60-Stand ausstehend).",
+            },
+            [3] = {
+                name = "Restoration",
+                dots = {},
+                fillers = {},
+                sources = {
+                    { "https://www.icy-veins.com/wow-forever/restoration-shaman-healer-pve-rotation-cooldowns-abilities", "WoW Forever, nur Titel aus Suche, Seite 403" },
+                    { "https://guildorder.com/games/wow_forever/tools/talents/shaman", "Baumreihenfolge, siehe Elemental" },
+                },
+                comparison = "Heilerbaum: keine Schaden-Rotation eingetragen. Suchergebnisse nennen Earth Shock nur als Unterbrechung, empfehlen zum Leveln Enhancement/Elemental; keine Quelle belegt eine Resto-Schadensrotation. Rueckfall (Flame Shock, Stormstrike, Earth Shock) gilt.",
+            },
+        },
         sources = {
             { "https://www.warcrafttavern.com/forever/guides/enhancement-shaman/", "WoW Forever, Beta-Stufe 30, ohne Datum" },
             { "https://wow.gg/guides/shaman-enhancement-forever-overview", "WoW Forever, Stand 2026-09-19, keine explizite Prioritaet (abgeleitet)" },

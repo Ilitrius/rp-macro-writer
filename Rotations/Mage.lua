@@ -17,6 +17,7 @@
 -- AENDERUNGSVERLAUF
 --   2026-11-11  Ausgangsstand aus der Sammeltabelle uebernommen (unverified).
 --   2026-11-11  Neu aufgebaut mit Varianten retail/classic, Quellen und Vergleich. Kein Dump fuer MAGE vorhanden.
+--   2026-11-11  classic.trees fuer Arcane/Fire/Frost (Forever, Warcraft Tavern), keine Stufenbaender (Bekannt-Filter deckt Stufen ab).
 local ADDON, ns = ...
 
 -- Hinweis: Magier haben je Spezialisierung andere Hauptzauber (Arkan: Arcane Blast, Feuer: Fireball, Frost: Frostbolt).
@@ -57,6 +58,62 @@ ns.RegisterRotation("MAGE", {
             { 116, "Frostbolt" },
             { 133, "Fireball" },
             { 30451, "Arcane Blast" },
+        },
+        -- Reihenfolge der Registerkarten Arcane, Fire, Frost: Annahme (klassische Reihenfolge, Warcraft-Tavern-Guides
+        -- nennen sie in dieser Folge); Wowhead-Talentrechner nicht lesbar. Im Spiel pruefen (/mw rotation: tree).
+        trees = {
+            [1] = {
+                name = "Arcane",
+                dots = {},
+                fillers = {
+                    { 30451, "Arcane Blast" },
+                    { 5143, "Arcane Missiles" },
+                    { 116, "Frostbolt" },
+                    { 133, "Fireball" },
+                },
+                sources = {
+                    "forever: https://www.warcrafttavern.com/forever/guides/arcane-mage/ (ohne Datum, Nov. 2026; Arcane Blast Aufbau, Missiles bei Missile Barrage, Arcane Wrath, Fire Blast/Scorch/Pyroblast in Stapeln)",
+                    "forever: https://www.warcrafttavern.com/forever/guides/mage-leveling/ (Nov. 2026; Level 1-3 Fireball, ab 4 Frostbolt, ab 8 Arcane Missiles, ab 20 Arcane Blast Hauptzauber)",
+                },
+                comparison = "Beide Quellen stimmen: Arcane Blast ist der Hauptzauber (ab Stufe 20), Arcane Missiles auf Missile Barrage. "
+                    .. "Proc-/Cooldown-Zauber (Arcane Wrath, Fire Blast, Pyroblast, Arcane Power) sind per Makro nicht sinnvoll und fehlen. "
+                    .. "Unter Stufe 20 faellt der Bekannt-Filter auf Arcane Missiles/Frostbolt/Fireball zurueck. IDs: 5143 per Wowhead Classic belegt, "
+                    .. "30451 (Arcane Blast) in Wowhead Classic nicht gelistet (Retail-ID, ungeprueft fuer Forever).",
+            },
+            [2] = {
+                name = "Fire",
+                dots = {
+                    { 2948, "Scorch" },
+                    { 2136, "Fire Blast" },
+                },
+                fillers = {
+                    { 133, "Fireball" },
+                    { 116, "Frostbolt" },
+                },
+                sources = {
+                    "forever: https://www.warcrafttavern.com/forever/guides/fire-mage/ (ohne Datum, Nov. 2026; Scorch bis 5 Improved Scorch, Fire Blast auf Cooldown, Fireball Fueller, Pyroblast bei 3 Heating Up)",
+                    "forever: https://wowtbc.gg/warcraftforever/class-guides/fire-mage/ (ohne Datum, 2026; Improved Scorch halten, Pyroblast bei Heating Up, Fire Blast, Frostfire Bolt)",
+                    "forever: https://www.warcrafttavern.com/forever/guides/mage-leveling/ (Fire: Fireball, ab 6 Fire Blast, ab 20 Pyroblast, ab 22 Scorch)",
+                },
+                comparison = "Quellen stimmen bei Scorch-Aufbau (Improved Scorch), Fire Blast und Fireball als Fueller ueberein. Pyroblast (Heating Up) ist "
+                    .. "proc-/Vorab-Zauber und fehlt im Makro. Frostfire Bolt (wowtbc.gg, Tavern-Variante) ist nur Nebenbuild, nicht aufgenommen "
+                    .. "(ID in Wowhead Classic nicht belegt). IDs 133, 2948, 2136 per Wowhead Classic belegt.",
+            },
+            [3] = {
+                name = "Frost",
+                dots = {},
+                fillers = {
+                    { 116, "Frostbolt" },
+                    { 133, "Fireball" },
+                    { 5143, "Arcane Missiles" },
+                },
+                sources = {
+                    "forever: https://www.warcrafttavern.com/forever/guides/frost-mage/ (ohne Datum, Nov. 2026; Frostbolt Hauptzauber, Ice Lance bei Fingers of Frost, Missiles bei Missile Barrage)",
+                    "forever: https://www.warcrafttavern.com/forever/guides/mage-leveling/ (Frost: Fireball bis 3, ab 4 Frostbolt, ab 20 Ice Lance)",
+                },
+                comparison = "Beide Quellen: Frostbolt Hauptzauber. Ice Lance und Arcane Missiles sind Procs (Fingers of Frost, Missile Barrage) und nicht "
+                    .. "als Dauerzauber ins Makro genommen. ID 116 per Wowhead Classic belegt; Ice Lance (30455) dort nicht gelistet.",
+            },
         },
     },
 })
