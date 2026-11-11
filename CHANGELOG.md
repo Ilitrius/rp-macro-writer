@@ -6,6 +6,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ## [Unreleased]
 
 ### Changed
+- "Ziel des Ziels (Rückfall)": every bracket of the chain now also checks `exists`, matching a line that is known to work in game: `[harm,nodead,exists][@targettarget,harm,nodead,exists][@target]`.
 - With the target set to focus or mouseover, the condition no longer appears twice (`[@focus,harm,nodead]` instead of `[@focus,harm,nodead][harm,nodead]`). The old behaviour is a new option, "Rückfall auf aktuelles Ziel" (fall back to current target), which is off by default; when it is on, a second bracket checks the current target if there is no valid focus or mouseover. Combinations saved before this change get the new default when loaded.
 
 ### Added

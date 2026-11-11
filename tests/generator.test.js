@@ -72,7 +72,7 @@ case("Beispiel: Fokus, anvisieren, Begleiter, Ziel des Ziels, Angriff",
   { dots[1], dots[3] },
   { focusMouseover = true, targetFocus = true, petAttack = true, targetTarget = true,
     startAttack = true, resetTarget = false, resetCombat = false, showTooltip = false },
-  "/focus [@mouseover,harm,nodead][]\\n/target focus\\n/petattack\\n/castsequence [harm,nodead][@targettarget,harm,nodead][@target] Verderbnis, Feuerbrand\\n/startattack [harm,nodead]", 0)
+  "/focus [@mouseover,harm,nodead][]\\n/target focus\\n/petattack\\n/castsequence [harm,nodead,exists][@targettarget,harm,nodead,exists][@target] Verderbnis, Feuerbrand\\n/startattack [harm,nodead]", 0)
 case("Ziel des Ziels: einfacher Cast, Freund ohne Bedingung braucht exists", { dots[1] },
   with(any, { targetTarget = true, showTooltip = false }),
   "/cast [][@targettarget,exists][@target] Verderbnis", 0)
@@ -92,6 +92,11 @@ case("Mouseover ohne Rueckfall, Sequenz", dots, { target = "mouseover", showTool
   "/castsequence [@mouseover,harm,nodead] " .. list, 0)
 case("Aktuelles Ziel: Rueckfall-Option aendert nichts", { dots[1] }, { target = "target", fallbackTarget = true, showTooltip = false },
   "/cast [harm,nodead] Verderbnis", 0)
+
+case("Vorlage des Nutzers: Ziel des Ziels mit exists, Reset nach 2 Sekunden",
+  { { kind = "spell", name = "Finsterer Stoß" }, { kind = "spell", name = "Meucheln" } },
+  { targetTarget = true, resetTarget = false, resetCombat = false, resetSeconds = 2, showTooltip = false },
+  "/castsequence [harm,nodead,exists][@targettarget,harm,nodead,exists][@target] reset=2 Finsterer Stoß, Meucheln", 0)
 
 -- Sequenz-Optionen
 case("Sequenz: Sekunden-Reset, Begleiter, Auto-Ziel", dots,

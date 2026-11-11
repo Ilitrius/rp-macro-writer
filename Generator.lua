@@ -105,6 +105,12 @@ local function Conditions(opts, mod)
                 end
             end
             for _, p in ipairs(base) do parts[#parts + 1] = p end
+            -- Kette mit Ziel des Ziels: jede Klammer prueft zusaetzlich "exists" (so laeuft die Vorlage des Nutzers im Spiel)
+            if opts.targetTarget and (opts.hostility ~= "any" or opts.life ~= "any") then
+                local has = false
+                for _, p in ipairs(parts) do if p == "exists" then has = true end end
+                if not has then parts[#parts + 1] = "exists" end
+            end
         end
         if #parts > 0 then anyContent = true end
         out = out .. "[" .. table.concat(parts, ",") .. "]"
