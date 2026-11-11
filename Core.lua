@@ -278,6 +278,28 @@ local function IsKnown(id)
     return GetSpellInfo and GetSpellInfo(name) ~= nil or false
 end
 
+-- Talentbaum (1..3) fuer Forever/Classic: laut Wiki gibt es dort C_SpecializationInfo.GetSpecialization (1.60.1+);
+-- sonst der Baum mit den meisten Punkten (GetTalentTabInfo). Retail nutzt keine Baeume (liefert nil).
+-- Gibt zweitens zurueck, woher der Wert kam (fuer /mw rotation).
+local function DetectTree()
+    if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then return nil, "retail" end
+    if C_SpecializationInfo and C_SpecializationInfo.GetSpecialization then
+        local ok, index = pcall(C_SpecializationInfo.GetSpecialization)
+        if ok and type(index) == "number" and index >= 1 and index <= 3 then return index, "C_SpecializationInfo" end
+    end
+    if GetNumTalentTabs and GetTalentTabInfo then
+        local best, bestPoints = nil, 0
+        for i = 1, (GetNumTalentTabs() or 0) do
+            local a, b, c, d, e = GetTalentTabInfo(i)
+            -- neue Form: id, name, description, icon, pointsSpent; alte Form: name, icon, pointsSpent
+            local points = (type(a) == "number") and e or c
+            if type(points) == "number" and points > bestPoints then best, bestPoints = i, points end
+        end
+        if best then return best, "GetTalentTabInfo" end
+    end
+    return nil, "keine"
+end
+
 function ns.BestRotation()
     if InCombatLockdown() then
         ns.Print(L["Im Kampf können keine Makros geändert werden."])
@@ -296,7 +318,7 @@ function ns.BestRotation()
     end
     if not ids or #ids == 0 then
         local _, class = UnitClass("player")
-        ids = ns.PickRotation(class, IsKnown, WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and "retail" or "classic")
+        ids = ns.PickRotation(class, IsKnown, WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and "retail" or "classic", (DetectTree()), UnitLevel("player"))
         source = L["eigene Tabelle"]
         if not ids then
             ns.Print(L["Für diese Klasse ist keine Rotation hinterlegt und die Rotationshilfe des Spiels liefert nichts."])
@@ -347,7 +369,9 @@ function ns.DumpRotation()
     end
     local specIndex = GetSpecialization and GetSpecialization()
     if specIndex then dump.spec = select(2, GetSpecializationInfo(specIndex)) end
-    local ids = ns.PickRotation(class, IsKnown, flavor)
+    local tree, treeSource = DetectTree()
+    dump.tree, dump.treeSource = tree, treeSource
+    local ids = ns.PickRotation(class, IsKnown, flavor, tree, dump.level)
     dump.table = {}
     for _, id in ipairs(ids or {}) do dump.table[#dump.table + 1] = id end
     ns.db.rotationDump = ns.db.rotationDump or {}
@@ -362,6 +386,7 @@ function ns.DumpRotation()
             ns.Print(string.format("  %d. %s (%d)%s", i, s.name, s.id, s.known and "" or " - nicht bekannt"))
         end
     end
+    if flavor == "classic" then ns.Print("  Talentbaum: " .. tostring(tree) .. " (erkannt ueber " .. treeSource .. ")") end
     ns.Print("  Gespeichert in den SavedVariables (nach /reload oder Abmelden) unter rotationDump.")
 end
 

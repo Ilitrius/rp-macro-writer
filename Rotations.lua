@@ -18,9 +18,20 @@ ns.ROTATIONS = {}
 -- sources = Liste der ausgewerteten Quellen (URL + Stand), comparison = Begruendung der Wahl (nachvollziehbar).
 local function Variant(v)
     local out = { dots = {}, fillers = {}, dotEntries = v.dots or {}, fillerEntries = v.fillers or {},
-        sources = v.sources, comparison = v.comparison }
+        sources = v.sources, comparison = v.comparison, name = v.name, minLevel = v.minLevel }
     for _, e in ipairs(out.dotEntries) do out.dots[#out.dots + 1] = e[1] end
     for _, e in ipairs(out.fillerEntries) do out.fillers[#out.fillers + 1] = e[1] end
+    -- Forever/Classic: je Talentbaum (1, 2, 3 in der Reihenfolge des Spiels) eine eigene Rotation, darin optional
+    -- Stufenbaender (bands = { { minLevel = 20, dots, fillers }, ... }): es gilt das Band mit dem hoechsten minLevel <= Level.
+    if v.trees then
+        out.trees = {}
+        for index, tv in pairs(v.trees) do out.trees[index] = Variant(tv) end
+    end
+    if v.bands then
+        out.bands = {}
+        for _, bv in ipairs(v.bands) do out.bands[#out.bands + 1] = Variant(bv) end
+        table.sort(out.bands, function(a, b) return (a.minLevel or 0) < (b.minLevel or 0) end)
+    end
     return out
 end
 
@@ -35,11 +46,27 @@ end
 -- Liefert eine Liste von Zauber-IDs (in Reihenfolge) oder nil = "keine Rotation fuer diese Klasse".
 -- isKnown(id) -> true, wenn der Charakter den Zauber aktuell hat.
 -- flavor = "retail" oder "classic" (Forever, Classic-Versionen); ohne passende Variante gilt der Standard.
-function ns.PickRotation(classToken, isKnown, flavor)
+-- tree (nur classic) = Talentbaum 1..3, level = Charakterstufe: waehlt die Rotation des Baums und dessen Stufenband.
+local function Usable(v) return v and (#v.dots + #v.fillers) > 0 end
+
+function ns.PickRotation(classToken, isKnown, flavor, tree, level)
     local rot = ns.ROTATIONS[classToken]
     if not rot then return nil end
     local v = rot.variants[flavor or "default"] or rot.variants.default
     if not v then return nil end
+    if tree and v.trees and Usable(v.trees[tree]) then
+        local tv = v.trees[tree]
+        if level and tv.bands then
+            for i = #tv.bands, 1, -1 do
+                if (tv.bands[i].minLevel or 0) <= level and Usable(tv.bands[i]) then tv = tv.bands[i]; break end
+            end
+        end
+        v = tv
+    elseif level and v.bands then
+        for i = #v.bands, 1, -1 do
+            if (v.bands[i].minLevel or 0) <= level and Usable(v.bands[i]) then v = v.bands[i]; break end
+        end
+    end
     local ids = {}
     for _, id in ipairs(v.dots) do
         if isKnown(id) then ids[#ids + 1] = id end

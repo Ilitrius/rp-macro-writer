@@ -27,6 +27,14 @@ Das Addon hat zwei offizielle Zielvarianten: **Retail** (12.x, Interface 120105/
 8. **Tests**: `cd tests; npm install; npm test`. Erst berichten, wenn grün – oder den Fehler mit Ausgabe nennen.
 9. **Changelog** (`CHANGELOG.md`, oberster Abschnitt, **immer auf Englisch**): welche Klasse und Spielversion, welche Quellen, was sich geändert hat.
 
+## Forever/Classic: drei Talentbäume und Stufenbänder (Beschluss des Nutzers, 2026-11-11)
+Der Nutzer will die Recherche **für alle drei Talentbäume der Klasse, nur für Forever/Classic**. Retail bleibt bei einer Rotation je Klasse und wird nicht erweitert, sofern der Nutzer es nicht verlangt.
+- Format in `classic = { ... }`: `trees = { [1] = { name = "Arms", dots, fillers, sources, comparison, bands = { { minLevel = 20, dots, fillers }, ... } }, [2] = ..., [3] = ... }`. Der Index 1..3 ist die Reihenfolge der Talentbäume **im Spiel** (Reihenfolge der Registerkarten; Quelle dafür angeben, z. B. Wowhead-Talentrechner), nicht die Reihenfolge deiner Wahl.
+- `dots`/`fillers` direkt unter `classic` bleiben der Rückfall, wenn kein Baum erkannt wird (Level-1-Charakter ohne Punkte, oder die Erkennung versagt).
+- **Levelunabhängig ist die Grundlage**: der Bekannt-Filter lässt noch nicht gelernte Zauber weg. `bands` nur eintragen, wo Quellen belegen, dass sich die Rotation ab einer Stufe wirklich ändert (z. B. ab 20, 40, 60); es gilt das Band mit dem höchsten `minLevel` ≤ Stufe. Keine erfundenen Bänder.
+- Pro Baum gleiche Regeln wie sonst: mindestens zwei Quellen für Forever/Classic, Zauber-IDs über Wowhead (`/classic/spell=`) belegen, 255-Zeichen-Grenze beachten, Rang-1-IDs (das Spiel löst den Rang über den Namen auf; ungeprüft, im Bericht vermerken).
+- Das Addon erkennt den Baum über `C_SpecializationInfo.GetSpecialization` (laut Wiki ab 1.60.1 in Forever) oder ersatzweise über den Baum mit den meisten Punkten (`GetTalentTabInfo`, für Forever im Wiki nicht gelistet). `/mw rotation` schreibt `tree` und `treeSource` in den Dump.
+
 ## Pre-Release vorbereiten
 Wenn der Nutzer ein Release verlangt (oder zusagt), folge dem Release-Ablauf aus `CLAUDE.md`:
 1. Version in `rp-macro-writer.toc` erhöhen, den Abschnitt in `CHANGELOG.md` datieren, `docs/release-notes/vX.Y.Z.md` schreiben (**Englisch**; die Rotationen und ihren Status nennen, z. B. „not yet verified in game“).

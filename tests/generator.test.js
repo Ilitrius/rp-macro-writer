@@ -197,6 +197,23 @@ do
   local allKnown = function() return true end
   local pr, pc, pd = rns.PickRotation("TESTCLASS", allKnown, "retail"), rns.PickRotation("TESTCLASS", allKnown, "classic"), rns.PickRotation("TESTCLASS", allKnown)
   local okFlavor = pr[1] == 10 and pr[2] == 20 and pc[1] == 30 and pc[2] == 40 and pd[1] == 1 and pd[2] == 2
+  rns.RegisterRotation("TREECLASS", { status = "unverified", updated = "x", source = "x",
+    classic = { dots = { { 1, "Std" } }, fillers = { { 2, "StdF" } },
+      trees = {
+        [1] = { name = "T1", dots = { { 50, "a" } }, fillers = { { 51, "b" } },
+                bands = { { minLevel = 20, dots = { { 60, "c" } }, fillers = { { 61, "d" } } },
+                          { minLevel = 40, dots = { { 70, "e" } }, fillers = { { 71, "f" } } } } },
+        [2] = { name = "T2", dots = { { 80, "g" } }, fillers = { { 81, "h" } } } } } })
+  local t1a = rns.PickRotation("TREECLASS", allKnown, "classic", 1, 10)
+  local t1b = rns.PickRotation("TREECLASS", allKnown, "classic", 1, 25)
+  local t1c = rns.PickRotation("TREECLASS", allKnown, "classic", 1, 60)
+  local t2 = rns.PickRotation("TREECLASS", allKnown, "classic", 2, 60)
+  local t3 = rns.PickRotation("TREECLASS", allKnown, "classic", 3, 60)
+  local tn = rns.PickRotation("TREECLASS", allKnown, "classic")
+  local okTree = t1a[1] == 50 and t1b[1] == 60 and t1c[1] == 70 and t2[1] == 80 and t3[1] == 1 and tn[1] == 1
+    and rns.PickRotation("TREECLASS", allKnown, "retail") == nil
+  rns.ROTATIONS.TREECLASS = nil
+  okFlavor = okFlavor and okTree
   rns.ROTATIONS.TESTCLASS = nil
   local okU = okFlavor and rns.PickRotation("NOCLASS", function() return true end) == nil
   local allClasses = true
