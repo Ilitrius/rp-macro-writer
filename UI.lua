@@ -140,6 +140,34 @@ local function CreateStepRow(parent, i)
         end
     end)
 
+    -- Umsortieren per Ziehen: Zeile anklicken, mit gedrueckter Maustaste auf eine andere Zeile ziehen
+    row.target = row:CreateTexture(nil, "OVERLAY")
+    row.target:SetAllPoints()
+    row.target:SetColorTexture(1, 0.82, 0, 0.25)
+    row.target:Hide()
+    row:HookScript("OnMouseDown", function(self, button)
+        if button == "LeftButton" and ns.state.steps[i] and not GetCursorInfo() then
+            ui.dragFrom = i
+            self:SetScript("OnUpdate", function()
+                for r = 1, ROWS do
+                    local other = ui.rows[r]
+                    other.target:SetShown(other:IsShown() and other:IsMouseOver() and r ~= i)
+                end
+            end)
+        end
+    end)
+    row:HookScript("OnMouseUp", function(self, button)
+        if ui.dragFrom ~= i then return end
+        ui.dragFrom = nil
+        self:SetScript("OnUpdate", nil)
+        local to
+        for r = 1, ROWS do
+            ui.rows[r].target:Hide()
+            if ui.rows[r]:IsShown() and ui.rows[r]:IsMouseOver() then to = r end
+        end
+        if to and to ~= i then ns.MoveStepTo(i, to) end
+    end)
+
     row:SetScript("OnEnter", function(self)
         local step = ns.state.steps[i]
         if step and step.kind == "spell" and GameTooltip.SetSpellByID then

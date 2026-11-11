@@ -23,6 +23,43 @@ ns.ROTATIONS = {
             29722, -- Verbrennen
         },
     },
+
+    MAGE = {
+        dots = { 2948 }, -- Verbrennen (Scorch)
+        fillers = { 30451, 133, 116, 5143 }, -- Arkanschlag, Feuerball, Frostblitz, Arkane Geschosse
+    },
+    PRIEST = {
+        dots = { 589, 34914, 2944, 8092 }, -- Schattenwort: Schmerz, Vampirberuehrung, Verschlingende Seuche, Gedankenschlag
+        fillers = { 15407, 585 }, -- Gedankenschinden, Zuechtigen
+    },
+    HUNTER = {
+        dots = { 1130, 1978 }, -- Mal des Jaegers, Stich der Schlange
+        fillers = { 56641, 3044 }, -- Zuverlaessiger Schuss, Arkaner Schuss
+    },
+    DRUID = {
+        dots = { 8921, 5570, 1822, 1079 }, -- Mondfeuer, Insektenschwarm, Krallenhieb, Zerfleischen
+        fillers = { 5221, 2912, 5176 }, -- Zerfetzen, Sternenfeuer, Zorn
+    },
+    ROGUE = {
+        dots = { 5171, 1943 }, -- Zerhaecksel, Blutung
+        fillers = { 1752, 53 }, -- Fieser Trick, Meucheln
+    },
+    WARRIOR = {
+        dots = { 772 }, -- Ruptur (Rend)
+        fillers = { 12294, 23881, 78 }, -- Toedlicher Stoss, Blutdurst, Heldenhafter Stoss
+    },
+    PALADIN = {
+        dots = { 20271 }, -- Richturteil
+        fillers = { 35395, 879 }, -- Kreuzfahrerstoss, Exorzismus
+    },
+    SHAMAN = {
+        dots = { 8050 }, -- Flammenschock
+        fillers = { 51505, 17364, 403 }, -- Lavaeruption, Sturmschlag, Blitzschlag
+    },
+    DEATHKNIGHT = {
+        dots = { 45477, 45462 }, -- Eisige Beruehrung, Seuchenstoss
+        fillers = { 49020, 49143, 47541 }, -- Vernichten, Frostschlag, Todesmantel
+    },
 }
 
 -- Liefert eine Liste von Zauber-IDs (in Reihenfolge) oder nil, "keine Rotation fuer diese Klasse".

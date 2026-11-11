@@ -12,7 +12,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 | `Generator.lua` | Makrotext aus Schritten + Optionen. **Keine WoW-API**, damit testbar |
 | `Core.lua` | Zustand, `RPMacroWriterDB`, Drag-&-Drop-Annahme, Makro anlegen, Slash-Befehle |
 | `UI.lua` | Fenster, Ablaufliste, Optionen, Vorschau, gespeicherte Kombinationen |
-| `Rotations.lua` | Eingebaute Rotationstabelle (Rückfall für „Beste Rotation“, bisher nur Hexenmeister). Keine WoW-API |
+| `Rotations.lua` | Eingebaute Rotationstabelle (Rückfall für „Beste Rotation“, alle Klassen außer Mönch, Dämonenjäger und Rufer). Keine WoW-API |
 | `Minimap.lua` | Minimap-Symbol (Klick öffnet das Fenster, Ziehen verschiebt es) |
 | `icon.tga` | Addon-Icon im Spiel, erzeugt von `tools/make-icon.js` (auch `media/icon.png` für CurseForge) |
 | `tests/` | Generator-Tests + Syntaxprüfung in einer Lua-VM (`cd tests; npm install; npm test`) |

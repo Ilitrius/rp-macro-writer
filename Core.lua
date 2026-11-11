@@ -153,6 +153,14 @@ function ns.MoveStep(index, delta)
     ns.Refresh()
 end
 
+-- Schritt von Position from an Position to setzen (Drag & Drop in der Ablaufliste)
+function ns.MoveStepTo(from, to)
+    local steps = ns.state.steps
+    if from == to or not steps[from] or to < 1 or to > #steps then return end
+    table.insert(steps, to, table.remove(steps, from))
+    ns.Refresh()
+end
+
 function ns.RemoveStep(index)
     table.remove(ns.state.steps, index)
     ns.Refresh()

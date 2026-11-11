@@ -157,10 +157,29 @@ do
   local b, w = ns.BuildMacro(steps, o2)
   if #b <= 255 and #w == 0 and b:find("\\n/tar focus\\n", 1, true) then print("OK   Gekuerzt auf " .. #b .. " Zeichen") else fails = fails + 1; print("FAIL Gekuerzt (" .. #b .. "):\\n" .. b) end
 end
+do
+  local rotChunk = assert(load(ROT, "@Rotations.lua"))
+  local rns = { MAX_STEPS = 10 }
+  rotChunk("rp-macro-writer", rns)
+  local known = { [980] = true, [172] = true, [686] = true, [348] = true }
+  local ids = rns.PickRotation("WARLOCK", function(id) return known[id] end)
+  local okW = ids and #ids == 3 + rns.FILLER_REPEAT and ids[1] == 980 and ids[#ids] == 686
+  local none = rns.PickRotation("WARLOCK", function() return false end)
+  local okN = none and #none == 0
+  local okU = rns.PickRotation("MONK", function() return true end) == nil
+  local allClasses = true
+  for _, c in ipairs({ "WARLOCK", "MAGE", "PRIEST", "HUNTER", "DRUID", "ROGUE", "WARRIOR", "PALADIN", "SHAMAN", "DEATHKNIGHT" }) do
+    local r = rns.PickRotation(c, function() return true end)
+    if not r or #r < 2 then allClasses = false end
+  end
+  if okW and okN and okU and allClasses then print("OK   Rotationen") else fails = fails + 1; print("FAIL Rotationen") end
+end
 return fails
 `;
 lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Generator.lua'), 'utf8')));
 lua.lua_setglobal(L, to_luastring('GEN'));
+lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Rotations.lua'), 'utf8')));
+lua.lua_setglobal(L, to_luastring('ROT'));
 if (lauxlib.luaL_dostring(L, to_luastring(harness)) !== lua.LUA_OK) {
   console.log('LAUFZEITFEHLER', to_jsstring(lua.lua_tostring(L, -1)));
   process.exitCode = 1;

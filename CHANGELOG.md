@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ## [Unreleased]
 
 ### Added
+- Steps in the list can be reordered by dragging: press a step, drag it onto another step and release.
+- "Beste Rotation" fallback table now covers warlock, mage, priest, hunter, druid, rogue, warrior, paladin, shaman and death knight (before: warlock only). It is used when the game's own rotation helper returns nothing. Monk, demon hunter and evoker still rely on the game's helper. The spell IDs of the table are not yet verified in game.
 - English interface: all window texts, tooltips, chat messages and warnings are now available in English. German game clients (deDE) keep the German texts, every other client language gets English. The TOC notes are English with a German variant.
 
 ## [0.1.3] – 2026-11-10
