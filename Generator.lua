@@ -54,6 +54,7 @@ function ns.NewOpts()
         focusMouseover = false, -- /focus auf die Einheit unter der Maus setzen (sonst auf das Ziel)
         targetFocus = false,    -- /target focus: den Fokus anvisieren, Zauber gehen aufs Ziel
         targetTarget = false,   -- Rueckfall auf das Ziel des Ziels, sonst Zauber trotzdem aufs Ziel
+        fallbackTarget = false, -- bei Mouseover/Fokus als Rueckfall das aktuelle Ziel pruefen ("[@focus,harm][harm]")
         startAttack = false,    -- /startattack am Ende
         perChar = false,        -- false = Makro gilt fuer alle Charaktere (Account)
     }
@@ -82,7 +83,7 @@ local function Conditions(opts, mod)
     elseif opts.target == "focus" then
         units[#units + 1] = "@focus"
     end
-    units[#units + 1] = ""
+    if opts.target == "target" or opts.fallbackTarget then units[#units + 1] = "" end
     if opts.targetTarget then
         units[#units + 1] = "@targettarget"
         units[#units + 1] = "CATCHALL" -- immer wahr: Zauber geht im Zweifel aufs Ziel

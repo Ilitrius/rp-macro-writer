@@ -5,6 +5,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+- With the target set to focus or mouseover, the condition no longer appears twice (`[@focus,harm,nodead]` instead of `[@focus,harm,nodead][harm,nodead]`). The old behaviour is a new option, "Rückfall auf aktuelles Ziel" (fall back to current target), which is off by default; when it is on, a second bracket checks the current target if there is no valid focus or mouseover. Combinations saved before this change get the new default when loaded.
+
 ### Added
 - The window title shows the addon version (read from the TOC).
 

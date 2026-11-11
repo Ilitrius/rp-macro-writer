@@ -327,6 +327,7 @@ local function CreateUI()
     Radio(right, L["Aktuelles Ziel"], c1, -164, "target", "target")
     Radio(right, "Mouseover", c2, -164, "target", "mouseover")
     Radio(right, L["Fokus"], c3, -164, "target", "focus")
+    Toggle(right, L["Rückfall auf aktuelles Ziel"], c2 - 4, -141, "fallbackTarget")
 
     Label(right, L["Ziel muss sein"], 0, -196)
     Radio(right, L["Feind"], c1, -212, "hostility", "harm")

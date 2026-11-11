@@ -23,6 +23,7 @@ local en = {
     ["Ziel muss sein"] = "Target must be",
     ["Feind"] = "Enemy",
     ["Freund"] = "Friend",
+    ["Rückfall auf aktuelles Ziel"] = "Fall back to current target",
     ["Egal"] = "Any",
     ["Am Leben"] = "Alive",
     ["Tot"] = "Dead",
