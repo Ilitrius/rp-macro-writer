@@ -1,5 +1,6 @@
 -- Core.lua: Zustand, gespeicherte Daten, Drag & Drop-Annahme, Makro schreiben.
 local ADDON, ns = ...
+local L = ns.L
 
 local PREFIX = "|cff9482c9rp-macro-writer|r: "
 local QUESTION_MARK_ICON = 134400 -- Fragezeichen: WoW zeigt dann automatisch das Symbol des Zaubers
@@ -91,14 +92,14 @@ local function StepFromCursor()
         -- Gegenstand noch nicht im Client-Cache: nachladen lassen, Schritt folgt per Ereignis
         if a then return nil, nil, a end
     elseif kind then
-        return nil, "Das kann nicht in ein Makro übernommen werden (nur Zauber, Begleiterfähigkeiten und Gegenstände)."
+        return nil, L["Das kann nicht in ein Makro übernommen werden (nur Zauber, Begleiterfähigkeiten und Gegenstände)."]
     end
-    return nil, kind and "Name konnte nicht ermittelt werden." or nil
+    return nil, kind and L["Name konnte nicht ermittelt werden."] or nil
 end
 
 local function AddStep(step)
     if #ns.state.steps >= ns.MAX_STEPS then
-        ns.Print("Maximal " .. ns.MAX_STEPS .. " Zauber pro Makro.")
+        ns.Print(L["Maximal "] .. ns.MAX_STEPS .. L[" Zauber pro Makro."])
         return
     end
     table.insert(ns.state.steps, step)
@@ -115,7 +116,7 @@ itemWatcher:SetScript("OnEvent", function(_, _, itemID, success)
     if not next(pendingItems) then itemWatcher:UnregisterEvent("GET_ITEM_INFO_RECEIVED") end
     local name = success ~= false and ItemName(itemID)
     if not name then
-        ns.Print("Name des Gegenstands konnte nicht ermittelt werden.")
+        ns.Print(L["Name des Gegenstands konnte nicht ermittelt werden."])
         return
     end
     for _ = 1, count do
@@ -271,7 +272,7 @@ end
 
 function ns.BestRotation()
     if InCombatLockdown() then
-        ns.Print("Im Kampf können keine Makros geändert werden.")
+        ns.Print(L["Im Kampf können keine Makros geändert werden."])
         return
     end
     local ids, source
@@ -279,7 +280,7 @@ function ns.BestRotation()
     if ac and ac.GetRotationSpells and (not ac.IsAvailable or ac.IsAvailable()) then
         local ok, list = pcall(ac.GetRotationSpells)
         if ok and type(list) == "table" and #list > 0 then
-            ids, source = {}, "Blizzard-Rotationshilfe"
+            ids, source = {}, L["Blizzard-Rotationshilfe"]
             for _, id in ipairs(list) do
                 if IsKnown(id) then ids[#ids + 1] = id end
             end
@@ -288,9 +289,9 @@ function ns.BestRotation()
     if not ids or #ids == 0 then
         local _, class = UnitClass("player")
         ids = ns.PickRotation(class, IsKnown)
-        source = "eigene Tabelle"
+        source = L["eigene Tabelle"]
         if not ids then
-            ns.Print("Für diese Klasse ist keine Rotation hinterlegt und die Rotationshilfe des Spiels liefert nichts.")
+            ns.Print(L["Für diese Klasse ist keine Rotation hinterlegt und die Rotationshilfe des Spiels liefert nichts."])
             return
         end
     end
@@ -303,7 +304,7 @@ function ns.BestRotation()
         end
     end
     if #steps == 0 then
-        ns.Print("Keine passenden Zauber für Level " .. UnitLevel("player") .. " gefunden.")
+        ns.Print(L["Keine passenden Zauber für Level "] .. UnitLevel("player") .. L[" gefunden."])
         return
     end
     ns.state.steps = steps
@@ -312,7 +313,7 @@ function ns.BestRotation()
     if Trim(ns.state.name) == "" then ns.state.name = "Rotation" end
     local names = {}
     for i, s in ipairs(steps) do names[i] = s.name end
-    ns.Print("Rotation (" .. source .. ", Level " .. UnitLevel("player") .. "): " .. table.concat(names, ", "))
+    ns.Print("Rotation (" .. source .. L[", Level "] .. UnitLevel("player") .. "): " .. table.concat(names, ", "))
     ns.Refresh()
     ns.WriteMacro()
 end
@@ -324,18 +325,18 @@ function ns.WriteMacro()
     local state = ns.state
     local name = Trim(state.name)
     if InCombatLockdown() then
-        ns.Print("Im Kampf können keine Makros geändert werden.")
+        ns.Print(L["Im Kampf können keine Makros geändert werden."])
         return
     end
     if name == "" then
-        ns.Print("Bitte zuerst einen Makronamen eingeben.")
+        ns.Print(L["Bitte zuerst einen Makronamen eingeben."])
         return
     end
     -- Fremdes Makro bearbeiten: direkt im Spiel aendern, ohne Kennung und ohne Vorlage
     if state.foreign then
         local body = state.manualBody or ""
         if #body > ns.MAX_MACRO_LEN then
-            ns.Print("Makro ist zu lang (" .. #body .. "/" .. ns.MAX_MACRO_LEN .. " Zeichen).")
+            ns.Print(L["Makro ist zu lang ("] .. #body .. "/" .. ns.MAX_MACRO_LEN .. L[" Zeichen)."])
             return
         end
         local index = state.foreign.index
@@ -344,24 +345,24 @@ function ns.WriteMacro()
             index = GetMacroIndexByName(state.foreign.name)
         end
         if not index or index == 0 then
-            ns.Print("Das Makro \"" .. state.foreign.name .. "\" gibt es nicht mehr.")
+            ns.Print(L["Das Makro \""] .. state.foreign.name .. L["\" gibt es nicht mehr."])
             return
         end
         local ok, err = pcall(EditMacro, index, name, nil, body)
         if not ok then
-            ns.Print("Makro konnte nicht gespeichert werden: " .. tostring(err))
+            ns.Print(L["Makro konnte nicht gespeichert werden: "] .. tostring(err))
             return
         end
         state.name = name
         state.foreign = { name = name, index = GetMacroIndexByName(name) }
-        ns.Print("Fremdes Makro \"" .. name .. "\" geändert.")
+        ns.Print(L["Fremdes Makro \""] .. name .. L["\" geändert."])
         ns.Refresh()
         return
     end
 
     local manual = state.manualBody and state.manualBody ~= ""
     if #state.steps == 0 and not manual then
-        ns.Print("Bitte zuerst Zauber in das Fenster ziehen.")
+        ns.Print(L["Bitte zuerst Zauber in das Fenster ziehen."])
         return
     end
     local body
@@ -373,7 +374,7 @@ function ns.WriteMacro()
         body = ns.BuildMacro(state.steps, state.opts)
     end
     if #body > ns.MAX_MACRO_LEN then
-        ns.Print("Makro ist zu lang (" .. #body .. "/" .. ns.MAX_MACRO_LEN .. " Zeichen). Bitte Zauber oder Optionen entfernen.")
+        ns.Print(L["Makro ist zu lang ("] .. #body .. "/" .. ns.MAX_MACRO_LEN .. L[" Zeichen). Bitte Zauber oder Optionen entfernen."])
         return
     end
     ns.db.long[name] = nil -- Rest der frueheren /click-Verlaengerung
@@ -384,7 +385,7 @@ function ns.WriteMacro()
         -- Nur eigene Makros ueberschreiben: fremde Makros gleichen Namens bleiben unangetastet
         local _, _, oldBody = GetMacroInfo(index)
         if not ns.IsOurMacro(oldBody) then
-            ns.Print("Es gibt schon ein Makro namens \"" .. name .. "\", das nicht von rp-macro-writer stammt. Bitte einen anderen Namen wählen.")
+            ns.Print(L["Es gibt schon ein Makro namens \""] .. name .. L["\", das nicht von rp-macro-writer stammt. Bitte einen anderen Namen wählen."])
             return
         end
         ok, err = pcall(EditMacro, index, name, nil, body)
@@ -393,33 +394,33 @@ function ns.WriteMacro()
         local perChar = state.opts.perChar and true or false
         local limit = perChar and (MAX_CHARACTER_MACROS or 18) or (MAX_ACCOUNT_MACROS or 120)
         if (perChar and numChar or numAccount) >= limit then
-            ns.Print("Kein freier Makroplatz mehr (" .. (perChar and "Charakter" or "Account") .. ").")
+            ns.Print(L["Kein freier Makroplatz mehr ("] .. (perChar and L["Charakter"] or L["Account"]) .. ").")
             return
         end
         ok, err = pcall(CreateMacro, name, QUESTION_MARK_ICON, body, perChar)
     end
     if not ok then
-        ns.Print("Makro konnte nicht gespeichert werden: " .. tostring(err))
+        ns.Print(L["Makro konnte nicht gespeichert werden: "] .. tostring(err))
         return
     end
 
     state.name = name
     ns.db.savedTab = state.opts.perChar and "char" or "global" -- Liste zeigt gleich den passenden Reiter
     ns.db.saved[name] = { steps = CopySteps(state.steps), opts = CopyOpts(state.opts), manualBody = manual and state.manualBody or nil }
-    ns.Print("Makro \"" .. name .. "\" gespeichert. Mit \"Auf Leiste\" kannst du es auf eine Aktionsleiste ziehen.")
+    ns.Print(L["Makro \""] .. name .. L["\" gespeichert. Mit \"Auf Leiste\" kannst du es auf eine Aktionsleiste ziehen."])
     ns.Refresh()
 end
 
 function ns.PickupMacro()
     if InCombatLockdown() then
-        ns.Print("Im Kampf nicht möglich.")
+        ns.Print(L["Im Kampf nicht möglich."])
         return
     end
     local index = GetMacroIndexByName(Trim(ns.state.name))
     if index and index > 0 then
         PickupMacro(index)
     else
-        ns.Print("Dieses Makro gibt es noch nicht – zuerst \"Makro erstellen/speichern\" klicken.")
+        ns.Print(L["Dieses Makro gibt es noch nicht – zuerst \"Makro erstellen/speichern\" klicken."])
     end
 end
 

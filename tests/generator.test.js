@@ -8,7 +8,7 @@ const root = path.join(__dirname, '..');
 const L = lauxlib.luaL_newstate();
 lualib.luaL_openlibs(L);
 
-for (const file of ['Generator.lua', 'Rotations.lua', 'Core.lua', 'UI.lua', 'Minimap.lua']) {
+for (const file of ['Locales.lua', 'Generator.lua', 'Rotations.lua', 'Core.lua', 'UI.lua', 'Minimap.lua']) {
   const src = fs.readFileSync(path.join(root, file));
   const status = lauxlib.luaL_loadbuffer(L, src, src.length, to_luastring('@' + file));
   if (status !== lua.LUA_OK) {

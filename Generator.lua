@@ -1,6 +1,8 @@
 -- Generator.lua: baut aus Schritten + Optionen den Makrotext.
 -- Bewusst ohne WoW-API, damit die Logik ausserhalb des Spiels testbar ist.
 local ADDON, ns = ...
+-- Sprache: ohne Locales.lua (Tests) bleibt es beim deutschen Text
+local L = ns.L or setmetatable({}, { __index = function(_, k) return k end })
 ns = ns or {}
 
 ns.MAX_MACRO_LEN = 255
@@ -252,12 +254,12 @@ function ns.BuildMacro(steps, opts)
             local mod = step.mod or ""
             if mod == "" then
                 if fallback then
-                    warnings[#warnings + 1] = step.name .. ": ohne Taste, wird ignoriert (nur ein Zauber ohne Taste möglich)."
+                    warnings[#warnings + 1] = step.name .. L[": ohne Taste, wird ignoriert (nur ein Zauber ohne Taste möglich)."]
                 else
                     fallback = step
                 end
             elseif seen[mod] then
-                warnings[#warnings + 1] = step.name .. ": Taste doppelt belegt, wird ignoriert."
+                warnings[#warnings + 1] = step.name .. L[": Taste doppelt belegt, wird ignoriert."]
             else
                 seen[mod] = true
                 parts[#parts + 1] = Conditions(opts, mod) .. step.name
@@ -272,7 +274,7 @@ function ns.BuildMacro(steps, opts)
             lines[#lines + 1] = cmd .. Conditions(opts) .. step.name
         end
         if #steps > 1 then
-            warnings[#warnings + 1] = "Hinweis: Pro Tastendruck löst WoW nur einen Zauber mit globaler Abklingzeit aus."
+            warnings[#warnings + 1] = L["Hinweis: Pro Tastendruck löst WoW nur einen Zauber mit globaler Abklingzeit aus."]
         end
     end
 
@@ -283,7 +285,7 @@ function ns.BuildMacro(steps, opts)
     end
     for _, step in ipairs(steps) do
         if ns.NameProblem(step.name, kindForNames) then
-            warnings[#warnings + 1] = step.name .. ": enthält Sonderzeichen, das Makro funktioniert evtl. nicht."
+            warnings[#warnings + 1] = step.name .. L[": enthält Sonderzeichen, das Makro funktioniert evtl. nicht."]
         end
     end
 
@@ -300,7 +302,7 @@ function ns.BuildMacro(steps, opts)
     if #body > ns.MAX_MACRO_LEN then body = ns.Compact(body) end -- erst kuerzen, dann erst warnen
     if #body > ns.MAX_MACRO_LEN then body = body:gsub("\n/target ", "\n/tar ") end -- /tar ist die Kurzform von /target
     if #body > ns.MAX_MACRO_LEN then
-        warnings[#warnings + 1] = "Makro ist zu lang (" .. #body .. "/" .. ns.MAX_MACRO_LEN .. " Zeichen). Bitte Zauber oder Optionen entfernen."
+        warnings[#warnings + 1] = L["Makro ist zu lang ("] .. #body .. "/" .. ns.MAX_MACRO_LEN .. L[" Zeichen). Bitte Zauber oder Optionen entfernen."]
     end
     return body, warnings
 end

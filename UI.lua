@@ -1,5 +1,6 @@
 -- UI.lua: Fenster mit Ablaufliste (Drop-Ziel), Optionen, Vorschau und gespeicherten Kombinationen.
 local ADDON, ns = ...
+local L = ns.L
 
 local ROWS, ROW_H = ns.MAX_STEPS, 31
 local BOTTOM = -94 --Versatz des unteren Bereichs (Name, Vorschau, gespeicherte Kombinationen)
@@ -7,7 +8,7 @@ local SAVED_ROWS, SAVED_H = 6, 22
 local LEFT_X, LEFT_W = 14, 300
 local RIGHT_X, RIGHT_W = 328, 298
 
-local MOD_LABEL = { [""] = "-", shift = "Shift", ctrl = "Strg", alt = "Alt" }
+local MOD_LABEL = { [""] = "-", shift = "Shift", ctrl = L["Strg"], alt = "Alt" }
 local MOD_NEXT = { [""] = "shift", shift = "ctrl", ctrl = "alt", alt = "" }
 
 local MIN_W, MAX_W = 640, 1100 -- Fensterbreite
@@ -230,13 +231,13 @@ local function CreateUI()
 
     -- Makro-Symbol oben rechts (Symbol des ersten Schritts, wie bei #showtooltip)
     -- Links: Ablauf ----------------------------------------------------------
-    Label(f, "Ablauf", LEFT_X, -32)
-    local best = TextButton(f, "Beste Rotation", 104, 18)
+    Label(f, L["Ablauf"], LEFT_X, -32)
+    local best = TextButton(f, L["Beste Rotation"], 104, 18)
     best:SetPoint("TOPLEFT", f, "TOPLEFT", LEFT_X + 56, -29)
     best:SetScript("OnClick", function() ns.BestRotation() end)
     best:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetText("Beste Rotation für dein Level und deine verfügbaren Zauber\nersetzt den Ablauf und legt das Makro an", nil, nil, nil, nil, true)
+        GameTooltip:SetText(L["Beste Rotation für dein Level und deine verfügbaren Zauber\nersetzt den Ablauf und legt das Makro an"], nil, nil, nil, nil, true)
         GameTooltip:Show()
     end)
     best:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -248,7 +249,7 @@ local function CreateUI()
     ui.dropHint = drop:CreateFontString(nil, "OVERLAY", "GameFontDisable")
     ui.dropHint:SetPoint("CENTER")
     ui.dropHint:SetWidth(LEFT_W - 40)
-    ui.dropHint:SetText("Zauber aus dem Zauberbuch\nhierher ziehen")
+    ui.dropHint:SetText(L["Zauber aus dem Zauberbuch\nhierher ziehen"])
 
     ui.rows = {}
     for i = 1, ROWS do ui.rows[i] = CreateStepRow(drop, i) end
@@ -264,16 +265,16 @@ local function CreateUI()
     ui.macroIcon:SetSize(40, 40)
     ui.macroIcon:SetPoint("TOPRIGHT", right, "TOPRIGHT", 0, -34)
 
-    Label(right, "Makro-Art", 0, -32)
-    Radio(right, "Automatisch erkennen", c1, -48, "mode", "auto")
-    Radio(right, "Zusatztaste", c1 + 160, -48, "mode", "modifier")
-    Radio(right, "Einzelne Zeilen", c1, -70, "mode", "lines")
-    Radio(right, "Zufall", c1 + 160, -70, "mode", "random")
+    Label(right, L["Makro-Art"], 0, -32)
+    Radio(right, L["Automatisch erkennen"], c1, -48, "mode", "auto")
+    Radio(right, L["Zusatztaste"], c1 + 160, -48, "mode", "modifier")
+    Radio(right, L["Einzelne Zeilen"], c1, -70, "mode", "lines")
+    Radio(right, L["Zufall"], c1 + 160, -70, "mode", "random")
 
-    Label(right, "Sequenz zurücksetzen (Reset) bei", 0, -100)
-    ui.resetTarget = Toggle(right, "Zielwechsel", c1, -116, "resetTarget")
-    ui.resetCombat = Toggle(right, "Kampfende", c2, -116, "resetCombat")
-    ui.secsLabel = Label(right, "Sek.:", c3, -121, "GameFontHighlightSmall")
+    Label(right, L["Sequenz zurücksetzen (Reset) bei"], 0, -100)
+    ui.resetTarget = Toggle(right, L["Zielwechsel"], c1, -116, "resetTarget")
+    ui.resetCombat = Toggle(right, L["Kampfende"], c2, -116, "resetCombat")
+    ui.secsLabel = Label(right, L["Sek.:"], c3, -121, "GameFontHighlightSmall")
     local secs = CreateFrame("EditBox", nil, right, "InputBoxTemplate")
     ui.secs = secs
     secs:SetSize(36, 20)
@@ -290,38 +291,38 @@ local function CreateUI()
     secs:SetScript("OnEnterPressed", secs.ClearFocus)
     secs:SetScript("OnEscapePressed", secs.ClearFocus)
 
-    Label(right, "Ziel", 0, -148)
-    Radio(right, "Aktuelles Ziel", c1, -164, "target", "target")
+    Label(right, L["Ziel"], 0, -148)
+    Radio(right, L["Aktuelles Ziel"], c1, -164, "target", "target")
     Radio(right, "Mouseover", c2, -164, "target", "mouseover")
-    Radio(right, "Fokus", c3, -164, "target", "focus")
+    Radio(right, L["Fokus"], c3, -164, "target", "focus")
 
-    Label(right, "Ziel muss sein", 0, -196)
-    Radio(right, "Feind", c1, -212, "hostility", "harm")
-    Radio(right, "Freund", c2, -212, "hostility", "help")
-    Radio(right, "Egal", c3, -212, "hostility", "any")
-    Radio(right, "Am Leben", c1, -234, "life", "alive")
-    Radio(right, "Tot", c2, -234, "life", "dead")
-    Radio(right, "Egal", c3, -234, "life", "any")
+    Label(right, L["Ziel muss sein"], 0, -196)
+    Radio(right, L["Feind"], c1, -212, "hostility", "harm")
+    Radio(right, L["Freund"], c2, -212, "hostility", "help")
+    Radio(right, L["Egal"], c3, -212, "hostility", "any")
+    Radio(right, L["Am Leben"], c1, -234, "life", "alive")
+    Radio(right, L["Tot"], c2, -234, "life", "dead")
+    Radio(right, L["Egal"], c3, -234, "life", "any")
 
     Label(right, "Extras", 0, -266)
-    Toggle(right, "Symbol/Tooltip anzeigen", c1, -282, "showTooltip")
-    Toggle(right, "Begleiter greift an", c1 + 160, -282, "petAttack")
-    Toggle(right, "Automatisch Gegner wählen", c1, -304, "autoTarget")
-    Toggle(right, "Nur dieser Charakter", c1 + 160, -304, "perChar")
-    Toggle(right, "Kanalisierte Zauber nicht abbrechen", c1, -326, "noChannel")
+    Toggle(right, L["Symbol/Tooltip anzeigen"], c1, -282, "showTooltip")
+    Toggle(right, L["Begleiter greift an"], c1 + 160, -282, "petAttack")
+    Toggle(right, L["Automatisch Gegner wählen"], c1, -304, "autoTarget")
+    Toggle(right, L["Nur dieser Charakter"], c1 + 160, -304, "perChar")
+    Toggle(right, L["Kanalisierte Zauber nicht abbrechen"], c1, -326, "noChannel")
     -- Fokus auf die Einheit unter der Maus (sonst aufs Ziel) setzen; gleich anvisieren, abwaehlbar
-    Check(right, "Maus-Ziel als Fokus setzen", c1, -348,
+    Check(right, L["Maus-Ziel als Fokus setzen"], c1, -348,
         function() return ns.state.opts.focusMouseover end,
         function(checked)
             ns.state.opts.focusMouseover = checked
             ns.state.opts.targetFocus = checked
         end)
-    Toggle(right, "Am Ende angreifen", c1 + 160, -348, "startAttack")
-    Toggle(right, "Fokus anvisieren", c1, -370, "targetFocus")
-    Toggle(right, "Ziel des Ziels (Rückfall)", c1 + 160, -370, "targetTarget")
+    Toggle(right, L["Am Ende angreifen"], c1 + 160, -348, "startAttack")
+    Toggle(right, L["Fokus anvisieren"], c1, -370, "targetFocus")
+    Toggle(right, L["Ziel des Ziels (Rückfall)"], c1 + 160, -370, "targetTarget")
 
     -- Unten links: Name, Vorschau, Knoepfe ------------------------------------
-    Label(f, "Makroname", LEFT_X, -312 + BOTTOM)
+    Label(f, L["Makroname"], LEFT_X, -312 + BOTTOM)
     local name = CreateFrame("EditBox", nil, f, "InputBoxTemplate")
     ui.name = name
     name:SetSize(130, 20)
@@ -413,7 +414,7 @@ local function CreateUI()
     previewBox:EnableMouse(true)
     previewBox:SetScript("OnMouseDown", function() edit:SetFocus() end)
 
-    ui.regen = TextButton(previewBox, "Neu erzeugen", 90, 18)
+    ui.regen = TextButton(previewBox, L["Neu erzeugen"], 90, 18)
     ui.regen:SetPoint("BOTTOMRIGHT", previewBox, "BOTTOMRIGHT", -26, 3)
     ui.regen:SetScript("OnClick", function()
         ns.state.manualBody = nil
@@ -463,7 +464,7 @@ local function CreateUI()
         end)
         grip:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetText("Ziehen: Fenster und Makrotext größer/kleiner machen")
+            GameTooltip:SetText(L["Ziehen: Fenster und Makrotext größer/kleiner machen"])
             GameTooltip:Show()
         end)
         grip:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -472,20 +473,20 @@ local function CreateUI()
     MakeGrip(f, f, -4, 4)
     MakeGrip(previewBox, previewBox, -1, 1)
 
-    local create = TextButton(f, "Makro erstellen/speichern", 172)
+    local create = TextButton(f, L["Makro erstellen/speichern"], 172)
     create:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", LEFT_X, 12)
     create:SetScript("OnClick", function() ns.WriteMacro() end)
 
-    local pickup = TextButton(f, "Auf Leiste", 74)
+    local pickup = TextButton(f, L["Auf Leiste"], 74)
     pickup:SetPoint("LEFT", create, "RIGHT", 4, 0)
     pickup:SetScript("OnClick", function() ns.PickupMacro() end)
 
-    local clear = TextButton(f, "Leeren", 50)
+    local clear = TextButton(f, L["Leeren"], 50)
     clear:SetPoint("LEFT", pickup, "RIGHT", 4, 0)
     clear:SetScript("OnClick", function() ns.ClearSteps() end)
 
     -- Unten rechts: gespeicherte Kombinationen --------------------------------
-    Label(right, "Gespeichert", 0, -312 + BOTTOM)
+    Label(right, L["Gespeichert"], 0, -312 + BOTTOM)
     -- Reiter: alle globalen Makros / nur Makros dieses Charakters
     ui.tabs = {}
     local function MakeTab(scope, w, x)
@@ -503,7 +504,7 @@ local function CreateUI()
     local saved = Box(right, 0, -334 + BOTTOM, RIGHT_W, SAVED_ROWS * SAVED_H + 6)
     ui.savedEmpty = saved:CreateFontString(nil, "OVERLAY", "GameFontDisable")
     ui.savedEmpty:SetPoint("CENTER")
-    ui.savedEmpty:SetText("Keine Makros")
+    ui.savedEmpty:SetText(L["Keine Makros"])
     ui.savedRows = {}
     for i = 1, SAVED_ROWS do ui.savedRows[i] = CreateSavedRow(saved, i) end
     saved:EnableMouseWheel(true)
@@ -511,7 +512,7 @@ local function CreateUI()
         ui.savedOffset = ui.savedOffset - delta
         ns.Refresh()
     end)
-    local hint = Label(right, "Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage, Klick lädt den Text zum Bearbeiten. Dunkelgrau = fremdes Makro, wird beim Speichern direkt geändert.", 0, -478 + BOTTOM, "GameFontDisableSmall")
+    local hint = Label(right, L["Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage, Klick lädt den Text zum Bearbeiten. Dunkelgrau = fremdes Makro, wird beim Speichern direkt geändert."], 0, -478 + BOTTOM, "GameFontDisableSmall")
     hint:SetWidth(RIGHT_W)
     hint:SetJustifyH("LEFT")
 
@@ -553,9 +554,9 @@ function ns.Refresh()
     if not autoMode or #steps == 0 then
         ui.detected:SetText("")
     elseif sequenceMode then
-        ui.detected:SetText("Erkannt: Cast-Sequenz")
+        ui.detected:SetText(L["Erkannt: Cast-Sequenz"])
     else
-        ui.detected:SetText("Erkannt: einfacher Cast")
+        ui.detected:SetText(L["Erkannt: einfacher Cast"])
     end
     SetEnabled(ui.resetTarget, sequenceMode)
     SetEnabled(ui.resetCombat, sequenceMode)
@@ -570,11 +571,11 @@ function ns.Refresh()
     local manual = state.manualBody
     if manual then
         body = manual
-        warnings = { "Von Hand bearbeitet: Optionen ändern den Text nicht mehr. \"Neu erzeugen\" setzt ihn zurück." }
+        warnings = { L["Von Hand bearbeitet: Optionen ändern den Text nicht mehr. \"Neu erzeugen\" setzt ihn zurück."] }
         if state.foreign then
-            warnings = { "Fremdes Makro: Speichern ändert es direkt im Spiel (ohne Kennung)." }
+            warnings = { L["Fremdes Makro: Speichern ändert es direkt im Spiel (ohne Kennung)."] }
         elseif not ns.IsOurMacro(body) then
-            warnings[2] = "Kennung " .. ns.MARKER .. " fehlt, wird beim Speichern angehängt."
+            warnings[2] = L["Kennung "] .. ns.MARKER .. L[" fehlt, wird beim Speichern angehängt."]
         end
     end
     ui.regen:SetShown(manual ~= nil and not state.foreign)
@@ -592,7 +593,7 @@ function ns.Refresh()
     local lists = { global = ns.ListEntries("global"), char = ns.ListEntries("char") }
     local entries = lists[tab]
     for scope, button in pairs(ui.tabs) do
-        local label = (scope == "global" and "Global" or "Dieser Charakter") .. " (" .. #lists[scope] .. ")"
+        local label = (scope == "global" and "Global" or L["Dieser Charakter"]) .. " (" .. #lists[scope] .. ")"
         if scope == tab then
             button:SetText("|cffffd100" .. label .. "|r")
             button:Disable()
@@ -611,11 +612,11 @@ function ns.Refresh()
         row.foreign = entry and entry.foreign
         if entry then
             if entry.foreign then
-                row.text:SetText("|cff888888" .. entry.name .. " (fremd)|r")
+                row.text:SetText("|cff888888" .. entry.name .. L[" (fremd)|r"])
             elseif not entry.hasTemplate then
-                row.text:SetText("|cffaaaaaa" .. entry.name .. " (nur Makro)|r")
+                row.text:SetText("|cffaaaaaa" .. entry.name .. L[" (nur Makro)|r"])
             elseif entry.inGame then
-                row.text:SetText(entry.name .. " |cff40ff40(im Spiel)|r")
+                row.text:SetText(entry.name .. L[" |cff40ff40(im Spiel)|r"])
             else
                 row.text:SetText(entry.name)
             end

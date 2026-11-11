@@ -3,6 +3,11 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- English interface: all window texts, tooltips, chat messages and warnings are now available in English. German game clients (deDE) keep the German texts, every other client language gets English. The TOC notes are English with a German variant.
+
 ## [0.1.3] – 2026-11-10
 
 ### Added

@@ -1,5 +1,6 @@
 -- Minimap.lua: Minimap-Symbol. Linksklick oeffnet/schliesst das Fenster, Ziehen verschiebt es am Minimaprand.
 local ADDON, ns = ...
+local L = ns.L
 
 local ICON = "Interface\\AddOns\\rp-macro-writer\\icon"
 
@@ -41,8 +42,8 @@ local function Create()
     button:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_LEFT")
         GameTooltip:SetText("rp-macro-writer")
-        GameTooltip:AddLine("Klick: Fenster öffnen/schließen", 1, 1, 1)
-        GameTooltip:AddLine("Ziehen: Symbol verschieben", 0.7, 0.7, 0.7)
+        GameTooltip:AddLine(L["Klick: Fenster öffnen/schließen"], 1, 1, 1)
+        GameTooltip:AddLine(L["Ziehen: Symbol verschieben"], 0.7, 0.7, 0.7)
         GameTooltip:Show()
     end)
     button:SetScript("OnLeave", function() GameTooltip:Hide() end)

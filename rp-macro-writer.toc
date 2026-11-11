@@ -1,11 +1,13 @@
 ## Interface: 120105, 120107, 50504, 38002, 20506, 16001, 11509
 ## Title: |cff9482c9rp|r-macro-writer
-## Notes: Zauber per Drag & Drop zu Makros kombinieren – erkennt Cast oder Cast-Sequenz automatisch.
+## Notes: Combine spells into macros by drag and drop – detects a cast or a cast sequence automatically.
+## Notes-deDE: Zauber per Drag & Drop zu Makros kombinieren – erkennt Cast oder Cast-Sequenz automatisch.
 ## IconTexture: Interface\AddOns\rp-macro-writer\icon
 ## Author: Rene
 ## Version: 0.1.3
 ## SavedVariables: RPMacroWriterDB
 
+Locales.lua
 Generator.lua
 Rotations.lua
 Core.lua
