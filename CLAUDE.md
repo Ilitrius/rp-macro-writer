@@ -20,7 +20,8 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 | `.claude/agents/` | `makro-generator` und `makro-ui` |
 
 ## Sprache
-- Mit dem Nutzer und in dieser Datei: Deutsch. Das Fenster des Addons ist seit 2026-11-11 zweisprachig (Deutsch auf deDE-Clients, sonst Englisch, siehe `Locales.lua`); weitere Sprachen wollte der Nutzer nicht („Englisch reicht“).
+- Mit dem Nutzer und in dieser Datei: Deutsch.
+- Offene Aufgaben dem Nutzer immer als nummerierte Liste zeigen (1., 2., 3.), nie als Bullet Points (Wunsch vom 2026-11-11). Das Fenster des Addons ist seit 2026-11-11 zweisprachig (Deutsch auf deDE-Clients, sonst Englisch, siehe `Locales.lua`); weitere Sprachen wollte der Nutzer nicht („Englisch reicht“).
 - **`CHANGELOG.md` und alle Release Notes immer auf Englisch.** Was der Nutzer dafür auf Deutsch vorgibt, wird ins Englische übersetzt.
 
 ## Arbeitsweise
