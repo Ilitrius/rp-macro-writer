@@ -249,12 +249,16 @@ local function CreateUI()
     AcceptDrop(f)
     tinsert(UISpecialFrames, "RPMacroWriterFrame") -- ESC schliesst das Fenster
 
+    -- Titel mit Version aus der TOC (## Version)
+    local getMeta = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+    local version = getMeta and getMeta(ADDON, "Version")
+    local titleText = "rp-macro-writer" .. (version and (" |cff888888v" .. version .. "|r") or "")
     if f.TitleText then
-        f.TitleText:SetText("rp-macro-writer")
+        f.TitleText:SetText(titleText)
     else
         local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         title:SetPoint("TOP", f, "TOP", 0, -6)
-        title:SetText("rp-macro-writer")
+        title:SetText(titleText)
     end
 
     -- Makro-Symbol oben rechts (Symbol des ersten Schritts, wie bei #showtooltip)

@@ -3,6 +3,11 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- The window title shows the addon version (read from the TOC).
+
 ## [0.1.4] – 2026-11-11
 
 ### Added
