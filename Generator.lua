@@ -45,26 +45,22 @@ function ns.NewOpts()
         resetCombat = true,     -- /castsequence reset=combat
         resetSeconds = 0,       -- /castsequence reset=<n>
         target = "target",      -- target | mouseover
-        hostility = "harm",     -- harm (Feind) | any (egal); im Fenster nicht mehr waehlbar, immer harm
         life = "alive",         -- alive (nodead) | dead | any
         showTooltip = true,
         petAttack = false,
         autoTarget = false,
         noChannel = false,
         targetTarget = false,   -- Rueckfall auf das Ziel des Ziels, sonst Zauber trotzdem aufs Ziel
-        fallbackTarget = false, -- bei Mouseover als Rueckfall das aktuelle Ziel pruefen ("[@mouseover,harm][harm]")
+        fallbackTarget = false, -- bei Mouseover als Rueckfall das aktuelle Ziel pruefen ("[@mouseover,nodead][nodead]")
         startAttack = false,    -- /startattack am Ende
         perChar = false,        -- false = Makro gilt fuer alle Charaktere (Account)
     }
 end
 
--- Bedingungsblock, z.B. "[mod:shift,@mouseover,harm,nodead][mod:shift] "
+-- Bedingungsblock, z.B. "[mod:shift,@mouseover,exists,nodead][mod:shift] "
 local function Conditions(opts, mod)
     -- Bedingungen, die fuer jedes Ziel gelten: Feind/Freund, lebt/tot, nicht kanalisierend
     local base = {}
-    if opts.hostility == "harm" then
-        base[#base + 1] = "harm"
-    end
     if opts.life == "alive" then
         base[#base + 1] = "nodead"
     elseif opts.life == "dead" then
@@ -91,18 +87,11 @@ local function Conditions(opts, mod)
         else
             if unit ~= "" then
                 parts[#parts + 1] = unit
-                -- [@mouseover] allein ist immer wahr; harm prueft die Existenz bereits mit
-                if opts.hostility ~= "harm" then
-                    parts[#parts + 1] = "exists"
-                end
             end
             for _, p in ipairs(base) do parts[#parts + 1] = p end
-            -- Kette mit Ziel des Ziels: jede Klammer prueft zusaetzlich "exists" (so laeuft die Vorlage des Nutzers im Spiel)
-            if opts.targetTarget and (opts.hostility ~= "any" or opts.life ~= "any") then
-                local has = false
-                for _, p in ipairs(parts) do if p == "exists" then has = true end end
-                if not has then parts[#parts + 1] = "exists" end
-            end
+            -- [@mouseover] und [@targettarget] allein sind immer wahr, deshalb "exists" dazu; in der Kette mit Ziel des Ziels
+            -- auch beim aktuellen Ziel (so laeuft die Vorlage des Nutzers im Spiel)
+            if unit ~= "" or (opts.targetTarget and opts.life ~= "any") then parts[#parts + 1] = "exists" end
         end
         if #parts > 0 then anyContent = true end
         out = out .. "[" .. table.concat(parts, ",") .. "]"
@@ -127,7 +116,7 @@ local COLOR = {
     comment = "ff808080", -- #rpmw und andere Kommentarzeilen
     show    = "ffffd100", -- #show, #showtooltip
     unit    = "ff66ccff", -- @mouseover, @targettarget, ...
-    cond    = "ff7fe07f", -- harm, nodead, mod:shift, ...
+    cond    = "ff7fe07f", -- nodead, exists, mod:shift, ...
     reset   = "ffd19bff", -- reset=target/combat
 }
 
@@ -216,7 +205,7 @@ function ns.BuildMacro(steps, opts)
     if #steps == 0 then return "", warnings end
 
     if opts.showTooltip then lines[#lines + 1] = "#showtooltip" end
-    if opts.autoTarget then lines[#lines + 1] = "/targetenemy [noharm][dead]" end
+    if opts.autoTarget then lines[#lines + 1] = "/targetenemy [noexists][dead]" end
     if opts.petAttack then lines[#lines + 1] = "/petattack" end
 
     local mode = opts.mode

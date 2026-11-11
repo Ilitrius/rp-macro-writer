@@ -10,7 +10,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - With the target set to mouseover, the condition no longer appears twice (`[@mouseover,harm,nodead]` instead of `[@mouseover,harm,nodead][harm,nodead]`). The old behaviour is a new option, "Rückfall auf aktuelles Ziel" (fall back to current target), off by default: when on, a second bracket checks the current target if there is nothing under the mouse.
 
 ### Removed
-- The target choices "Feind" (enemy), "Freund" (friend) and "Egal" (any) under "Ziel muss sein": the macros always require an enemy (`harm`). "Ziel muss sein" keeps only alive / dead / any. Saved combinations load with the enemy requirement.
+- The enemy/friend condition: the target choices "Feind", "Freund" and "Egal" under "Ziel muss sein" are gone, and no macro contains `harm` or `help` any more. "Ziel muss sein" keeps only alive / dead / any (`nodead`, `dead`). `[@mouseover]` and `[@targettarget]` get `exists` instead; the chain for the target of the target reads `[nodead,exists][@targettarget,nodead,exists][@target]`. "Automatisch Gegner wählen" uses `/targetenemy [noexists][dead]` instead of `[noharm][dead]`. Note that the spells can now also go to friendly targets.
 - Everything about the focus: the target choice "Fokus", "Maus-Ziel als Fokus setzen" (`/focus`) and "Fokus anvisieren" (`/target focus`). The addon now works with the current target, mouseover and the target of the target only. Saved combinations that used the focus fall back to the current target. The `/target` → `/tar` shortening is gone, because no line uses `/target` any more.
 
 ### Added
