@@ -45,7 +45,7 @@ function ns.NewOpts()
         resetCombat = true,     -- /castsequence reset=combat
         resetSeconds = 0,       -- /castsequence reset=<n>
         target = "target",      -- target | mouseover
-        hostility = "harm",     -- harm (Feind) | any (egal)
+        hostility = "harm",     -- harm (Feind) | any (egal); im Fenster nicht mehr waehlbar, immer harm
         life = "alive",         -- alive (nodead) | dead | any
         showTooltip = true,
         petAttack = false,
