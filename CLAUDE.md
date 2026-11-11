@@ -57,7 +57,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 ## Offen
 - Erster Test im Spiel (Forever und Retail) hat der Nutzer laut eigener Aussage am 2026-11-11 abgeschlossen.
 - Screenshots, CurseForge-Upload von 0.1.4 und Prüfung der Rotations-IDs sind laut Nutzer am 2026-11-11 erledigt.
-- CurseForge-Projekt ist angelegt (ID 1794790, Lizenz MIT, GitHub-Remote steht); Release dort noch nicht hochgeladen.
+- CurseForge-Projekt ist angelegt (ID 1794790, Lizenz MIT, GitHub-Remote steht); Release 0.1.4 ist dort laut Nutzer hochgeladen (2026-11-11).
 
 ## Kennung und geplante Auswahl
 - Jedes erzeugte Makro endet mit der Zeile `#rpmw` (`ns.MARKER`, kostet 6 der 255 Zeichen). Daran erkennt das Add-on eigene Makros im Spiel (`ns.ListEntries`), zeigt sie in der Liste (Reiter „Global“ mit allen Account-Makros, „Dieser Charakter“ nur Charakter-Makros; fremde Makros grau) und überschreibt keine fremden Makros gleichen Namens. Die Kennung nie ändern, sonst werden alte Makros nicht mehr erkannt.
