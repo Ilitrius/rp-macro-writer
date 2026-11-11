@@ -12,12 +12,13 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 | `Generator.lua` | Makrotext aus Schritten + Optionen. **Keine WoW-API**, damit testbar |
 | `Core.lua` | Zustand, `RPMacroWriterDB`, Drag-&-Drop-Annahme, Makro anlegen, Slash-Befehle |
 | `UI.lua` | Fenster, Ablaufliste, Optionen, Vorschau, gespeicherte Kombinationen |
-| `Rotations.lua` | Eingebaute Rotationstabelle (Rückfall für „Beste Rotation“, alle 13 Klassen). Keine WoW-API |
+| `Rotations.lua` | Mechanik der Rotationen (`ns.RegisterRotation`, `ns.PickRotation`, Varianten `retail`/`classic`). Keine WoW-API |
+| `Rotations/<Klasse>.lua` | Je Klasse eine Datei (13): Zauberlisten je Spielversion, Quellen, Begründung, Status, Änderungsverlauf. Wird vom Agenten `rotation-helper` gepflegt |
 | `Minimap.lua` | Minimap-Symbol (Klick öffnet das Fenster, Ziehen verschiebt es) |
 | `icon.tga` | Addon-Icon im Spiel, erzeugt von `tools/make-icon.js` (auch `media/icon.png` für CurseForge) |
 | `tests/` | Generator-Tests + Syntaxprüfung in einer Lua-VM (`cd tests; npm install; npm test`) |
 | `CHANGELOG.md`, `docs/release-notes/` | Versionsverlauf und Release Notes |
-| `.claude/agents/` | `makro-generator` und `makro-ui` |
+| `.claude/agents/` | `makro-generator`, `makro-ui` und `rotation-helper` |
 
 ## Sprache
 - Mit dem Nutzer und in dieser Datei: Deutsch.
@@ -26,7 +27,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 - **`CHANGELOG.md` und alle Release Notes immer auf Englisch.** Was der Nutzer dafür auf Deutsch vorgibt, wird ins Englische übersetzt.
 
 ## Arbeitsweise
-- Aufgaben am Makrotext gehen an den Agenten `makro-generator`, Aufgaben an Fenster/Bedienung an `makro-ui`. Kleinigkeiten dürfen direkt erledigt werden.
+- Aufgaben am Makrotext gehen an den Agenten `makro-generator`, Aufgaben an Fenster/Bedienung an `makro-ui`, Aufgaben an den Rotationen („Beste Rotation“: Recherche, Klassendateien, Pre-Release) an `rotation-helper`. Kleinigkeiten dürfen direkt erledigt werden.
 - **Nach jeder Umsetzung den Nutzer fragen, ob es so in Ordnung ist** – das hat er ausdrücklich verlangt.
 - Memory und diese Datei laufend aktuell halten, auch mitten in der Arbeit (offene Aufgaben, Entscheidungen, Links).
 - Im Spiel kann nur der Nutzer testen (`/reload`, dann `/mw`). Nie behaupten, etwas sei im Spiel geprüft.
@@ -69,3 +70,4 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 - Ziel Fokus/Mouseover: nur eine Klammer `[@focus,…]`; zweite Klammer (Rückfall aufs aktuelle Ziel) nur mit Option `fallbackTarget`.
 - Cast-Sequenz: letzte Klammer ist immer `[@target]` (Nutzer, 2026-11-11).
 - „Beste Rotation“ (`ns.BestRotation`): zuerst `C_AssistedCombat.GetRotationSpells`, sonst `Rotations.lua`. Alle Klassen sind abgedeckt (Quelle 1 gilt für alle, Tabelle als Rückfall); Rassen spielen keine Rolle. Die Zauber-IDs der Tabelle sind ungeprüft.
+- Rotationen (Nutzer, 2026-11-11): je Klasse eine Datei `Rotations/<Klasse>.lua`; der Agent `rotation-helper` recherchiert per Websuche die besten Rotationen **für die richtige Spielversion** (Retail oder Forever/Classic), vergleicht sie mit der Blizzard-Rotationshilfe und dem Dump aus `/mw rotation` (liegt nach `/reload` in den SavedVariables unter `rotationDump`) und bereitet ein Pre-Release vor. Status je Klasse: `unverified` → `helper-matched` → `game-verified` (nur nach Ansage des Nutzers).

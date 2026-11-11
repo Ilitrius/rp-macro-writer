@@ -27,7 +27,8 @@ Then type `/reload` in game.
 ## Development
 - `Locales.lua` – interface texts (German keys, English translations)
 - `Generator.lua` – macro text from steps + options (no WoW API, testable)
-- `Rotations.lua` – built-in rotation table for most classes (fallback for "Best rotation")
+- `Rotations.lua` – mechanics of the rotation fallback; `Rotations/<Class>.lua` – one file per class with spell lists per game version, sources and status (fallback for "Best rotation")
+- `/mw rotation` – prints and saves what the game's rotation helper returns for your character (for checking the tables)
 - `Core.lua` – state, drag and drop, creating macros in game
 - `UI.lua` – window
 - `Minimap.lua` – minimap button

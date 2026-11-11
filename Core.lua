@@ -296,7 +296,7 @@ function ns.BestRotation()
     end
     if not ids or #ids == 0 then
         local _, class = UnitClass("player")
-        ids = ns.PickRotation(class, IsKnown)
+        ids = ns.PickRotation(class, IsKnown, WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and "retail" or "classic")
         source = L["eigene Tabelle"]
         if not ids then
             ns.Print(L["Für diese Klasse ist keine Rotation hinterlegt und die Rotationshilfe des Spiels liefert nichts."])
@@ -324,6 +324,45 @@ function ns.BestRotation()
     ns.Print("Rotation (" .. source .. L[", Level "] .. UnitLevel("player") .. "): " .. table.concat(names, ", "))
     ns.Refresh()
     ns.WriteMacro()
+end
+
+-- /mw rotation: schreibt auf, was die Blizzard-Rotationshilfe fuer diesen Charakter liefert (Klasse, Spielversion,
+-- Level, Zauber mit ID und Name). Der Dump steht im Chat und in RPMacroWriterDB.rotationDump; der Agent
+-- "rotation-helper" liest ihn aus der SavedVariables-Datei und gleicht Rotations/<Klasse>.lua damit ab.
+function ns.DumpRotation()
+    local _, class = UnitClass("player")
+    local flavor = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) and "retail" or "classic"
+    local build, _, _, toc = GetBuildInfo()
+    local dump = { class = class, flavor = flavor, level = UnitLevel("player"), build = build, toc = toc,
+        race = select(2, UnitRace("player")), date = date("%Y-%m-%d %H:%M"), helper = {}, available = false }
+    local ac = C_AssistedCombat
+    if ac and ac.GetRotationSpells then
+        dump.available = (not ac.IsAvailable) or ac.IsAvailable() and true or false
+        local ok, list = pcall(ac.GetRotationSpells)
+        if ok and type(list) == "table" then
+            for _, id in ipairs(list) do
+                dump.helper[#dump.helper + 1] = { id = id, name = SpellName(id) or "?", known = IsKnown(id) and true or false }
+            end
+        end
+    end
+    local specIndex = GetSpecialization and GetSpecialization()
+    if specIndex then dump.spec = select(2, GetSpecializationInfo(specIndex)) end
+    local ids = ns.PickRotation(class, IsKnown, flavor)
+    dump.table = {}
+    for _, id in ipairs(ids or {}) do dump.table[#dump.table + 1] = id end
+    ns.db.rotationDump = ns.db.rotationDump or {}
+    ns.db.rotationDump[class .. ":" .. flavor .. (dump.spec and (":" .. dump.spec) or "")] = dump
+
+    ns.Print("Rotationsdump " .. class .. " (" .. flavor .. ", Level " .. dump.level .. ", Build " .. tostring(build) .. ")")
+    if not ac or not ac.GetRotationSpells then
+        ns.Print("  C_AssistedCombat gibt es in dieser Spielversion nicht.")
+    else
+        ns.Print("  Rotationshilfe verfuegbar: " .. tostring(dump.available) .. ", " .. #dump.helper .. " Zauber")
+        for i, s in ipairs(dump.helper) do
+            ns.Print(string.format("  %d. %s (%d)%s", i, s.name, s.id, s.known and "" or " - nicht bekannt"))
+        end
+    end
+    ns.Print("  Gespeichert in den SavedVariables (nach /reload oder Abmelden) unter rotationDump.")
 end
 
 -- ---------------------------------------------------------------------------
@@ -450,5 +489,6 @@ SLASH_RPMACROWRITER1 = "/mw"
 SLASH_RPMACROWRITER2 = "/rpmw"
 SLASH_RPMACROWRITER3 = "/macrowriter"
 SlashCmdList["RPMACROWRITER"] = function(msg)
+    if msg and msg:lower():match("^%s*rotation") then return ns.DumpRotation() end
     if ns.Toggle then ns.Toggle() end
 end

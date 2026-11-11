@@ -3,6 +3,12 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- Rotations are now stored in one file per class (`Rotations/<Class>.lua`) with the spell lists, sources, the reasoning and a status, and they can differ between Retail and Forever/Classic. The built-in table is only the fallback when the game's own rotation helper returns nothing.
+- `/mw rotation` writes down what the game's rotation helper returns for the current character (class, game version, level, spells with ID and name) to the chat and to the saved variables, so the rotation tables can be checked against it.
+
 ## [0.1.5] – 2026-11-11
 
 ### Changed

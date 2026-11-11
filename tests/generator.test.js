@@ -8,7 +8,8 @@ const root = path.join(__dirname, '..');
 const L = lauxlib.luaL_newstate();
 lualib.luaL_openlibs(L);
 
-for (const file of ['Locales.lua', 'Generator.lua', 'Rotations.lua', 'Core.lua', 'UI.lua', 'Minimap.lua']) {
+const rotationFiles = fs.readdirSync(path.join(root, 'Rotations')).filter(f => f.endsWith('.lua')).sort().map(f => 'Rotations/' + f);
+for (const file of ['Locales.lua', 'Generator.lua', 'Rotations.lua', ...rotationFiles, 'Core.lua', 'UI.lua', 'Minimap.lua']) {
   const src = fs.readFileSync(path.join(root, file));
   const status = lauxlib.luaL_loadbuffer(L, src, src.length, to_luastring('@' + file));
   if (status !== lua.LUA_OK) {
@@ -173,18 +174,37 @@ do
   local rotChunk = assert(load(ROT, "@Rotations.lua"))
   local rns = { MAX_STEPS = 10 }
   rotChunk("rp-macro-writer", rns)
+  local classFiles = 0
+  for src in (ROTFILES .. "\\n@@SPLIT@@\\n"):gmatch("(.-)\\n@@SPLIT@@\\n") do
+    if src ~= "" then assert(load(src, "@Rotations/Klasse.lua"))("rp-macro-writer", rns); classFiles = classFiles + 1 end
+  end
+  local okFiles = classFiles == 13
+  for tok, rot in pairs(rns.ROTATIONS) do
+    if not (rot.status and rot.updated and rot.source and next(rot.variants)) then okFiles = false end
+    for _, v in pairs(rot.variants) do
+      if not (#v.dots + #v.fillers > 0 and #v.dotEntries == #v.dots and #v.fillerEntries == #v.fillers) then okFiles = false end
+    end
+  end
   local known = { [980] = true, [172] = true, [686] = true, [348] = true }
   local ids = rns.PickRotation("WARLOCK", function(id) return known[id] end)
   local okW = ids and #ids == 3 + rns.FILLER_REPEAT and ids[1] == 980 and ids[#ids] == 686
   local none = rns.PickRotation("WARLOCK", function() return false end)
   local okN = none and #none == 0
-  local okU = rns.PickRotation("NOCLASS", function() return true end) == nil
+  rns.RegisterRotation("TESTCLASS", { status = "unverified", updated = "x", source = "x",
+    dots = { { 1, "A" } }, fillers = { { 2, "Standard" } },
+    retail = { dots = { { 10, "R" } }, fillers = { { 20, "RetailFiller" } } },
+    classic = { dots = { { 30, "C" } }, fillers = { { 40, "ClassicFiller" } } } })
+  local allKnown = function() return true end
+  local pr, pc, pd = rns.PickRotation("TESTCLASS", allKnown, "retail"), rns.PickRotation("TESTCLASS", allKnown, "classic"), rns.PickRotation("TESTCLASS", allKnown)
+  local okFlavor = pr[1] == 10 and pr[2] == 20 and pc[1] == 30 and pc[2] == 40 and pd[1] == 1 and pd[2] == 2
+  rns.ROTATIONS.TESTCLASS = nil
+  local okU = okFlavor and rns.PickRotation("NOCLASS", function() return true end) == nil
   local allClasses = true
   for _, c in ipairs({ "WARLOCK", "MAGE", "PRIEST", "HUNTER", "DRUID", "ROGUE", "WARRIOR", "PALADIN", "SHAMAN", "DEATHKNIGHT", "MONK", "DEMONHUNTER", "EVOKER" }) do
     local r = rns.PickRotation(c, function() return true end)
     if not r or #r < 2 then allClasses = false end
   end
-  if okW and okN and okU and allClasses then print("OK   Rotationen") else fails = fails + 1; print("FAIL Rotationen") end
+  if okW and okN and okU and allClasses and okFiles then print("OK   Rotationen") else fails = fails + 1; print("FAIL Rotationen") end
 end
 return fails
 `;
@@ -192,6 +212,8 @@ lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Generator.lu
 lua.lua_setglobal(L, to_luastring('GEN'));
 lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Rotations.lua'), 'utf8')));
 lua.lua_setglobal(L, to_luastring('ROT'));
+lua.lua_pushstring(L, to_luastring(rotationFiles.map(f => fs.readFileSync(path.join(root, f), 'utf8')).join('\n@@SPLIT@@\n')));
+lua.lua_setglobal(L, to_luastring('ROTFILES'));
 if (lauxlib.luaL_dostring(L, to_luastring(harness)) !== lua.LUA_OK) {
   console.log('LAUFZEITFEHLER', to_jsstring(lua.lua_tostring(L, -1)));
   process.exitCode = 1;
