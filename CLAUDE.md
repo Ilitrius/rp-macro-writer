@@ -55,8 +55,8 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 6. Interface-Nummern in der TOC bei jedem WoW-Patch gegen `TOC_format` im Wiki abgleichen.
 
 ## Offen
-- Erster Test im Spiel (WoW Forever **und** Retail) durch den Nutzer steht aus.
-- Screenshots für CurseForge (erst nach dem Test im Spiel möglich).
+- Erster Test im Spiel (Forever und Retail) hat der Nutzer laut eigener Aussage am 2026-11-11 abgeschlossen.
+- Screenshots, CurseForge-Upload von 0.1.4 und Prüfung der Rotations-IDs sind laut Nutzer am 2026-11-11 erledigt.
 - CurseForge-Projekt ist angelegt (ID 1794790, Lizenz MIT, GitHub-Remote steht); Release dort noch nicht hochgeladen.
 
 ## Kennung und geplante Auswahl
