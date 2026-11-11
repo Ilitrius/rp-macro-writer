@@ -166,9 +166,9 @@ do
   local okW = ids and #ids == 3 + rns.FILLER_REPEAT and ids[1] == 980 and ids[#ids] == 686
   local none = rns.PickRotation("WARLOCK", function() return false end)
   local okN = none and #none == 0
-  local okU = rns.PickRotation("MONK", function() return true end) == nil
+  local okU = rns.PickRotation("NOCLASS", function() return true end) == nil
   local allClasses = true
-  for _, c in ipairs({ "WARLOCK", "MAGE", "PRIEST", "HUNTER", "DRUID", "ROGUE", "WARRIOR", "PALADIN", "SHAMAN", "DEATHKNIGHT" }) do
+  for _, c in ipairs({ "WARLOCK", "MAGE", "PRIEST", "HUNTER", "DRUID", "ROGUE", "WARRIOR", "PALADIN", "SHAMAN", "DEATHKNIGHT", "MONK", "DEMONHUNTER", "EVOKER" }) do
     local r = rns.PickRotation(c, function() return true end)
     if not r or #r < 2 then allClasses = false end
   end

@@ -1,4 +1,5 @@
--- Rotations.lua: Vorschlaege fuer Rotationen je Klasse. Keine WoW-API, damit testbar.
+-- Rotations.lua: Rueckfalltabelle fuer "Beste Rotation", fuer alle Klassen. Keine WoW-API, damit testbar.
+-- Die Rassen spielen keine Rolle: welche Zauber gelten, liest der Aufrufer aus dem Zauberbuch des Charakters.
 -- Eine Rotation besteht aus "dots" (Reihenfolge der Dauerschaden-Zauber / Aufbau) und
 -- "fillers" (Fuellzauber: der erste bekannte wird am Ende wiederholt). Zauber-IDs sind
 -- Grundraenge; welche davon das Spiel kennt, entscheidet der Aufrufer (Level, Talente, Spezialisierung).
@@ -59,6 +60,18 @@ ns.ROTATIONS = {
     DEATHKNIGHT = {
         dots = { 45477, 45462 }, -- Eisige Beruehrung, Seuchenstoss
         fillers = { 49020, 49143, 47541 }, -- Vernichten, Frostschlag, Todesmantel
+    },
+    MONK = {
+        dots = { 116095 }, -- Behinderung (Disable)
+        fillers = { 113656, 107428, 100784, 100780 }, -- Furor der Fauste, Aufsteigender Sonnentritt, Schwarzer Tritt, Tigerklaue
+    },
+    DEMONHUNTER = {
+        dots = { 258920 }, -- Feuerbrandaura (Immolation Aura)
+        fillers = { 228477, 162794, 263642, 203782, 162243 }, -- Seelenspalter, Chaosschlag, Bruch, Scherung, Daemonenbiss
+    },
+    EVOKER = {
+        dots = { 357208 }, -- Feueratem
+        fillers = { 356995, 361469, 362969 }, -- Zersetzen, Lebendiges Feuer, Azurblauer Schlag
     },
 }
 

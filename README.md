@@ -1,6 +1,6 @@
 # rp-macro-writer
 
-World of Warcraft addon: combine spells into macros by drag and drop. Initially focused on warlocks (DoTs, curses, pets), but it works with any class. Targets WoW Forever and WoW Retail. The interface is English, and German on German game clients.
+World of Warcraft addon: combine spells into macros by drag and drop. Works with every class and race. Targets WoW Forever and WoW Retail. The interface is English, and German on German game clients.
 
 ![The rp-macro-writer window with a best-rotation macro for a rogue](media/macro%20writer%20panel2.png)
 
@@ -13,7 +13,7 @@ World of Warcraft addon: combine spells into macros by drag and drop. Initially 
 With "Auto-detect", one spell becomes a simple cast and several become a cast sequence.
 
 ### Best rotation
-The **Best rotation** button fills the list with a rotation for your level and the spells you currently know, and creates the macro. **Not every class has a best rotation available.** The addon asks the game's own rotation helper first; where the game offers none for your class, specialization or game flavor, the addon falls back to a simple built-in table (warlock, mage, priest, hunter, druid, rogue, warrior, paladin, shaman, death knight). For the remaining classes (monk, demon hunter, evoker) the button then reports that no rotation is available. The built-in table is a rough heuristic, not a simulated optimum.
+The **Best rotation** button fills the list with a rotation for your level and the spells you currently know, and creates the macro. It works for every class and race: the addon asks the game's own rotation helper first and falls back to a simple built-in table that covers all 13 classes. Your race does not matter, because the spells are read from your own spellbook. Classes and spells that do not exist in your game version are skipped. The built-in table is a rough heuristic, not a simulated optimum, and its spell IDs are not yet verified in game.
 
 ## Installing for testing
 Link the project folder (any name, here `wow-macro-writer`) as `rp-macro-writer` into the AddOns folder of the game flavor you want (PowerShell, once):

@@ -4,7 +4,7 @@
 
 rp-macro-writer turns macro writing into something you do with your mouse. Open the window, drag spells straight out of your spellbook, tick the options you want, and the finished macro appears in front of you – ready to be placed on your action bar.
 
-It was built with warlocks in mind (DoTs, curses, pets), but it works with every class.
+It works with every class and race.
 
 ## What it does
 
