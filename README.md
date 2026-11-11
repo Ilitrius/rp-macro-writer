@@ -2,6 +2,8 @@
 
 World of Warcraft addon: combine spells into macros by drag and drop. Initially focused on warlocks (DoTs, curses, pets), but it works with any class. Targets WoW Forever and WoW Retail. The interface is English, and German on German game clients.
 
+![The rp-macro-writer window with a best-rotation macro for a rogue](media/macro%20writer%20panel2.png)
+
 ## Usage
 1. `/mw` opens the window.
 2. Drag spells from the spellbook (or items from your bags) into the "Steps" list.
