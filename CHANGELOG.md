@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ## [Unreleased]
 
 ### Added
+- Warlock rotation rebuilt per game version from Method and Maxroll (Retail 12.1.5: Agony, Corruption, Haunt, Unstable Affliction, filler Drain Soul/Shadow Bolt) and Warcraft Tavern (Classic/Forever: Immolate, Corruption, Curse of Agony, Siphon Life, filler Shadow Bolt). Still unverified: no helper dump yet, not checked in game.
+- Rotation research for the other 12 classes (one spec each, per game version, from Method, Maxroll, Warcraft Tavern and others; see the `sources` and `comparison` in every `Rotations/<Class>.lua`): Mage, Priest, Hunter, Druid, Rogue, Warrior, Paladin, Shaman, Death Knight, Monk, Demon Hunter and Evoker. Death Knight, Monk, Demon Hunter and Evoker have a Retail variant only, because WoW Forever has only the nine Classic classes. All files are still `unverified`: no helper dump yet, not checked in game, and several versions rest on a single readable source.
 - Rotations are now stored in one file per class (`Rotations/<Class>.lua`) with the spell lists, sources, the reasoning and a status, and they can differ between Retail and Forever/Classic. The built-in table is only the fallback when the game's own rotation helper returns nothing.
 - `/mw rotation` writes down what the game's rotation helper returns for the current character (class, game version, level, spells with ID and name) to the chat and to the saved variables, so the rotation tables can be checked against it.
 

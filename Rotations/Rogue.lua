@@ -16,18 +16,39 @@
 --
 -- AENDERUNGSVERLAUF
 --   2026-11-11  Ausgangsstand aus der Sammeltabelle uebernommen (unverified).
+--   2026-11-11  Neu recherchiert: Retail (Assassination, 12.1.5) und Forever/Classic (Combat). IDs per Wowhead belegt. Kein Dump vorhanden.
 local ADDON, ns = ...
 
 ns.RegisterRotation("ROGUE", {
     status = "unverified",
     updated = "2026-11-11",
-    source = "Gedaechtnis (Ausgangsstand), noch nicht gegen Wiki oder Rotationshilfe abgeglichen",
-    dots = {
-        { 5171, "Slice and Dice" },
-        { 1943, "Rupture" },
+    source = "Method.gg 12.1.5 (Retail), Warcraft Tavern Forever (undatiert); IDs Wowhead. Kein rotationDump vorhanden.",
+    retail = {
+        sources = {
+            "Retail 12.1.5 (Assassination, Stand 2026-10-18): https://www.method.gg/guides/assassination-rogue/playstyle-and-rotation",
+            "Retail 12.1.5 (Stand 2026-10-13, nur Kopf lesbar): https://www.wowhead.com/guide/classes/rogue/assassination/rotation-cooldowns-pve-dps",
+        },
+        comparison = "Kein Dump vorhanden, nicht mit der Rotationshilfe abgeglicht. Method: Garrote und Rupture halten, Mutilate aufbauen, Envenom ab 5 CP (nicht aufgenommen, Makro kennt CP nicht). Nur Assassination abgedeckt. IDs Wowhead belegt.",
+        dots = {
+            { 703, "Garrote" },
+            { 1943, "Rupture" },
+        },
+        fillers = {
+            { 1329, "Mutilate" },
+        },
     },
-    fillers = {
-        { 1752, "Sinister Strike" },
-        { 53, "Backstab" },
+    classic = {
+        sources = {
+            "Forever (Combat, undatiert, 2026): https://www.warcrafttavern.com/forever/guides/combat-rogue/",
+            "Forever (Suchtreffer, 403 nicht lesbar): https://www.icy-veins.com/wow-forever/combat-rogue-melee-dps-pve-rotation-cooldowns-abilities",
+        },
+        comparison = "Kein Dump vorhanden. Warcraft Tavern: Sinister Strike (Dolch: Backstab), Slice and Dice hoechste Prioritaet, Eviscerate bei 5 CP (nicht aufgenommen, CP unbekannt). Zweite Quelle nicht lesbar, daher nur eine Quelle.",
+        dots = {
+            { 5171, "Slice and Dice" },
+        },
+        fillers = {
+            { 1752, "Sinister Strike" },
+            { 53, "Backstab" },
+        },
     },
 })

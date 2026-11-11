@@ -1,6 +1,6 @@
 -- Rotations/DemonHunter.lua – Rotation fuer Dämonenjäger (DEMONHUNTER), Rueckfall fuer "Beste Rotation".
 --
--- STATUS: unverified
+-- STATUS: unverified (kein Dump der Rotationshilfe vorhanden, nicht im Spiel geprueft)
 --   unverified      = Zauber-IDs aus dem Gedaechtnis eingetragen, weder im Spiel noch im Wiki geprueft
 --   helper-matched  = deckt sich mit dem Dump der Blizzard-Rotationshilfe ("/mw rotation", siehe unten)
 --   game-verified   = vom Nutzer im Spiel geprueft
@@ -16,20 +16,43 @@
 --
 -- AENDERUNGSVERLAUF
 --   2026-11-11  Ausgangsstand aus der Sammeltabelle uebernommen (unverified).
+--   2026-11-11  Neu aufgebaut (Havoc) aus Method + Maxroll, IDs per Wowhead belegt. Nur retail: Daemonenjaeger gibt es in
+--               WoW Forever / Classic nicht (Klasse stammt aus Legion; Forever startet mit den 9 Classic-Klassen). unverified.
 local ADDON, ns = ...
 
 ns.RegisterRotation("DEMONHUNTER", {
     status = "unverified",
     updated = "2026-11-11",
-    source = "Gedaechtnis (Ausgangsstand), noch nicht gegen Wiki oder Rotationshilfe abgeglichen",
+    source = "Method + Maxroll (Retail 12.1.5, Havoc), IDs per Wowhead belegt; nur Retail, Klasse fehlt in Forever/Classic",
     dots = {
         { 258920, "Immolation Aura" },
+        { 198013, "Eye Beam" },
+        { 258860, "Essence Break" },
+        { 188499, "Blade Dance" },
     },
     fillers = {
-        { 228477, "Soul Cleave" },
         { 162794, "Chaos Strike" },
-        { 263642, "Fracture" },
-        { 203782, "Shear" },
-        { 162243, "Demon's Bite" },
+        { 232893, "Felblade" },
     },
+    retail = {
+        sources = {
+            { "https://www.method.gg/guides/havoc-demon-hunter/playstyle-and-rotation", "Retail 12.1.5, Stand 2026-10-16, Havoc" },
+            { "https://maxroll.gg/wow/class-guides/havoc-demon-hunter-mythic-plus-guide", "Retail 12.1.5, Stand 2026-10-17/19, Havoc" },
+        },
+        comparison = "Beide: Essence Break mit Eye Beam, Eye Beam nach Abklingzeit, Blade Dance, Chaos Strike als Filler, Felblade fuer Fury. "
+            .. "Method: Reaver's Glaive/The Hunt zuerst (Hero-Talent-abhaengig), Fel-Scarred Immolation Aura bei 2 Aufladungen; Maxroll stellt Eye Beam vor Essence Break. "
+            .. "Metamorphose-Varianten (Death Sweep 210152, Annihilation 201427, belegt) ersetzen Blade Dance/Chaos Strike und sind per Name nicht stabil, daher weggelassen; "
+            .. "Vengeful Retreat/The Hunt (Mobilitaet/Cooldown) weggelassen. Nur Havoc; Vengeance und Devourer nicht recherchiert. Kein Dump der Rotationshilfe.",
+        dots = {
+            { 258920, "Immolation Aura" },
+            { 198013, "Eye Beam" },
+            { 258860, "Essence Break" },
+            { 188499, "Blade Dance" },
+        },
+        fillers = {
+            { 162794, "Chaos Strike" },
+            { 232893, "Felblade" },
+        },
+    },
+    -- classic: bewusst nicht vorhanden (Klasse existiert in Forever/Classic nicht)
 })

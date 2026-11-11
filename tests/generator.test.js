@@ -201,8 +201,10 @@ do
   local okU = okFlavor and rns.PickRotation("NOCLASS", function() return true end) == nil
   local allClasses = true
   for _, c in ipairs({ "WARLOCK", "MAGE", "PRIEST", "HUNTER", "DRUID", "ROGUE", "WARRIOR", "PALADIN", "SHAMAN", "DEATHKNIGHT", "MONK", "DEMONHUNTER", "EVOKER" }) do
-    local r = rns.PickRotation(c, function() return true end)
-    if not r or #r < 2 then allClasses = false end
+    -- jede Klasse braucht mindestens in einer Spielversion eine Rotation (z.B. gibt es den Rufer in Forever nicht)
+    local r1 = rns.PickRotation(c, function() return true end, "retail")
+    local r2 = rns.PickRotation(c, function() return true end, "classic")
+    if not ((r1 and #r1 >= 2) or (r2 and #r2 >= 2)) then allClasses = false; print("  Klasse ohne Rotation: " .. c) end
   end
   if okW and okN and okU and allClasses and okFiles then print("OK   Rotationen") else fails = fails + 1; print("FAIL Rotationen") end
 end
