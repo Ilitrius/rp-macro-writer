@@ -52,7 +52,6 @@ local function CopyOpts(opts)
     for k in pairs(out) do
         if opts and opts[k] ~= nil then out[k] = opts[k] end
     end
-    if out.target == "focus" then out.target = "target" end -- Fokus gibt es nicht mehr
     return out
 end
 

@@ -326,12 +326,16 @@ local function CreateUI()
     Label(right, L["Ziel"], 0, -148)
     Radio(right, L["Aktuelles Ziel"], c1, -164, "target", "target")
     Radio(right, "Mouseover", c2, -164, "target", "mouseover")
+    Radio(right, L["Fokus"], c3, -164, "target", "focus")
     Toggle(right, L["Rückfall auf aktuelles Ziel"], c2 - 4, -141, "fallbackTarget")
 
     Label(right, L["Ziel muss sein"], 0, -196)
-    Radio(right, L["Am Leben"], c1, -212, "life", "alive")
-    Radio(right, L["Tot"], c2, -212, "life", "dead")
-    Radio(right, L["Egal"], c3, -212, "life", "any")
+    Radio(right, L["Feind"], c1, -212, "hostility", "harm")
+    Radio(right, L["Freund"], c2, -212, "hostility", "help")
+    Radio(right, L["Egal"], c3, -212, "hostility", "any")
+    Radio(right, L["Am Leben"], c1, -234, "life", "alive")
+    Radio(right, L["Tot"], c2, -234, "life", "dead")
+    Radio(right, L["Egal"], c3, -234, "life", "any")
 
     Label(right, "Extras", 0, -266)
     Toggle(right, L["Symbol/Tooltip anzeigen"], c1, -282, "showTooltip")
@@ -339,8 +343,16 @@ local function CreateUI()
     Toggle(right, L["Automatisch Gegner wählen"], c1, -304, "autoTarget")
     Toggle(right, L["Nur dieser Charakter"], c1 + 160, -304, "perChar")
     Toggle(right, L["Kanalisierte Zauber nicht abbrechen"], c1, -326, "noChannel")
-    Toggle(right, L["Am Ende angreifen"], c1, -348, "startAttack")
-    Toggle(right, L["Ziel des Ziels (Rückfall)"], c1 + 160, -348, "targetTarget")
+    -- Fokus auf die Einheit unter der Maus (sonst aufs Ziel) setzen; gleich anvisieren, abwaehlbar
+    Check(right, L["Maus-Ziel als Fokus setzen"], c1, -348,
+        function() return ns.state.opts.focusMouseover end,
+        function(checked)
+            ns.state.opts.focusMouseover = checked
+            ns.state.opts.targetFocus = checked
+        end)
+    Toggle(right, L["Am Ende angreifen"], c1 + 160, -348, "startAttack")
+    Toggle(right, L["Fokus anvisieren"], c1, -370, "targetFocus")
+    Toggle(right, L["Ziel des Ziels (Rückfall)"], c1 + 160, -370, "targetTarget")
 
     -- Unten links: Name, Vorschau, Knoepfe ------------------------------------
     Label(f, L["Makroname"], LEFT_X, -312 + BOTTOM)

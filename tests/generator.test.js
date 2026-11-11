@@ -54,55 +54,65 @@ local list = "Verderbnis, Fluch der Pein, Feuerbrand"
 
 -- Automatik
 case("Auto: ein Zauber = einfacher Cast", { dots[1] }, {},
-  "#showtooltip\\n/cast [nodead] Verderbnis", 0)
+  "#showtooltip\\n/cast [harm,nodead] Verderbnis", 0)
 case("Auto: mehrere Zauber = Cast-Sequenz mit Reset", dots, {},
-  "#showtooltip\\n/castsequence [nodead] reset=target/combat " .. list, 0)
+  "#showtooltip\\n/castsequence [harm,nodead][@target] reset=target/combat " .. list, 0)
 case("Auto: ein Gegenstand = /use", { { kind = "item", name = "Gesundheitsstein" } }, any,
   "#showtooltip\\n/use Gesundheitsstein", 0)
-case("Auto: egal und tot", { { kind = "spell", name = "Wiederbelebung" } },
-  { hostility = "any", life = "dead", showTooltip = false },
-  "/cast [dead] Wiederbelebung", 0)
+case("Auto: Freund und tot", { { kind = "spell", name = "Wiederbelebung" } },
+  { hostility = "help", life = "dead", showTooltip = false },
+  "/cast [help,dead] Wiederbelebung", 0)
 
--- Beispiel des Nutzers: Begleiter, Ziel des Ziels als Rueckfall, Angriff am Ende
-case("Beispiel: Begleiter, Ziel des Ziels, Angriff",
+-- Fokus auf Mouseover und Angriff starten
+case("Fokus: Mouseover als Fokus, Fokus als Ziel, Angriff am Ende", { dots[1] },
+  { focusMouseover = true, target = "focus", startAttack = true, fallbackTarget = true },
+  "#showtooltip\\n/focus [@mouseover,harm,nodead][]\\n/cast [@focus,harm,nodead][harm,nodead] Verderbnis\\n/startattack [@focus,harm,nodead][harm,nodead]", 0)
+-- Beispiel des Nutzers: Fokus setzen und anvisieren, Begleiter, Ziel des Ziels als Rueckfall
+case("Beispiel: Fokus, anvisieren, Begleiter, Ziel des Ziels, Angriff",
   { dots[1], dots[3] },
-  { petAttack = true, targetTarget = true, startAttack = true, resetTarget = false, resetCombat = false, showTooltip = false },
-  "/petattack\\n/castsequence [nodead,exists][@targettarget,nodead,exists][@target] Verderbnis, Feuerbrand\\n/startattack [nodead]", 0)
-case("Ziel des Ziels: einfacher Cast, ohne Bedingung braucht exists", { dots[1] },
+  { focusMouseover = true, targetFocus = true, petAttack = true, targetTarget = true,
+    startAttack = true, resetTarget = false, resetCombat = false, showTooltip = false },
+  "/focus [@mouseover,harm,nodead][]\\n/target focus\\n/petattack\\n/castsequence [harm,nodead,exists][@targettarget,harm,nodead,exists][@target] Verderbnis, Feuerbrand\\n/startattack [harm,nodead]", 0)
+case("Ziel des Ziels: einfacher Cast, Freund ohne Bedingung braucht exists", { dots[1] },
   with(any, { targetTarget = true, showTooltip = false }),
   "/cast [][@targettarget,exists][@target] Verderbnis", 0)
+case("Fokus: ohne Bedingungen braucht exists", { dots[1] },
+  with(any, { focusMouseover = true, target = "focus", showTooltip = false, fallbackTarget = true }),
+  "/focus [@mouseover,exists][]\\n/cast [@focus,exists][] Verderbnis", 0)
 case("Angriff: ohne Bedingungen bleibt schlicht", { dots[1] },
   with(any, { startAttack = true, showTooltip = false, noChannel = true }),
   "/cast [nochanneling] Verderbnis\\n/startattack", 0)
 case("Angriff: nach Sequenz, nochanneling gilt nicht fuer den Angriff", dots,
   { startAttack = true, noChannel = true, showTooltip = false },
-  "/castsequence [nodead,nochanneling] reset=target/combat " .. list .. "\\n/startattack [nodead]", 0)
+  "/castsequence [harm,nodead,nochanneling][@target] reset=target/combat " .. list .. "\\n/startattack [harm,nodead]", 0)
 
+case("Fokus ohne Rueckfall: Bedingung steht nur einmal", { dots[1] }, { target = "focus", showTooltip = false },
+  "/cast [@focus,harm,nodead] Verderbnis", 0)
 case("Mouseover ohne Rueckfall, Sequenz", dots, { target = "mouseover", showTooltip = false, resetTarget = false, resetCombat = false },
-  "/castsequence [@mouseover,nodead,exists] " .. list, 0)
+  "/castsequence [@mouseover,harm,nodead][@target] " .. list, 0)
 case("Aktuelles Ziel: Rueckfall-Option aendert nichts", { dots[1] }, { target = "target", fallbackTarget = true, showTooltip = false },
-  "/cast [nodead] Verderbnis", 0)
+  "/cast [harm,nodead] Verderbnis", 0)
 
 case("Vorlage des Nutzers: Ziel des Ziels mit exists, Reset nach 2 Sekunden",
   { { kind = "spell", name = "Finsterer Stoß" }, { kind = "spell", name = "Meucheln" } },
   { targetTarget = true, resetTarget = false, resetCombat = false, resetSeconds = 2, showTooltip = false },
-  "/castsequence [nodead,exists][@targettarget,nodead,exists][@target] reset=2 Finsterer Stoß, Meucheln", 0)
+  "/castsequence [harm,nodead,exists][@targettarget,harm,nodead,exists][@target] reset=2 Finsterer Stoß, Meucheln", 0)
 
 -- Sequenz-Optionen
 case("Sequenz: Sekunden-Reset, Begleiter, Auto-Ziel", dots,
   { resetSeconds = 6, petAttack = true, autoTarget = true },
-  "#showtooltip\\n/targetenemy [noexists][dead]\\n/petattack\\n/castsequence [nodead] reset=target/combat/6 " .. list)
+  "#showtooltip\\n/targetenemy [noharm][dead]\\n/petattack\\n/castsequence [harm,nodead][@target] reset=target/combat/6 " .. list)
 case("Sequenz: Mouseover ohne Reset", dots,
   { resetTarget = false, resetCombat = false, target = "mouseover", showTooltip = false, fallbackTarget = true },
-  "/castsequence [@mouseover,nodead,exists][nodead] " .. list)
+  "/castsequence [@mouseover,harm,nodead][harm,nodead][@target] " .. list)
 case("Sequenz: ohne Bedingungen", dots, with(any, { resetCombat = false }),
-  "#showtooltip\\n/castsequence reset=target " .. list)
+  "#showtooltip\\n/castsequence [@target] reset=target " .. list)
 case("Sequenz: nicht kanalisierend", dots, with(any, { noChannel = true }),
-  "#showtooltip\\n/castsequence [nochanneling] reset=target/combat " .. list)
+  "#showtooltip\\n/castsequence [nochanneling][@target] reset=target/combat " .. list)
 
 -- Andere Arten
-case("Zufall mit Mouseover und Rueckfall", dots, { mode = "random", target = "mouseover", fallbackTarget = true },
-  "#showtooltip\\n/castrandom [@mouseover,nodead,exists][nodead] " .. list)
+case("Zufall mit Fokus", dots, { mode = "random", target = "focus", fallbackTarget = true },
+  "#showtooltip\\n/castrandom [@focus,harm,nodead][harm,nodead] " .. list)
 local mods = {
   { kind = "spell", name = "Fluch der Pein" },
   { kind = "spell", name = "Fluch der Elemente", mod = "shift" },
@@ -111,7 +121,7 @@ local mods = {
   { kind = "spell", name = "Verderbnis" },
 }
 case("Zusatztaste: doppelte und ueberzaehlige werden gemeldet", mods, { mode = "modifier" },
-  "#showtooltip\\n/cast [mod:shift,nodead] Fluch der Elemente; [mod:ctrl,nodead] Fluch der Sprachen; [nodead] Fluch der Pein", 2)
+  "#showtooltip\\n/cast [mod:shift,harm,nodead] Fluch der Elemente; [mod:ctrl,harm,nodead] Fluch der Sprachen; [harm,nodead] Fluch der Pein", 2)
 case("Zusatztaste: Mouseover ohne Bedingungen braucht exists", { mods[1], mods[2] },
   with(any, { mode = "modifier", target = "mouseover", showTooltip = false, fallbackTarget = true }),
   "/cast [mod:shift,@mouseover,exists][mod:shift] Fluch der Elemente; [@mouseover,exists][] Fluch der Pein", 0)
@@ -135,7 +145,7 @@ local np = (not ns.NameProblem("Feuerball", "cast")) and ns.NameProblem("A[B]", 
 if np then print("OK   Namen mit Sonderzeichen") else fails = fails + 1; print("FAIL Namen mit Sonderzeichen") end
 
 local function strip(s) return (s:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("||", "|")) end
-local sample = "#showtooltip\\n/castsequence [@mouseover,harm,nodead][mod:shift] reset=target/combat Verderbnis, Feuerbrand\\n\\n/startattack\\n#rpmw"
+local sample = "#showtooltip\\n/castsequence [@mouseover,harm,nodead][mod:shift][@target] reset=target/combat Verderbnis, Feuerbrand\\n\\n/startattack\\n#rpmw"
 local hl = ns.Highlight(sample)
 local hlOk = strip(hl) == sample and hl:find("|cff66ccff@mouseover|r", 1, true) and hl:find("|cff7fe07fharm|r", 1, true)
   and hl:find("|cffd19bffreset=target/combat|r", 1, true) and hl:find("|cffffa040/castsequence|r", 1, true)
@@ -147,15 +157,15 @@ local _, w1 = ns.BuildMacro({ { kind = "spell", name = "A,B" }, { kind = "spell"
 local _, w2 = ns.BuildMacro({ { kind = "spell", name = "A,B" } }, o)
 if #w1 == 1 and #w2 == 0 then print("OK   Namenswarnung in der Vorschau") else fails = fails + 1; print("FAIL Namenswarnung " .. #w1 .. "/" .. #w2) end
 do
-  local c = ns.Compact("#showtooltip\\n/castsequence [nodead] reset=target/combat A, B, C\\n/cast [mod:shift] X; [harm] Y\\n#rpmw")
-  local ok = c == "#showtooltip\\n/castsequence [nodead] reset=target/combat A,B,C\\n/cast [mod:shift] X;[harm] Y\\n#rpmw"
+  local c = ns.Compact("#showtooltip\\n/castsequence [harm,nodead][@target] reset=target/combat A, B, C\\n/cast [mod:shift] X; [harm] Y\\n#rpmw")
+  local ok = c == "#showtooltip\\n/castsequence [harm,nodead][@target] reset=target/combat A,B,C\\n/cast [mod:shift] X;[harm] Y\\n#rpmw"
   if ok then print("OK   Kuerzen") else fails = fails + 1; print("FAIL Kuerzen: " .. c) end
 end
 do
   local steps = { dots[1], dots[3] }
-  for i = 1, 7 do steps[#steps + 1] = { kind = "spell", name = "Schattenblitz" } end
+  for i = 1, 4 do steps[#steps + 1] = { kind = "spell", name = "Schattenblitz" } end
   local o2 = ns.NewOpts()
-  o2.startAttack = true; o2.targetTarget = true
+  o2.focusMouseover = true; o2.targetFocus = true; o2.petAttack = true; o2.startAttack = true; o2.target = "focus"
   local b, w = ns.BuildMacro(steps, o2)
   if #b <= 255 and #w == 0 and not b:find(", ", 1, true) then print("OK   Gekuerzt auf " .. #b .. " Zeichen") else fails = fails + 1; print("FAIL Gekuerzt (" .. #b .. "):\\n" .. b) end
 end
