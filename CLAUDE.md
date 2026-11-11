@@ -51,13 +51,13 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 2. `CHANGELOG.md`: Abschnitt der Version mit Datum versehen; neue Einträge immer oben.
 3. `docs/release-notes/vX.Y.Z.md` schreiben (nutzerfreundliche Fassung für die CurseForge-Seite).
 4. Tests grün, im Spiel geprüft, dann committen und ZIP bauen (`pwsh tools/build-release.ps1`). GitHub-Release samt ZIP: `gh release create vX.Y.Z .release/rp-macro-writer-X.Y.Z.zip --target main --title ... --notes-file ...` (Notizen = Changelog-Abschnitt der Version; bis zum Spieltest mit `--prerelease`).
-5. Paket bauen: BigWigs-Packager liest `.pkgmeta`. Sobald das CurseForge-Projekt existiert, `## X-Curse-Project-ID: <id>` in die TOC eintragen.
+5. Paket bauen: BigWigs-Packager liest `.pkgmeta`. Die CurseForge-Projekt-ID 1794790 steht seit 2026-11-11 in der TOC.
 6. Interface-Nummern in der TOC bei jedem WoW-Patch gegen `TOC_format` im Wiki abgleichen.
 
 ## Offen
 - Erster Test im Spiel (WoW Forever **und** Retail) durch den Nutzer steht aus.
 - Screenshots für CurseForge (erst nach dem Test im Spiel möglich).
-- CurseForge-Projekt anlegen (Lizenz MIT seit 2026-11-10, GitHub-Remote steht).
+- CurseForge-Projekt ist angelegt (ID 1794790, Lizenz MIT, GitHub-Remote steht); Release dort noch nicht hochgeladen.
 
 ## Kennung und geplante Auswahl
 - Jedes erzeugte Makro endet mit der Zeile `#rpmw` (`ns.MARKER`, kostet 6 der 255 Zeichen). Daran erkennt das Add-on eigene Makros im Spiel (`ns.ListEntries`), zeigt sie in der Liste (Reiter „Global“ mit allen Account-Makros, „Dieser Charakter“ nur Charakter-Makros; fremde Makros grau) und überschreibt keine fremden Makros gleichen Namens. Die Kennung nie ändern, sonst werden alte Makros nicht mehr erkannt.
