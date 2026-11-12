@@ -9,7 +9,7 @@ const L = lauxlib.luaL_newstate();
 lualib.luaL_openlibs(L);
 
 const rotationFiles = fs.readdirSync(path.join(root, 'Rotations')).filter(f => f.endsWith('.lua')).sort().map(f => 'Rotations/' + f);
-for (const file of ['Locales.lua', 'Generator.lua', 'Rotations.lua', ...rotationFiles, 'Core.lua', 'UI.lua', 'Minimap.lua']) {
+for (const file of ['Locales.lua', 'Generator.lua', 'Rotations.lua', ...rotationFiles, 'Core.lua', 'UI.lua', 'Minimap.lua', 'Options.lua']) {
   const src = fs.readFileSync(path.join(root, file));
   const status = lauxlib.luaL_loadbuffer(L, src, src.length, to_luastring('@' + file));
   if (status !== lua.LUA_OK) {

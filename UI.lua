@@ -679,3 +679,13 @@ function ns.Toggle()
         ui.frame:Show()
     end
 end
+
+-- Fenster nur anzeigen (nie schliessen), z. B. aus dem Optionen-Eintrag
+function ns.ShowWindow()
+    if not ns.state then return end
+    if not ui.frame then CreateUI() end
+    if not ui.frame:IsShown() then
+        ns.Refresh()
+        ui.frame:Show()
+    end
+end

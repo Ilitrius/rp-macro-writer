@@ -92,6 +92,9 @@ local en = {
     ["\" gespeichert. Mit \"Auf Leiste\" kannst du es auf eine Aktionsleiste ziehen."] = "\" saved. Use \"To bar\" to drag it onto an action bar.",
     ["Im Kampf nicht möglich."] = "Not possible in combat.",
     ["Dieses Makro gibt es noch nicht – zuerst \"Makro erstellen/speichern\" klicken."] = "This macro does not exist yet – click \"Create/save macro\" first.",
+    -- Optionen > AddOns
+    ["Ein Klick auf diesen Eintrag öffnet das Fenster zum Erstellen von Makros. Du kannst es jederzeit auch mit /mw öffnen."] = "Clicking this entry opens the window for creating macros. You can also open it at any time with /mw.",
+    ["Fenster öffnen"] = "Open window",
     -- Verlaengerung ueber 255 Zeichen (/click)
     ["Länger als 255 Zeichen ("] = "Longer than 255 characters (",
     ["): Beim Speichern läuft der Text über Zusatzschaltflächen (/click, bis 1024 Zeichen)."] = "): when saved, the text runs through helper buttons (/click, up to 1024 characters).",

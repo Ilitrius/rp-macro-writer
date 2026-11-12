@@ -29,6 +29,8 @@ Then type `/reload` in game.
 - `Generator.lua` – macro text from steps + options (no WoW API, testable)
 - `Rotations.lua` – mechanics of the rotation fallback; `Rotations/<Class>.lua` – one file per class with spell lists per game version, sources and status (fallback for "Best rotation")
 - `/mw rotation` – prints and saves what the game's rotation helper returns for your character (for checking the tables)
+- `/mw long` – lists the helper buttons of macros longer than 255 characters and what they hold
+- `Options.lua` – entry under Options > AddOns that opens the window
 - `Core.lua` – state, drag and drop, creating macros in game
 - `UI.lua` – window
 - `Minimap.lua` – minimap button

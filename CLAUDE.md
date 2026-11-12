@@ -15,6 +15,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 | `Rotations.lua` | Mechanik der Rotationen (`ns.RegisterRotation`, `ns.PickRotation`, Varianten `retail`/`classic`). Keine WoW-API |
 | `Rotations/<Klasse>.lua` | Je Klasse eine Datei (13): Zauberlisten je Spielversion, Quellen, Begründung, Status, Änderungsverlauf. Wird vom Agenten `rotation-helper` gepflegt |
 | `Minimap.lua` | Minimap-Symbol (Klick öffnet das Fenster, Ziehen verschiebt es) |
+| `Options.lua` | Eintrag unter Optionen > AddOns (`Settings.RegisterCanvasLayoutCategory`, Rückfall `InterfaceOptions_AddCategory`); ein Klick öffnet das Fenster (`ns.ShowWindow`) |
 | `icon.tga` | Addon-Icon im Spiel, erzeugt von `tools/make-icon.js` (auch `media/icon.png` für CurseForge) |
 | `tests/` | Generator-Tests + Syntaxprüfung in einer Lua-VM (`cd tests; npm install; npm test`) |
 | `CHANGELOG.md`, `docs/release-notes/` | Versionsverlauf und Release Notes |
@@ -56,9 +57,12 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 6. Interface-Nummern in der TOC bei jedem WoW-Patch gegen `TOC_format` im Wiki abgleichen.
 
 ## Offen
-- Erster Test im Spiel (Forever und Retail) hat der Nutzer laut eigener Aussage am 2026-11-11 abgeschlossen.
-- Screenshots, CurseForge-Upload von 0.1.4 und Prüfung der Rotations-IDs sind laut Nutzer am 2026-11-11 erledigt.
-- CurseForge-Projekt ist angelegt (ID 1794790, Lizenz MIT, GitHub-Remote steht); Release 0.1.4 ist dort laut Nutzer hochgeladen (2026-11-11).
+Aktueller Stand und Details stehen im Memory (`makrowriter-offene-aufgaben.md`); hier die Kurzfassung (Stand 2026-11-12):
+1. **„Spezial einfügen“ und „Slot einfügen“ aus MacroToolkit übernehmen** (Auftrag des Nutzers, als zusätzliche Optionen im Panel): nur analysiert; Plan, Tabelle der 18 Befehle, API-Fallen und Layout in `docs/plan-spezial-slot-einfuegen.md`. Offene Fragen: „Destroy grey items“ löscht Gegenstände, wie absichern; Befehlspräfix `/rp…`.
+2. Im Spiel prüfen (nur der Nutzer): Klickverlängerung (`/mw long`), Rotationen und Talentbaum-Erkennung in Forever (`/mw rotation`), `[@target]` in Cast-Sequenzen, Optionen-Eintrag.
+3. Rotationen mit dem Dump der Rotationshilfe abgleichen (`rotation-helper`), danach Status `helper-matched`; `game-verified` nur nach Ansage des Nutzers.
+4. Neue Version veröffentlichen, wenn 1.–3. laufen (zunächst `--prerelease`); CurseForge-Upload von 0.1.5/0.1.6 klären (Nutzer).
+5. Screenshots auf der CurseForge-Seite hochladen (Nutzer). Alle GitHub-Releases 0.1.0–0.1.6 sind normale Releases.
 
 ## Kennung und geplante Auswahl
 - Jedes erzeugte Makro endet mit der Zeile `#rpmw` (`ns.MARKER`, kostet 6 der 255 Zeichen). Daran erkennt das Add-on eigene Makros im Spiel (`ns.ListEntries`), zeigt sie in der Liste (Reiter „Global“ mit allen Account-Makros, „Dieser Charakter“ nur Charakter-Makros; fremde Makros grau) und überschreibt keine fremden Makros gleichen Namens. Die Kennung nie ändern, sonst werden alte Makros nicht mehr erkannt.

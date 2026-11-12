@@ -6,6 +6,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ## [Unreleased]
 
 ### Added
+- Entry under Options > AddOns: selecting "rp-macro-writer" there opens the macro window (and closes the options), and a button "Fenster öffnen" does the same. Registered like Macro Toolkit does on WoW Forever (`Settings.RegisterCanvasLayoutCategory`), with a fallback to the older `InterfaceOptions_AddCategory`. Not yet verified in game.
 - Macros longer than 255 characters are possible again, with a new approach modelled on Macro Toolkit: when the text is still too long after shortening, it is split at line breaks into parts of at most 255 characters, every part is stored in a secure helper button (`RPMWL<n>`, `RPMWL<n>_2`, …) and the macro in game only holds the lines `/click RPMWL<n> LeftButton 1`. The helper buttons use `RegisterForClicks("AnyDown")` and `pressAndHoldAction = "1"` (as Macro Toolkit does since client 10.0.2) and are restored on login. Up to 1024 characters in total. A single line longer than 255 characters cannot be split. The counter turns blue above 255, the saved list marks such macros with a blue `[+length]`, and clicking one loads the full text again. `/mw long` lists the helper buttons and what they hold. Macros of other addons stay limited to 255 characters.
 - Not yet verified in game: Macro Toolkit itself disables its "Extend" button on WoW Forever and Retail because the client limits the text of such buttons, so this may only work in parts of up to 255 characters, which is how it is built.
 

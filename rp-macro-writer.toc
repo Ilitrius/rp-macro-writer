@@ -27,3 +27,4 @@ Rotations/Evoker.lua
 Core.lua
 UI.lua
 Minimap.lua
+Options.lua
