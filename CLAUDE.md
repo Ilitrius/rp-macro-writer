@@ -14,8 +14,6 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 | `UI.lua` | Fenster, Ablaufliste, Optionen, Vorschau, gespeicherte Kombinationen |
 | `Rotations.lua` | Mechanik der Rotationen (`ns.RegisterRotation`, `ns.PickRotation`, Varianten `retail`/`classic`). Keine WoW-API |
 | `Rotations/<Klasse>.lua` | Je Klasse eine Datei (13): Zauberlisten je Spielversion, Quellen, Begründung, Status, Änderungsverlauf. Wird vom Agenten `rotation-helper` gepflegt |
-| `Inserts.lua` | Daten und reine Textfunktionen zu „Slot einfügen“ (`ns.SLOTS`) und „Spezial einfügen“ (`ns.SPECIALS`, `ns.SpecialLine`, `ns.InsertText`). **Keine WoW-API, auch nicht beim Laden** (wird in den Tests ausgeführt) |
-| `Specials.lua` | Die Slash-Befehle `/rp<Kürzel>` zu „Spezial einfügen“ (Handler mit Schutz je Spielversion); überspringt Befehle, die ein anderes Add-on schon belegt |
 | `Minimap.lua` | Minimap-Symbol (Klick öffnet das Fenster, Ziehen verschiebt es) |
 | `Options.lua` | Eintrag unter Optionen > AddOns (`Settings.RegisterCanvasLayoutCategory`, Rückfall `InterfaceOptions_AddCategory`); ein Klick öffnet das Fenster (`ns.ShowWindow`) |
 | `icon.tga` | Addon-Icon im Spiel, erzeugt von `tools/make-icon.js` (auch `media/icon.png` für CurseForge) |
@@ -60,7 +58,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 
 ## Offen
 Aktueller Stand (0.1.7 ist ein Pre-release, siehe Memory) und Details stehen im Memory (`makrowriter-offene-aufgaben.md`); hier die Kurzfassung (Stand 2026-11-12):
-1. **„Spezial einfügen“ und „Slot einfügen“** sind umgesetzt (2026-11-12: `Inserts.lua`, `Specials.lua`, Abschnitt „Einfügen“ in `UI.lua`), im Spiel ungetestet. Entscheidungen von mir, weil der Nutzer die Fragen nicht beantwortet hat: „Destroy grey items“ ist dabei, mit Rückfrage und nie im Kampf; Präfix `/rp…`. Plan und Hintergründe: `docs/plan-spezial-slot-einfuegen.md`.
+1. **„Spezial einfügen“ und „Slot einfügen“ (aus MacroToolkit)** hat der Nutzer am 2026-11-12 wieder entfernen lassen. Die Umsetzung steht in der Git-Historie (Commit 5d28828, per Revert zurückgenommen) und lässt sich bei Bedarf wiederherstellen; Analyse und Plan bleiben in `docs/plan-spezial-slot-einfuegen.md`. Im Code und in den Aufbau-Tabellen ist davon nichts mehr vorhanden.
 2. Im Spiel prüfen (nur der Nutzer): Klickverlängerung (`/mw long`), Rotationen und Talentbaum-Erkennung in Forever (`/mw rotation`), `[@target]` in Cast-Sequenzen, Optionen-Eintrag.
 3. Rotationen mit dem Dump der Rotationshilfe abgleichen (`rotation-helper`), danach Status `helper-matched`; `game-verified` nur nach Ansage des Nutzers.
 4. Neue Version veröffentlichen, wenn 1.–3. laufen (zunächst `--prerelease`); CurseForge-Upload von 0.1.5/0.1.6 klären (Nutzer).

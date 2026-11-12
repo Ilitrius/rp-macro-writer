@@ -1,6 +1,6 @@
 # Plan: „Spezial einfügen“ und „Slot einfügen“ aus MacroToolkit übernehmen
 
-Stand 2026-11-12. **Umgesetzt am 2026-11-12** (`Inserts.lua`, `Specials.lua`, Abschnitt „Einfügen“ in `UI.lua`, `[Unreleased]` im Changelog), im Spiel ungetestet. Die offenen Fragen unten hat der Nutzer nicht beantwortet; entschieden wurde: „Destroy grey items“ dabei mit Rückfrage (StaticPopup mit Anzahl) und nie im Kampf, Präfix `/rp…`, Befehle anderer Add-ons werden nicht überschrieben. Die Layout-Zahlen weiter unten gelten für den Stand davor. Auftrag des Nutzers (wörtlich): „Übernimmt die Optionen aus Spezial einfügen und Slot einfügen. Stelle die Option optisch im Panel dar. Dies sind alles zusätzliche Optionen.“
+Stand 2026-11-12. **Am selben Tag umgesetzt und auf Wunsch des Nutzers wieder entfernt** (umgesetzt in Commit 5d28828, zurückgenommen per Revert). Dieses Dokument bleibt als Analyse des Vorbilds MacroToolkit erhalten; der Code ist nur in der Git-Historie. Auftrag des Nutzers (wörtlich) war: „Übernimmt die Optionen aus Spezial einfügen und Slot einfügen. Stelle die Option optisch im Panel dar. Dies sind alles zusätzliche Optionen.“
 
 Vorbild: das Add-on MacroToolkit v2.3.53 unter
 `D:\Games\Battle.net\World of Warcraft\_forever_\Interface\AddOns\MacroToolkit` (nur lesen, nichts kopieren oder ändern; eigene Umsetzung in rp-macro-writer, Lizenz des Vorbilds nicht übernehmen).

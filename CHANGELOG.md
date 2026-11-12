@@ -3,15 +3,6 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
-
-### Added
-- New section "Einfügen" (insert) in the options column, taken over from Macro Toolkit: **Slot** inserts the number of an equipment slot (1 to 19, names in the game language) at the cursor, **Spezial** inserts a ready-made line with one of 18 helper commands (clear/disable/enable UI errors, random pet, sound effects on/off, set raid target, exit vehicle, print map coordinates, toggle cloak/helm, eject passenger, sell grey items, destroy grey items, report missing food buff/flask, random favourite mount, print a message). Choosing a command opens a list with a tooltip for every entry; the commands that need a target, marker or channel show a second row for it.
-- The helper commands are the addon's own slash commands `/rp<code>` (for example `/rpce`, `/rprt target 1`), so lines inserted this way only work while rp-macro-writer is loaded. Commands another addon already uses are skipped and reported. Every command checks the game functions it needs and says so when they do not exist in your game version (Forever and Retail differ).
-- "Destroy grey items" always asks for confirmation (with the item count) and never works in combat. "Sell grey items" needs an open vendor.
-- Inserting works on the macro text box: the cursor position is remembered, text is never put behind the `#rpmw` line or above a leading `#showtooltip`, and the text switches to hand-edited mode so that it is not overwritten. Not verified in game yet; whether the cursor position counts characters or bytes is measured in game.
-- The window is 92 pixels taller by default and at least that tall to fit the new section; a saved smaller size is raised to the new minimum.
-
 ## [0.1.7] – 2026-11-12
 
 ### Added

@@ -9,7 +9,7 @@ const L = lauxlib.luaL_newstate();
 lualib.luaL_openlibs(L);
 
 const rotationFiles = fs.readdirSync(path.join(root, 'Rotations')).filter(f => f.endsWith('.lua')).sort().map(f => 'Rotations/' + f);
-for (const file of ['Locales.lua', 'Generator.lua', 'Rotations.lua', ...rotationFiles, 'Core.lua', 'UI.lua', 'Minimap.lua', 'Options.lua', 'Inserts.lua', 'Specials.lua']) {
+for (const file of ['Locales.lua', 'Generator.lua', 'Rotations.lua', ...rotationFiles, 'Core.lua', 'UI.lua', 'Minimap.lua', 'Options.lua']) {
   const src = fs.readFileSync(path.join(root, file));
   const status = lauxlib.luaL_loadbuffer(L, src, src.length, to_luastring('@' + file));
   if (status !== lua.LUA_OK) {
@@ -266,52 +266,12 @@ do
       .. " notip=" .. tostring(okNoTip) .. " err=" .. tostring(okErr) .. " warn=" .. tostring(#wa))
   end
 end
-
-do
-  -- Slot einfuegen / Spezial einfuegen: Daten und reine Textfunktionen
-  local insChunk = assert(load(INS, "@Inserts.lua"))
-  insChunk("rp-macro-writer", ns)
-  local M = ns.MARKER
-  local body = "#showtooltip Verderbnis\\n/cast Verderbnis\\n" .. M
-  local b1 = ns.InsertText(body, 0, "/rpce", true)
-  local ok1 = b1 == "#showtooltip Verderbnis\\n/rpce\\n/cast Verderbnis\\n" .. M
-  local b2 = ns.InsertText(body, #body, "/rpce", true)
-  local ok2 = b2 == "#showtooltip Verderbnis\\n/cast Verderbnis\\n/rpce\\n" .. M
-  local b3, p3 = ns.InsertText("/use X\\n" .. M, 5, "13", false)
-  local ok3 = b3 == "/use 13X\\n" .. M and p3 == 7
-  local b4 = ns.InsertText("/use X\\n" .. M, 999, "13", false)
-  local ok4 = b4 == "/use X13\\n" .. M
-  local b5 = ns.InsertText("/cast Sto\\195\\159\\n" .. M, 10, "!", false)
-  local ok5 = b5 == "/cast Sto!\\195\\159\\n" .. M
-  local ok6 = ns.CharToByte("Sto\\195\\159!", 4) == 5 and ns.ByteToChar("Sto\\195\\159!", 5) == 4 and ns.CharToByte("abc", 99) == 3
-  local ok7 = ns.InsertText("", 0, "/rpce", true) == "/rpce" and ns.InsertText(M, 0, "/rpce", true) == "/rpce\\n" .. M
-  local ok8 = ns.InsertText("/cast A\\n/cast B", 3, "/rpce", true) == "/cast A\\n/rpce\\n/cast B"
-  local codes, okData = {}, #ns.SLOTS == 19 and #ns.SPECIALS == 18
-  for _, s in ipairs(ns.SPECIALS) do
-    if codes[s.code] or not s.name or not s.tip then okData = false end
-    codes[s.code] = true
-  end
-  for i, s in ipairs(ns.SLOTS) do if s[1] ~= i then okData = false end end
-  local okLine = ns.SpecialLine("rt", { target = "focus", marker = 3 }) == "/rprt focus 3"
-    and ns.SpecialLine("nb", { channel = "party" }) == "/rpnb party" and ns.SpecialLine("nb", { channel = "raid" }) == "/rpnb"
-    and ns.SpecialLine("ce") == "/rpce" and ns.SpecialLine("p") == "/rpp Text"
-  local all = ok1 and ok2 and ok3 and ok4 and ok5 and ok6 and ok7 and ok8 and okData and okLine
-  if all then
-    print("OK   Einfuegen (Slot und Spezial)")
-  else
-    fails = fails + 1
-    print("FAIL Einfuegen: " .. table.concat({ tostring(ok1), tostring(ok2), tostring(ok3), tostring(ok4), tostring(ok5),
-      tostring(ok6), tostring(ok7), tostring(ok8), tostring(okData), tostring(okLine) }, " "))
-  end
-end
 return fails
 `;
 lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Generator.lua'), 'utf8')));
 lua.lua_setglobal(L, to_luastring('GEN'));
 lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Rotations.lua'), 'utf8')));
 lua.lua_setglobal(L, to_luastring('ROT'));
-lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Inserts.lua'), 'utf8')));
-lua.lua_setglobal(L, to_luastring('INS'));
 lua.lua_pushstring(L, to_luastring(rotationFiles.map(f => fs.readFileSync(path.join(root, f), 'utf8')).join('\n@@SPLIT@@\n')));
 lua.lua_setglobal(L, to_luastring('ROTFILES'));
 if (lauxlib.luaL_dostring(L, to_luastring(harness)) !== lua.LUA_OK) {

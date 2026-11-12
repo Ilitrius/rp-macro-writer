@@ -10,7 +10,6 @@
 
 Locales.lua
 Generator.lua
-Inserts.lua
 Rotations.lua
 Rotations/Warlock.lua
 Rotations/Mage.lua
@@ -29,4 +28,3 @@ Core.lua
 UI.lua
 Minimap.lua
 Options.lua
-Specials.lua
