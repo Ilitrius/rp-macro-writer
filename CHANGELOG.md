@@ -3,7 +3,7 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.7] – 2026-11-12
 
 ### Added
 - Entry under Options > AddOns: selecting "rp-macro-writer" there opens the macro window (and closes the options), and a button "Fenster öffnen" does the same. Registered like Macro Toolkit does on WoW Forever (`Settings.RegisterCanvasLayoutCategory`), with a fallback to the older `InterfaceOptions_AddCategory`. Not yet verified in game.
