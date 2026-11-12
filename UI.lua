@@ -4,6 +4,8 @@ local L = ns.L
 
 local ROWS, ROW_H = ns.MAX_STEPS, 31
 local BOTTOM = -94 --Versatz des unteren Bereichs (Name, Vorschau, gespeicherte Kombinationen)
+local INSERT_H = 92 -- Platz fuer den Abschnitt "Einfuegen" in der rechten Spalte
+local RBOTTOM = BOTTOM - INSERT_H -- Versatz der gespeicherten Kombinationen (rechte Spalte)
 local SAVED_ROWS, SAVED_H = 6, 22
 local LEFT_X, LEFT_W = 14, 300
 local RIGHT_X, RIGHT_W = 328, 298
@@ -12,7 +14,7 @@ local MOD_LABEL = { [""] = "-", shift = "Shift", ctrl = L["Strg"], alt = "Alt" }
 local MOD_NEXT = { [""] = "shift", shift = "ctrl", ctrl = "alt", alt = "" }
 
 local MIN_W, MAX_W = 640, 1100 -- Fensterbreite
-local MIN_H, MAX_H = 620, 900  -- Fensterhoehe
+local MIN_H, MAX_H = 620 + INSERT_H, 900  -- Fensterhoehe
 
 local ui = { syncs = {}, savedOffset = 0 }
 
@@ -215,18 +217,167 @@ local function CreateSavedRow(parent, i)
 end
 
 -- ---------------------------------------------------------------------------
+-- Auswahlliste (eigene kleine Popup-Liste; keine UIDropDownMenu-Vorlage)
+-- ---------------------------------------------------------------------------
+local PICK_ROW_H = 18
+
+local function GetPicker()
+    if ui.picker then return ui.picker end
+    -- unsichtbarer Faenger hinter der Liste: ein Klick irgendwo sonst schliesst sie
+    local catcher = CreateFrame("Button", nil, UIParent)
+    catcher:SetAllPoints(UIParent)
+    catcher:SetFrameStrata("FULLSCREEN_DIALOG")
+    catcher:SetFrameLevel(1)
+    catcher:Hide()
+
+    local p = CreateFrame("Frame", "RPMacroWriterPicker", UIParent)
+    p:SetFrameStrata("FULLSCREEN_DIALOG")
+    p:SetFrameLevel(10)
+    p:SetClampedToScreen(true)
+    p:EnableMouse(true)
+    p:Hide()
+    local bg = p:CreateTexture(nil, "BACKGROUND")
+    bg:SetAllPoints()
+    bg:SetColorTexture(0.04, 0.04, 0.07, 0.97)
+    local function Edge(p1, p2, horizontal)
+        local e = p:CreateTexture(nil, "BORDER")
+        e:SetColorTexture(1, 0.82, 0, 0.6)
+        e:SetPoint(p1)
+        e:SetPoint(p2)
+        if horizontal then e:SetHeight(1) else e:SetWidth(1) end
+    end
+    Edge("TOPLEFT", "TOPRIGHT", true)
+    Edge("BOTTOMLEFT", "BOTTOMRIGHT", true)
+    Edge("TOPLEFT", "BOTTOMLEFT", false)
+    Edge("TOPRIGHT", "BOTTOMRIGHT", false)
+
+    p.rows = {}
+    catcher:SetScript("OnClick", function() p:Hide() end)
+    p:SetScript("OnShow", function() catcher:Show() end)
+    p:SetScript("OnHide", function() catcher:Hide(); p.anchor = nil end)
+    tinsert(UISpecialFrames, "RPMacroWriterPicker") -- ESC schliesst die Liste
+    ui.picker = p
+    return p
+end
+
+-- items: Liste { text, tip, ... }; onSelect(item) wird beim Klick auf eine Zeile gerufen
+function ui.OpenPicker(anchor, items, onSelect)
+    local p = GetPicker()
+    if p:IsShown() and p.anchor == anchor then p:Hide() return end
+    p.anchor = anchor
+    p.onSelect = onSelect
+    for i, item in ipairs(items) do
+        local row = p.rows[i]
+        if not row then
+            row = CreateFrame("Button", nil, p)
+            row:SetHeight(PICK_ROW_H)
+            row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
+            row.text = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+            row.text:SetPoint("LEFT", row, "LEFT", 6, 0)
+            row.text:SetJustifyH("LEFT")
+            row:SetScript("OnClick", function(self)
+                local callback, chosen = p.onSelect, self.item
+                p:Hide()
+                if callback and chosen then callback(chosen) end
+            end)
+            row:SetScript("OnEnter", function(self)
+                if self.item and self.item.tip then
+                    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                    GameTooltip:SetText(self.item.tip, nil, nil, nil, nil, true)
+                    GameTooltip:Show()
+                end
+            end)
+            row:SetScript("OnLeave", function() GameTooltip:Hide() end)
+            p.rows[i] = row
+        end
+        row.item = item
+        row.text:SetText(item.text)
+        row:ClearAllPoints()
+        row:SetPoint("TOPLEFT", p, "TOPLEFT", 3, -4 - (i - 1) * PICK_ROW_H)
+        row:SetPoint("TOPRIGHT", p, "TOPRIGHT", -3, -4 - (i - 1) * PICK_ROW_H)
+        row:Show()
+    end
+    for i = #items + 1, #p.rows do p.rows[i]:Hide() end
+    p:SetSize(math.max(anchor:GetWidth(), 210), #items * PICK_ROW_H + 8)
+    p:ClearAllPoints()
+    -- unten genug Platz? sonst nach oben aufklappen
+    local scale = anchor:GetEffectiveScale() / UIParent:GetEffectiveScale()
+    if (anchor:GetBottom() or 0) * scale - p:GetHeight() > 0 then
+        p:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -2)
+    else
+        p:SetPoint("BOTTOMLEFT", anchor, "TOPLEFT", 0, 2)
+    end
+    p:Show()
+end
+
+-- ---------------------------------------------------------------------------
+-- Einfuegen in den Makrotext ("Slot einfuegen", "Spezial einfuegen")
+-- ---------------------------------------------------------------------------
+-- Zaehlt der Client die Cursor-Position in Zeichen oder in Bytes? Im Spiel messen statt raten:
+-- ein Umlaut (zwei Bytes, ein Zeichen) wird in ein verstecktes Feld eingefuegt.
+local function CursorUnit()
+    if ui.cursorUnit then return ui.cursorUnit end
+    local unit = "chars"
+    local ok, probe = pcall(CreateFrame, "EditBox", nil, UIParent)
+    if ok and probe then
+        probe:SetFontObject("GameFontHighlightSmall")
+        probe:SetAutoFocus(false)
+        probe:Hide()
+        probe:SetText("")
+        probe:Insert("\195\164")
+        if probe:GetText() == "\195\164" and probe:GetCursorPosition() >= 2 then unit = "bytes" end
+    end
+    ui.cursorUnit = unit
+    return unit
+end
+
+-- Kurzer Text fuer Knoepfe (an Zeichengrenzen gekuerzt)
+local function Short(s, maxChars)
+    if ns.ByteToChar(s, #s) <= maxChars then return s end
+    return s:sub(1, ns.CharToByte(s, maxChars - 1)) .. "..."
+end
+
+function ui.insert(text, asLine)
+    local state = ns.state
+    local edit = ui.preview
+    local base = edit:GetText()
+    local unit = CursorUnit()
+    local bytePos
+    if ui.lastCursor == nil then
+        bytePos = #base
+    elseif unit == "bytes" then
+        bytePos = ui.lastCursor
+    else
+        bytePos = ns.CharToByte(base, ui.lastCursor)
+    end
+    local newBody, newBytePos = ns.InsertText(base, bytePos, text, asLine)
+    local limit = state.foreign and ns.MAX_MACRO_LEN or ns.LONG_MAX
+    if #newBody > limit then
+        ns.Print(L["Kein Platz im Makro (höchstens "] .. limit .. L[" Zeichen)."])
+        return
+    end
+    -- Handmodus: ohne gespeicherten Text wuerde das naechste Neuzeichnen das Eingefuegte wieder ueberschreiben
+    state.manualBody = newBody
+    ns.Refresh()
+    local newPos = (unit == "bytes") and newBytePos or ns.ByteToChar(newBody, newBytePos)
+    edit:SetFocus()
+    edit:SetCursorPosition(newPos)
+    ui.lastCursor = newPos
+end
+
+-- ---------------------------------------------------------------------------
 -- Fenster
 -- ---------------------------------------------------------------------------
 local function CreateUI()
     local f = CreateFrame("Frame", "RPMacroWriterFrame", UIParent, "BasicFrameTemplate")
     ui.frame = f
-    f:SetSize(640, 620)
+    f:SetSize(MIN_W, MIN_H)
     f:SetPoint("CENTER", UIParent, "CENTER", 250, 0)
     -- Position und Groesse aus der letzten Sitzung wiederherstellen
     local w = ns.db and ns.db.window
     if type(w) == "table" and w.point and tonumber(w.x) and tonumber(w.y) then
         f:SetSize(math.min(math.max(tonumber(w.w) or 640, MIN_W), MAX_W),
-                  math.min(math.max(tonumber(w.h) or 620, MIN_H), MAX_H))
+                  math.min(math.max(tonumber(w.h) or MIN_H, MIN_H), MAX_H))
         f:ClearAllPoints()
         f:SetPoint(w.point, UIParent, w.relPoint or w.point, w.x, w.y)
     end
@@ -248,6 +399,7 @@ local function CreateUI()
     end)
     AcceptDrop(f)
     tinsert(UISpecialFrames, "RPMacroWriterFrame") -- ESC schliesst das Fenster
+    f:HookScript("OnHide", function() if ui.picker then ui.picker:Hide() end end)
 
     -- Titel mit Version aus der TOC (## Version)
     local getMeta = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
@@ -288,7 +440,7 @@ local function CreateUI()
 
     -- Rechts: Optionen (Container haengt am rechten Fensterrand, wandert beim Verbreitern mit) --
     local right = CreateFrame("Frame", nil, f)
-    right:SetSize(RIGHT_W, 560)
+    right:SetSize(RIGHT_W, 560 + INSERT_H)
     right:SetPoint("TOPRIGHT", f, "TOPRIGHT", -14, 0)
     local c1, c2, c3 = 0, 110, 210
 
@@ -353,6 +505,86 @@ local function CreateUI()
     Toggle(right, L["Am Ende angreifen"], c1 + 160, -348, "startAttack")
     Toggle(right, L["Fokus anvisieren"], c1, -370, "targetFocus")
     Toggle(right, L["Ziel des Ziels (Rückfall)"], c1 + 160, -370, "targetTarget")
+
+    -- Einfuegen: zusaetzliche Optionen (Slot-Nummer, Spezialzeile) ------------------
+    Label(right, L["Einfügen"], 0, -396)
+    local sel = { target = "target", marker = 1, channel = "raid" }
+    ui.insertSel = sel
+
+    Label(right, L["Slot:"], 0, -421, "GameFontHighlightSmall")
+    local slotPick = TextButton(right, L["Auswählen ..."], 150, 20)
+    slotPick:SetPoint("TOPLEFT", right, "TOPLEFT", 58, -416)
+    local slotAdd = TextButton(right, L["Einfügen"], 82, 20)
+    slotAdd:SetPoint("TOPLEFT", right, "TOPLEFT", 214, -416)
+    SetEnabled(slotAdd, false)
+    slotPick:SetScript("OnClick", function(self)
+        local items = {}
+        for _, e in ipairs(ns.SLOTS) do
+            items[#items + 1] = { text = e[1] .. "  " .. (_G[e[2]] or e[3]) .. (e[4] or ""), value = e[1] }
+        end
+        ui.OpenPicker(self, items, function(item)
+            sel.slot = item.value
+            self:SetText(Short(item.text, 22))
+            SetEnabled(slotAdd, true)
+        end)
+    end)
+    slotAdd:SetScript("OnClick", function()
+        if sel.slot then ui.insert(tostring(sel.slot), false) end
+    end)
+
+    Label(right, L["Spezial:"], 0, -447, "GameFontHighlightSmall")
+    local specPick = TextButton(right, L["Auswählen ..."], 150, 20)
+    specPick:SetPoint("TOPLEFT", right, "TOPLEFT", 58, -442)
+    local specAdd = TextButton(right, L["Einfügen"], 82, 20)
+    specAdd:SetPoint("TOPLEFT", right, "TOPLEFT", 214, -442)
+    SetEnabled(specAdd, false)
+
+    -- Zusatzfelder, nur sichtbar, wenn die gewaehlte Spezialzeile sie braucht
+    local tgtBtn = TextButton(right, "", 130, 20)
+    tgtBtn:SetPoint("TOPLEFT", right, "TOPLEFT", 58, -468)
+    local mkBtn = TextButton(right, "", 100, 20)
+    mkBtn:SetPoint("LEFT", tgtBtn, "RIGHT", 4, 0)
+    local chanBtn = TextButton(right, "", 150, 20)
+    chanBtn:SetPoint("TOPLEFT", right, "TOPLEFT", 58, -468)
+    local TARGETS = { "target", "mouseover", "focus", "player" }
+    local CHANNELS = { "raid", "party", "chat" }
+    local CHANNEL_TEXT = { raid = L["Schlachtzug"], party = L["Gruppe"], chat = L["Chat"] }
+    local function CycleNext(list, value)
+        for i, v in ipairs(list) do
+            if v == value then return list[i % #list + 1] end
+        end
+        return list[1]
+    end
+    local function RefreshParams()
+        local param = sel.special and sel.special.param
+        tgtBtn:SetText(L["Ziel: "] .. sel.target)
+        mkBtn:SetText(L["Marker: "] .. "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_" .. sel.marker .. ":14|t")
+        chanBtn:SetText(L["Melden an: "] .. CHANNEL_TEXT[sel.channel])
+        tgtBtn:SetShown(param == "raidtarget")
+        mkBtn:SetShown(param == "raidtarget")
+        chanBtn:SetShown(param == "channel")
+    end
+    tgtBtn:SetScript("OnClick", function() sel.target = CycleNext(TARGETS, sel.target); RefreshParams() end)
+    mkBtn:SetScript("OnClick", function() sel.marker = sel.marker % 8 + 1; RefreshParams() end)
+    chanBtn:SetScript("OnClick", function() sel.channel = CycleNext(CHANNELS, sel.channel); RefreshParams() end)
+    RefreshParams()
+
+    specPick:SetScript("OnClick", function(self)
+        local items = {}
+        for _, s in ipairs(ns.SPECIALS) do
+            local name = L[s.name]
+            items[#items + 1] = { text = s.danger and ("|cffff6060" .. name .. "|r") or name, tip = L[s.tip], value = s, plain = name }
+        end
+        ui.OpenPicker(self, items, function(item)
+            sel.special = item.value
+            self:SetText((item.value.danger and "|cffff6060" or "") .. Short(item.plain, 22) .. (item.value.danger and "|r" or ""))
+            SetEnabled(specAdd, true)
+            RefreshParams()
+        end)
+    end)
+    specAdd:SetScript("OnClick", function()
+        if sel.special then ui.insert(ns.SpecialLine(sel.special.code, sel), true) end
+    end)
 
     -- Unten links: Name, Vorschau, Knoepfe ------------------------------------
     Label(f, L["Makroname"], LEFT_X, -312 + BOTTOM)
@@ -430,6 +662,7 @@ local function CreateUI()
     edit:SetScript("OnEditFocusGained", function() blink = 0 end)
     edit:SetScript("OnEditFocusLost", function() caret:Hide() end)
     edit:SetScript("OnCursorChanged", function(self, x, y, _, h)
+        ui.lastCursor = self:GetCursorPosition()
         caret:ClearAllPoints()
         caret:SetPoint("TOPLEFT", self, "TOPLEFT", x, y)
         caret:SetHeight(math.max(h or 12, 8))
@@ -519,12 +752,12 @@ local function CreateUI()
     clear:SetScript("OnClick", function() ns.ClearSteps() end)
 
     -- Unten rechts: gespeicherte Kombinationen --------------------------------
-    Label(right, L["Gespeichert"], 0, -312 + BOTTOM)
+    Label(right, L["Gespeichert"], 0, -312 + RBOTTOM)
     -- Reiter: alle globalen Makros / nur Makros dieses Charakters
     ui.tabs = {}
     local function MakeTab(scope, w, x)
         local b = TextButton(right, scope, w, 20)
-        b:SetPoint("TOPLEFT", right, "TOPLEFT", x, -308 + BOTTOM)
+        b:SetPoint("TOPLEFT", right, "TOPLEFT", x, -308 + RBOTTOM)
         b:SetScript("OnClick", function()
             ui.savedOffset = 0
             ns.db.savedTab = scope
@@ -534,7 +767,7 @@ local function CreateUI()
     end
     MakeTab("global", 100, 90)
     MakeTab("char", 104, 194)
-    local saved = Box(right, 0, -334 + BOTTOM, RIGHT_W, SAVED_ROWS * SAVED_H + 6)
+    local saved = Box(right, 0, -334 + RBOTTOM, RIGHT_W, SAVED_ROWS * SAVED_H + 6)
     ui.savedEmpty = saved:CreateFontString(nil, "OVERLAY", "GameFontDisable")
     ui.savedEmpty:SetPoint("CENTER")
     ui.savedEmpty:SetText(L["Keine Makros"])
@@ -545,7 +778,7 @@ local function CreateUI()
         ui.savedOffset = ui.savedOffset - delta
         ns.Refresh()
     end)
-    local hint = Label(right, L["Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage, Klick lädt den Text zum Bearbeiten. Dunkelgrau = fremdes Makro, wird beim Speichern direkt geändert."], 0, -478 + BOTTOM, "GameFontDisableSmall")
+    local hint = Label(right, L["Klick lädt die Kombination, das rote Symbol löscht die Vorlage. Grau = Makro ohne Vorlage, Klick lädt den Text zum Bearbeiten. Dunkelgrau = fremdes Makro, wird beim Speichern direkt geändert."], 0, -478 + RBOTTOM, "GameFontDisableSmall")
     hint:SetWidth(RIGHT_W)
     hint:SetJustifyH("LEFT")
 
