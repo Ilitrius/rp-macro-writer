@@ -57,7 +57,7 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 6. Interface-Nummern in der TOC bei jedem WoW-Patch gegen `TOC_format` im Wiki abgleichen.
 
 ## Offen
-Aktueller Stand und Details stehen im Memory (`makrowriter-offene-aufgaben.md`); hier die Kurzfassung (Stand 2026-11-12):
+Aktueller Stand (0.1.7 ist ein Pre-release, siehe Memory) und Details stehen im Memory (`makrowriter-offene-aufgaben.md`); hier die Kurzfassung (Stand 2026-11-12):
 1. **„Spezial einfügen“ und „Slot einfügen“ aus MacroToolkit übernehmen** (Auftrag des Nutzers, als zusätzliche Optionen im Panel): nur analysiert; Plan, Tabelle der 18 Befehle, API-Fallen und Layout in `docs/plan-spezial-slot-einfuegen.md`. Offene Fragen: „Destroy grey items“ löscht Gegenstände, wie absichern; Befehlspräfix `/rp…`.
 2. Im Spiel prüfen (nur der Nutzer): Klickverlängerung (`/mw long`), Rotationen und Talentbaum-Erkennung in Forever (`/mw rotation`), `[@target]` in Cast-Sequenzen, Optionen-Eintrag.
 3. Rotationen mit dem Dump der Rotationshilfe abgleichen (`rotation-helper`), danach Status `helper-matched`; `game-verified` nur nach Ansage des Nutzers.
