@@ -59,7 +59,8 @@ local function InitDB()
     RPMacroWriterDB = RPMacroWriterDB or {}
     local db = RPMacroWriterDB
     db.saved = db.saved or {}
-    db.long = db.long or {}
+    db.ext = db.ext or {} -- Verlaengerung ueber 255 Zeichen: [Makroname] = { slot, text, parts }
+    db.long = nil         -- Rest des ersten Versuchs vom 2026-11-10
     db.current = db.current or {}
     db.current.name = db.current.name or ""
     if type(db.current.manualBody) ~= "string" then db.current.manualBody = nil end
@@ -224,13 +225,15 @@ function ns.ListEntries(scope)
         local isChar = saved.opts and saved.opts.perChar and true or false
         if isChar == wantChar then
             local m = inGame[name]
-            entries[#entries + 1] = { name = name, hasTemplate = true, inGame = m ~= nil, index = m and m.index }
+            entries[#entries + 1] = { name = name, hasTemplate = true, inGame = m ~= nil, index = m and m.index,
+                long = m and ns.db.ext[name] and #ns.db.ext[name].text or nil }
             seen[name] = true
         end
     end
     for name, m in pairs(inGame) do
         if not seen[name] then
-            entries[#entries + 1] = { name = name, hasTemplate = false, inGame = true, index = m.index, foreign = not m.ours }
+            entries[#entries + 1] = { name = name, hasTemplate = false, inGame = true, index = m.index, foreign = not m.ours,
+                long = m.ours and ns.db.ext[name] and #ns.db.ext[name].text or nil }
         end
     end
     -- Eigene Makros (mit Vorlage oder Kennung) zuerst, fremde danach; jeweils alphabetisch
@@ -251,8 +254,11 @@ function ns.LoadMacro(index, foreign)
     ns.state.name = name
     ns.state.steps = {}
     ns.state.manualBody = body or ""
-    if not foreign and ns.db.long[name] then -- verlaengertes Makro: den vollen Text laden, nicht nur /click
-        ns.state.manualBody = ns.db.long[name] .. "\n" .. ns.MARKER
+    local ext = (not foreign) and ns.db.ext[name]
+    if ext and ext.text and ext.text ~= "" and (body or ""):find("RPMWL" .. ext.slot .. " ", 1, true) then
+        -- verlaengertes Makro: den vollen Text laden (mit der #show-Zeile aus dem Makro), nicht nur die /click-Zeilen
+        local tip = (body or ""):match("^(#show[^\n]*)\n")
+        ns.state.manualBody = (tip and (tip .. "\n") or "") .. ext.text .. "\n" .. ns.MARKER
     end
     ns.state.foreign = foreign and { name = name, index = index } or nil
     ns.state.opts.perChar = index > (MAX_ACCOUNT_MACROS or 120) -- Charakter-Makros haben die hohen Indizes
@@ -391,6 +397,89 @@ function ns.DumpRotation()
 end
 
 -- ---------------------------------------------------------------------------
+-- Verlaengerung ueber 255 Zeichen per /click (Vorbild: MacroToolkit, mainframe.lua CreateSecureActionButton)
+-- Der Text liegt in sicheren Schaltflaechen RPMWL<slot>, RPMWL<slot>_2, ... (je Stueck hoechstens 255 Zeichen);
+-- das Makro im Spiel enthaelt nur die Zeilen "/click RPMWL<slot> LeftButton 1".
+-- ---------------------------------------------------------------------------
+local extButtons = {}
+local extPending = false
+
+local function ExtButtonName(slot, part)
+    return part == 1 and ("RPMWL" .. slot) or ("RPMWL" .. slot .. "_" .. part)
+end
+
+local function ExtButton(frameName)
+    local btn = extButtons[frameName]
+    if not btn then
+        btn = CreateFrame("Button", frameName, nil, "SecureActionButtonTemplate")
+        btn:SetAttribute("type", "macro")
+        btn:SetAttribute("macrotext", "")
+        btn:RegisterForClicks("AnyDown")
+        -- ab Client 10.0.2: erzwingt die Ausfuehrung beim Druecken, unabhaengig von der Einstellung des Spiels
+        btn:SetAttribute("pressAndHoldAction", "1")
+        extButtons[frameName] = btn
+    end
+    return btn
+end
+
+-- Legt den Text einer Verlaengerung auf die Schaltflaechen (Attribute sind im Kampf gesperrt)
+local function ApplyExt(entry)
+    local chunks = ns.SplitChunks(entry.text, ns.MAX_MACRO_LEN) or {}
+    for part = 1, math.max(#chunks, entry.parts or 0) do
+        ExtButton(ExtButtonName(entry.slot, part)):SetAttribute("macrotext", chunks[part] or "")
+    end
+    entry.parts = #chunks
+end
+
+local function ExtSlot(name)
+    local entry = ns.db.ext[name]
+    if entry and entry.slot then return entry.slot end
+    local used = {}
+    for _, e in pairs(ns.db.ext) do used[e.slot] = true end
+    local slot = 1
+    while used[slot] do slot = slot + 1 end
+    return slot
+end
+
+local function ClearExt(name)
+    local entry = ns.db.ext[name]
+    if not entry then return end
+    entry.text = ""
+    ApplyExt(entry) -- leert die Schaltflaechen
+    ns.db.ext[name] = nil
+end
+
+-- Beim Anmelden alle gespeicherten Verlaengerungen wieder auf die Schaltflaechen legen
+function ns.RestoreExt()
+    if InCombatLockdown() then extPending = true; return end
+    for _, entry in pairs(ns.db.ext) do ApplyExt(entry) end
+end
+
+local extRegen = CreateFrame("Frame")
+extRegen:RegisterEvent("PLAYER_REGEN_ENABLED")
+extRegen:SetScript("OnEvent", function()
+    if extPending then extPending = false; ns.RestoreExt() end
+end)
+
+-- /mw long: zeigt, ob die Schaltflaechen da sind und wie viel Text sie halten
+function ns.ExtStatus()
+    local any
+    for name, e in pairs(ns.db.ext) do
+        any = true
+        local chunks = ns.SplitChunks(e.text, ns.MAX_MACRO_LEN) or {}
+        ns.Print(name .. ": " .. #e.text .. L[" Zeichen in "] .. #chunks .. L[" Teil(en)"])
+        for i = 1, #chunks do
+            local frameName = ExtButtonName(e.slot, i)
+            local btn = _G[frameName]
+            local have = btn and btn:GetAttribute("macrotext")
+            ns.Print("  " .. frameName .. (btn and L[" vorhanden"] or L[" FEHLT"]) .. ", type=" .. tostring(btn and btn:GetAttribute("type"))
+                .. ", " .. (have and #have or 0) .. "/" .. #chunks[i])
+        end
+    end
+    if not any then ns.Print(L["Keine verlängerten Makros gespeichert."]) end
+end
+
+-- ---------------------------------------------------------------------------
 -- Makro im Spiel anlegen / aktualisieren
 -- ---------------------------------------------------------------------------
 function ns.WriteMacro()
@@ -445,11 +534,26 @@ function ns.WriteMacro()
     else
         body = ns.BuildMacro(state.steps, state.opts)
     end
+    -- Zu lang fuer ein Makro: Text in Zusatzschaltflaechen auslagern, das Makro ruft sie per /click auf
+    local ext
     if #body > ns.MAX_MACRO_LEN then
-        ns.Print(L["Makro ist zu lang ("] .. #body .. "/" .. ns.MAX_MACRO_LEN .. L[" Zeichen). Bitte Zauber oder Optionen entfernen."])
-        return
+        local slot = ExtSlot(name)
+        local macro, chunks, text = ns.ExtendBody(body, function(i) return ExtButtonName(slot, i) end,
+            (not manual and state.opts.showTooltip and state.steps[1]) and state.steps[1].name or nil)
+        if not macro then
+            if chunks == "long" then
+                ns.Print(L["Makro ist zu lang ("] .. #body .. "/" .. ns.LONG_MAX .. L[" Zeichen). Bitte Zauber oder Optionen entfernen."])
+            elseif chunks == "line" then
+                ns.Print(L["Eine einzelne Zeile ist länger als 255 Zeichen und lässt sich nicht aufteilen. Bitte Zauber oder Optionen entfernen."])
+            else
+                ns.Print(L["Die /click-Zeilen passen nicht in 255 Zeichen. Bitte den Text kürzen."])
+            end
+            return
+        end
+        local old = ns.db.ext[name]
+        ext = { slot = slot, text = text, parts = old and old.parts or 0, count = #chunks }
+        body = macro
     end
-    ns.db.long[name] = nil -- Rest der frueheren /click-Verlaengerung
 
     local index = GetMacroIndexByName(name)
     local ok, err
@@ -474,6 +578,16 @@ function ns.WriteMacro()
     if not ok then
         ns.Print(L["Makro konnte nicht gespeichert werden: "] .. tostring(err))
         return
+    end
+
+    if ext then
+        local count = ext.count
+        ext.count = nil
+        ns.db.ext[name] = ext
+        ApplyExt(ext)
+        ns.Print(L["Der Makrotext ("] .. #ext.text .. L[" Zeichen) läuft über "] .. count .. L[" Zusatzschaltfläche(n) (/click)."])
+    else
+        ClearExt(name) -- wieder kurz genug: Text steht direkt im Makro
     end
 
     state.name = name
@@ -508,6 +622,7 @@ loader:SetScript("OnEvent", function(self, _, addon)
     if addon ~= ADDON then return end
     self:UnregisterEvent("ADDON_LOADED")
     InitDB()
+    ns.RestoreExt()
 end)
 
 SLASH_RPMACROWRITER1 = "/mw"
@@ -515,5 +630,6 @@ SLASH_RPMACROWRITER2 = "/rpmw"
 SLASH_RPMACROWRITER3 = "/macrowriter"
 SlashCmdList["RPMACROWRITER"] = function(msg)
     if msg and msg:lower():match("^%s*rotation") then return ns.DumpRotation() end
+    if msg and msg:lower():match("^%s*long") then return ns.ExtStatus() end
     if ns.Toggle then ns.Toggle() end
 end

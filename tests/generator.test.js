@@ -225,6 +225,47 @@ do
   end
   if okW and okN and okU and allClasses and okFiles then print("OK   Rotationen") else fails = fails + 1; print("FAIL Rotationen") end
 end
+
+do
+  -- Verlaengerung ueber /click: Aufteilen und Klickzeilen
+  local ch = ns.SplitChunks("/cast AAAA\\n/cast BBBB\\n\\n/cast CC", 21)
+  local okSplit = ch and #ch == 2 and ch[1] == "/cast AAAA\\n/cast BBBB" and ch[2] == "/cast CC"
+    and ns.SplitChunks("/cast AAAAAAAAAAAAAAAAAAAAAAAA", 21) == nil
+  local lines = {}
+  for i = 1, 14 do lines[i] = "/cast Ein langer Zaubername Nummer " .. i end
+  local long = "#showtooltip\\n" .. table.concat(lines, "\\n") .. "\\n" .. ns.MARKER
+  local names = function(i) return "RPMWL3" .. (i > 1 and ("_" .. i) or "") end
+  local macro, chunks, text = ns.ExtendBody(long, names, "Verderbnis")
+  local okExt = macro ~= nil and #macro <= ns.MAX_MACRO_LEN
+    and macro:find("^#showtooltip Verderbnis\\n/click RPMWL3 LeftButton 1\\n") ~= nil
+    and macro:find("\\n" .. ns.MARKER .. "$") ~= nil
+    and macro:find("/click RPMWL3_2 LeftButton 1", 1, true) ~= nil
+  for _, c in ipairs(chunks or {}) do if #c > ns.MAX_MACRO_LEN then okExt = false end end
+  okExt = okExt and table.concat(chunks, "\\n") == table.concat(lines, "\\n") and text == table.concat(lines, "\\n")
+  -- #showtooltip mit Zauber bleibt unveraendert; ohne Kopfzeile gibt es keine
+  local m2 = ns.ExtendBody(long:gsub("#showtooltip", "#showtooltip Feuerbrand", 1), names, "Verderbnis")
+  local okTip = m2 and m2:find("^#showtooltip Feuerbrand\\n") ~= nil and not m2:find("Verderbnis", 1, true)
+  local m3 = ns.ExtendBody(table.concat(lines, "\\n") .. "\\n" .. ns.MARKER, names)
+  local okNoTip = m3 and not m3:find("#show", 1, true) and m3:find("^/click RPMWL3 LeftButton 1") ~= nil
+  -- Fehlerfaelle: einzelne Zeile > 255, Text > 1024, zu viele Klickzeilen
+  local _, e1 = ns.ExtendBody("/cast " .. string.rep("A", 300) .. "\\n" .. ns.MARKER, names)
+  local big = {}
+  for i = 1, 40 do big[i] = "/cast Ein langer Zaubername Nummer " .. i end
+  local _, e2 = ns.ExtendBody(table.concat(big, "\\n") .. "\\n" .. ns.MARKER, names)
+  local _, e3 = ns.ExtendBody(table.concat(lines, "\\n") .. "\\n" .. ns.MARKER, function(i) return string.rep("X", 90) .. i end)
+  local okErr = e1 == "line" and e2 == "long" and e3 == "macro"
+  -- Vorschau: ueber 255 nur Hinweis, ueber 1024 Fehler
+  local manyA = {}
+  for i = 1, 10 do manyA[i] = { kind = "spell", name = "Ein ziemlich langer Zaubername " .. i } end
+  local _, wa = ns.BuildMacro(manyA, ns.NewOpts())
+  if okSplit and okExt and okTip and okNoTip and okErr and #wa == 1 and wa[1]:find("255", 1, true) then
+    print("OK   Klickverlaengerung")
+  else
+    fails = fails + 1
+    print("FAIL Klickverlaengerung split=" .. tostring(okSplit) .. " ext=" .. tostring(okExt) .. " tip=" .. tostring(okTip)
+      .. " notip=" .. tostring(okNoTip) .. " err=" .. tostring(okErr) .. " warn=" .. tostring(#wa))
+  end
+end
 return fails
 `;
 lua.lua_pushstring(L, to_luastring(fs.readFileSync(path.join(root, 'Generator.lua'), 'utf8')));

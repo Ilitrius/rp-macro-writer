@@ -13,6 +13,52 @@ ns.MAX_STEPS = 10
 -- (ausser #show/#showtooltip), das Add-on erkennt daran seine eigenen Makros wieder.
 ns.MARKER = "#rpmw"
 
+-- Verlaengerung ueber 255 Zeichen (nach dem Muster von MacroToolkit): der Text liegt in sicheren Schaltflaechen,
+-- das Makro im Spiel enthaelt nur noch /click-Zeilen. Gesamtgrenze wie im Editor von MacroToolkit.
+ns.LONG_MAX = 1024
+
+-- Teilt einen Makrotext an Zeilengrenzen in Stuecke von hoechstens max Bytes.
+-- Liefert nil, wenn eine einzelne Zeile laenger als max ist (laesst sich nicht teilen).
+function ns.SplitChunks(text, max)
+    local chunks, cur = {}, nil
+    for line in (text .. "\n"):gmatch("(.-)\n") do
+        if #line > max then return nil end
+        if line ~= "" then
+            if cur and #cur + 1 + #line <= max then
+                cur = cur .. "\n" .. line
+            else
+                if cur then chunks[#chunks + 1] = cur end
+                cur = line
+            end
+        end
+    end
+    if cur then chunks[#chunks + 1] = cur end
+    return chunks
+end
+
+-- Macht aus einem zu langen Makrotext (mit Kennung am Ende) ein kurzes Makro aus /click-Zeilen.
+--   buttonName(i)  Name der i-ten Schaltflaeche (Teil i des Textes)
+--   tooltipName    Zaubername fuer ein nacktes #showtooltip (sonst bleibt die Zeile, wie sie ist)
+-- Liefert  macroBody, chunks, fullText   oder   nil, fehlerSchluessel ("line" | "long" | "macro")
+function ns.ExtendBody(body, buttonName, tooltipName)
+    local text = body:gsub("\n?" .. ns.MARKER .. "%s*$", "")
+    local tip = text:match("^(#show[^\n]*)\n")
+    if tip then
+        text = text:sub(#tip + 2)
+        if tooltipName and tip:match("^#show%a*%s*$") then tip = tip:gsub("%s+$", "") .. " " .. tooltipName end
+    end
+    if #text > ns.LONG_MAX then return nil, "long" end
+    local chunks = ns.SplitChunks(text, ns.MAX_MACRO_LEN)
+    if not chunks then return nil, "line" end
+    local parts = {}
+    if tip then parts[#parts + 1] = tip end
+    for i = 1, #chunks do parts[#parts + 1] = "/click " .. buttonName(i) .. " LeftButton 1" end
+    parts[#parts + 1] = ns.MARKER
+    local macro = table.concat(parts, "\n")
+    if #macro > ns.MAX_MACRO_LEN then return nil, "macro" end
+    return macro, chunks, text
+end
+
 -- Kuerzt einen Makrotext ohne Wirkungsaenderung: Leerzeichen nach Komma/Semikolon in den
 -- Zauberlisten weglassen (nur Zeilen mit /cast, /castsequence, /castrandom, /use).
 function ns.Compact(body)
@@ -317,8 +363,10 @@ function ns.BuildMacro(steps, opts)
     local body = table.concat(lines, "\n")
     if #body > ns.MAX_MACRO_LEN then body = ns.Compact(body) end -- erst kuerzen, dann erst warnen
     if #body > ns.MAX_MACRO_LEN then body = body:gsub("\n/target ", "\n/tar ") end -- /tar ist die Kurzform von /target
-    if #body > ns.MAX_MACRO_LEN then
-        warnings[#warnings + 1] = L["Makro ist zu lang ("] .. #body .. "/" .. ns.MAX_MACRO_LEN .. L[" Zeichen). Bitte Zauber oder Optionen entfernen."]
+    if #body > ns.LONG_MAX then
+        warnings[#warnings + 1] = L["Makro ist zu lang ("] .. #body .. "/" .. ns.LONG_MAX .. L[" Zeichen). Bitte Zauber oder Optionen entfernen."]
+    elseif #body > ns.MAX_MACRO_LEN then
+        warnings[#warnings + 1] = L["Länger als 255 Zeichen ("] .. #body .. L["): Beim Speichern läuft der Text über Zusatzschaltflächen (/click, bis 1024 Zeichen)."]
     end
     return body, warnings
 end

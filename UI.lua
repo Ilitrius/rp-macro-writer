@@ -614,9 +614,13 @@ function ns.Refresh()
     ui.regen:SetShown(manual ~= nil and not state.foreign)
     if ui.preview:GetText() ~= body then ui.preview:SetText(body) end
     local len = #body
-    ui.counter:SetText(len .. "/" .. ns.MAX_MACRO_LEN)
-    if len > ns.MAX_MACRO_LEN then
+    -- Fremde Makros bleiben bei 255; eigene duerfen ueber die Verlaengerung (/click) bis ns.LONG_MAX
+    local limit = state.foreign and ns.MAX_MACRO_LEN or ns.LONG_MAX
+    ui.counter:SetText(len .. "/" .. ((len > ns.MAX_MACRO_LEN and not state.foreign) and ns.LONG_MAX or ns.MAX_MACRO_LEN))
+    if len > limit then
         ui.counter:SetTextColor(1, 0.2, 0.2)
+    elseif len > ns.MAX_MACRO_LEN then
+        ui.counter:SetTextColor(0.4, 0.8, 1) -- verlaengert
     else
         ui.counter:SetTextColor(1, 1, 1)
     end
@@ -652,6 +656,9 @@ function ns.Refresh()
                 row.text:SetText(entry.name .. L[" |cff40ff40(im Spiel)|r"])
             else
                 row.text:SetText(entry.name)
+            end
+            if entry.long then -- Makro-Verlaengerung (Text laeuft ueber Zusatzschaltflaechen)
+                row.text:SetText(row.text:GetText() .. " |cff66ccff[+" .. entry.long .. "]|r")
             end
             row.delete:SetShown(entry.hasTemplate)
             row:Show()

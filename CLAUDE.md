@@ -65,8 +65,8 @@ Das Repo-Wurzelverzeichnis **ist** das Addon (so erwartet es der CurseForge-Pack
 - Erledigt 2026-11-10: Auswahl in der Liste nach „Global“ und „Dieser Charakter“ (zwei Reiter).
 
 ## Makrolänge
-- Makros müssen in 255 Zeichen passen. Zu lange erzeugte Makros kürzt `ns.Compact` (Leerzeichen in Zauberlisten), danach `/target` → `/tar`.
-- Eine Verlängerung per `/click` auf sichere Zusatzschaltflächen (`macrotext`) lief beim Nutzer auf Forever nicht und wurde am 2026-11-10 auf seinen Wunsch wieder ausgebaut. Nicht erneut einbauen.
+- Ein Makro im Spiel hat höchstens 255 Zeichen. Zu lange erzeugte Makros kürzt zuerst `ns.Compact` (Leerzeichen in Zauberlisten), danach `/target` → `/tar`; reicht das nicht, läuft der Text über die Klickverlängerung (`ns.ExtendBody`, `Core.lua` Abschnitt „Verlängerung“, bis `ns.LONG_MAX` = 1024). Fremde Makros bleiben bei 255.
+- Verlängerung über 255 Zeichen per `/click` auf sichere Zusatzschaltflächen: **ausdrücklich erlaubt und gewünscht** (Nutzer, 2026-11-12: „Ich habe kein Verbot erteilt“). Der erste Versuch am 2026-11-10 lief auf Forever nicht und wurde ausgebaut; das war kein Verbot. Neuer Anlauf nach dem Muster von MacroToolkit (`MacroToolkit.lua`, `mainframe.lua:1102–1115`): Schaltfläche `type = "macro"`, `RegisterForClicks("AnyDown")`, `pressAndHoldAction = "1"`, Aufruf `/click NAME LeftButton 1`, Text in Stücken ≤ 255 Zeichen (der Client begrenzt `macrotext` dort vermutlich auf 255), Gesamtgrenze 1024.
 - Ziel Fokus/Mouseover: nur eine Klammer `[@focus,…]`; zweite Klammer (Rückfall aufs aktuelle Ziel) nur mit Option `fallbackTarget`.
 - Cast-Sequenz: letzte Klammer ist immer `[@target]` (Nutzer, 2026-11-11).
 - „Beste Rotation“ (`ns.BestRotation`): zuerst `C_AssistedCombat.GetRotationSpells`, sonst `Rotations.lua`. Alle Klassen sind abgedeckt (Quelle 1 gilt für alle, Tabelle als Rückfall); Rassen spielen keine Rolle. Die Zauber-IDs der Tabelle sind ungeprüft.
