@@ -3,7 +3,7 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.8] – 2026-11-13
 
 ### Added
 - The rotation dump (what the game's rotation helper returns for your character, see `/mw rotation`) is now also written automatically and silently to the saved variables: a few seconds after login or reload, when your specialization or talents change, and on every click of "Best rotation". The data builds up while you play, so the rotation tables can be checked without anyone typing a command.
