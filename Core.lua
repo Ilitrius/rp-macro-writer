@@ -307,6 +307,7 @@ local function DetectTree()
 end
 
 function ns.BestRotation()
+    pcall(ns.RecordRotation) -- Dump fuer den Abgleich der Rotationstabellen sammeln (still)
     if InCombatLockdown() then
         ns.Print(L["Im Kampf können keine Makros geändert werden."])
         return
@@ -357,7 +358,8 @@ end
 -- /mw rotation: schreibt auf, was die Blizzard-Rotationshilfe fuer diesen Charakter liefert (Klasse, Spielversion,
 -- Level, Zauber mit ID und Name). Der Dump steht im Chat und in RPMacroWriterDB.rotationDump; der Agent
 -- "rotation-helper" liest ihn aus der SavedVariables-Datei und gleicht Rotations/<Klasse>.lua damit ab.
-function ns.DumpRotation()
+-- Zeichnet auf, was die Rotationshilfe fuer diesen Charakter liefert (ohne Chatausgabe) und gibt den Dump zurueck.
+function ns.RecordRotation()
     local _, class = UnitClass("player")
     local flavor = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) and "retail" or "classic"
     local build, _, _, toc = GetBuildInfo()
@@ -381,8 +383,14 @@ function ns.DumpRotation()
     dump.table = {}
     for _, id in ipairs(ids or {}) do dump.table[#dump.table + 1] = id end
     ns.db.rotationDump = ns.db.rotationDump or {}
-    ns.db.rotationDump[class .. ":" .. flavor .. (dump.spec and (":" .. dump.spec) or "")] = dump
+    local variant = dump.spec or (tree and ("tree" .. tree)) -- Retail: Spezialisierung, Forever: Talentbaum
+    ns.db.rotationDump[class .. ":" .. flavor .. (variant and (":" .. variant) or "")] = dump
+    return dump, class, flavor, build, tree, treeSource, ac
+end
 
+-- /mw rotation: zeichnet auf und schreibt das Ergebnis in den Chat
+function ns.DumpRotation()
+    local dump, class, flavor, build, tree, treeSource, ac = ns.RecordRotation()
     ns.Print("Rotationsdump " .. class .. " (" .. flavor .. ", Level " .. dump.level .. ", Build " .. tostring(build) .. ")")
     if not ac or not ac.GetRotationSpells then
         ns.Print("  C_AssistedCombat gibt es in dieser Spielversion nicht.")
@@ -624,6 +632,24 @@ loader:SetScript("OnEvent", function(self, _, addon)
     InitDB()
     ns.RestoreExt()
 end)
+
+-- Rotationsdump automatisch schreiben: nach dem Anmelden und wenn sich Spezialisierung oder Talente aendern.
+-- Verzoegert und zusammengefasst, damit Zauberbuch und Rotationshilfe geladen sind; ohne Chatausgabe.
+local autoDump = CreateFrame("Frame")
+local autoDumpPending = false
+local function AutoDump()
+    autoDumpPending = false
+    if ns.db then pcall(ns.RecordRotation) end
+end
+local function ScheduleAutoDump()
+    if autoDumpPending then return end
+    autoDumpPending = true
+    if C_Timer and C_Timer.After then C_Timer.After(5, AutoDump) else AutoDump() end
+end
+for _, event in ipairs({ "PLAYER_ENTERING_WORLD", "PLAYER_SPECIALIZATION_CHANGED", "ACTIVE_TALENT_GROUP_CHANGED", "PLAYER_TALENT_UPDATE" }) do
+    pcall(autoDump.RegisterEvent, autoDump, event) -- nicht jede Spielversion kennt jedes Ereignis
+end
+autoDump:SetScript("OnEvent", ScheduleAutoDump)
 
 SLASH_RPMACROWRITER1 = "/mw"
 SLASH_RPMACROWRITER2 = "/rpmw"
