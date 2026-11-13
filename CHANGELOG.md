@@ -5,6 +5,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Documentation
+- README: new section "Commands" that explains every command (`/mw`, `/mw rotation`, `/mw long`), the other ways to open the window and the lines the addon puts into its own macros.
+
 ### Removed
 - The option "Automatisch Gegner wählen" (auto-target enemy, `/targetenemy [noharm][dead]`) is gone. Saved combinations that had it load without it.
 
