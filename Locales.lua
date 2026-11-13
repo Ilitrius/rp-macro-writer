@@ -29,7 +29,6 @@ local en = {
     ["Tot"] = "Dead",
     ["Symbol/Tooltip anzeigen"] = "Show icon/tooltip",
     ["Begleiter greift an"] = "Pet attacks",
-    ["Automatisch Gegner wählen"] = "Auto-target enemy",
     ["Nur dieser Charakter"] = "This character only",
     ["Kanalisierte Zauber nicht abbrechen"] = "Do not interrupt channeled spells",
     ["Maus-Ziel als Fokus setzen"] = "Set mouseover as focus",

@@ -340,8 +340,7 @@ local function CreateUI()
     Label(right, "Extras", 0, -266)
     Toggle(right, L["Symbol/Tooltip anzeigen"], c1, -282, "showTooltip")
     Toggle(right, L["Begleiter greift an"], c1 + 160, -282, "petAttack")
-    Toggle(right, L["Automatisch Gegner wählen"], c1, -304, "autoTarget")
-    Toggle(right, L["Nur dieser Charakter"], c1 + 160, -304, "perChar")
+    Toggle(right, L["Nur dieser Charakter"], c1, -304, "perChar")
     Toggle(right, L["Kanalisierte Zauber nicht abbrechen"], c1, -326, "noChannel")
     -- Fokus auf die Einheit unter der Maus (sonst aufs Ziel) setzen; gleich anvisieren, abwaehlbar
     Check(right, L["Maus-Ziel als Fokus setzen"], c1, -348,

@@ -3,6 +3,11 @@
 All notable changes to rp-macro-writer are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Removed
+- The option "Automatisch Gegner wählen" (auto-target enemy, `/targetenemy [noharm][dead]`) is gone. Saved combinations that had it load without it.
+
 ## [0.1.7] – 2026-11-12
 
 ### Added

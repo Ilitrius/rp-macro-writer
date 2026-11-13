@@ -95,7 +95,6 @@ function ns.NewOpts()
         life = "alive",         -- alive (nodead) | dead | any
         showTooltip = true,
         petAttack = false,
-        autoTarget = false,
         noChannel = false,
         focusMouseover = false, -- /focus auf die Einheit unter der Maus setzen (sonst auf das Ziel)
         targetFocus = false,    -- /target focus: den Fokus anvisieren, Zauber gehen aufs Ziel
@@ -288,7 +287,6 @@ function ns.BuildMacro(steps, opts)
     -- Fokus: Einheit unter der Maus, sonst (leere Bedingung) das aktuelle Ziel
     if opts.focusMouseover then lines[#lines + 1] = "/focus " .. MouseoverOnly(opts) .. "[]" end
     if opts.targetFocus then lines[#lines + 1] = "/target focus" end
-    if opts.autoTarget then lines[#lines + 1] = "/targetenemy [noharm][dead]" end
     if opts.petAttack then lines[#lines + 1] = "/petattack" end
 
     local mode = opts.mode

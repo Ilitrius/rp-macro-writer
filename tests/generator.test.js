@@ -101,8 +101,8 @@ case("Vorlage des Nutzers: Ziel des Ziels mit exists, Reset nach 2 Sekunden",
 
 -- Sequenz-Optionen
 case("Sequenz: Sekunden-Reset, Begleiter, Auto-Ziel", dots,
-  { resetSeconds = 6, petAttack = true, autoTarget = true },
-  "#showtooltip\\n/targetenemy [noharm][dead]\\n/petattack\\n/castsequence [harm,nodead][@target] reset=target/combat/6 " .. list)
+  { resetSeconds = 6, petAttack = true },
+  "#showtooltip\\n/petattack\\n/castsequence [harm,nodead][@target] reset=target/combat/6 " .. list)
 case("Sequenz: Mouseover ohne Reset", dots,
   { resetTarget = false, resetCombat = false, target = "mouseover", showTooltip = false, fallbackTarget = true },
   "/castsequence [@mouseover,harm,nodead][harm,nodead][@target] " .. list)
